@@ -122,6 +122,7 @@ function feedbackMessage(params: {
     auth_missing: "没有找到对应的 Supabase Auth 用户。",
     admin_protection: "不能移除当前账号的管理员角色。",
     governance_protection: "必须保留至少一位在职董事长。",
+    high_risk_confirmation: "高危角色变更失败：请输入目标员工姓名确认。",
     invalid_employee: "员工资料格式不正确。",
     invalid_roles: "请至少保留普通员工角色。",
     invalid_auth_user: "Auth User UUID 格式不正确。",
@@ -633,6 +634,20 @@ export async function ConnectedEmployeeManagement({
                                     </label>
                                   ))}
                                 </div>
+                                <label className="mt-3 block rounded-lg border border-[#f0dec5] bg-[#fff9ef] p-3">
+                                  <span className="text-[9px] font-medium text-[#9a6321]">
+                                    高危角色二次确认
+                                  </span>
+                                  <span className="mt-1 block text-[9px] leading-4 text-muted-foreground">
+                                    新增或移除系统管理员、董事长时，请输入“{employee.name}”。
+                                  </span>
+                                  <input
+                                    autoComplete="off"
+                                    className="mt-2 h-8 w-full rounded-lg border border-[#ead8b8] bg-white px-2.5 text-[9px] outline-none focus:border-[#c89a52]"
+                                    name="highRiskConfirmation"
+                                    placeholder={`输入 ${employee.name} 确认`}
+                                  />
+                                </label>
                                 <button
                                   className="mt-3 h-8 w-full rounded-lg border border-primary/20 bg-white text-[9px] font-medium text-primary"
                                   type="submit"

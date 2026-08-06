@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { FileClock, LockKeyhole, ScrollText, ShieldCheck } from "lucide-react";
 import { WorkflowShell } from "@/features/approvals/workflow-shell";
 import { requireCurrentEmployee } from "@/features/auth/current-employee";
@@ -35,6 +36,17 @@ const actionLabels: Record<string, string> = {
   rejected: "驳回",
   withdrawn: "撤回",
   resubmitted: "重新提交",
+  employee_roles_updated: "角色变更",
+  permission_template_published: "权限模板发布",
+};
+
+const roleLabels: Record<string, string> = {
+  employee: "普通员工",
+  department_lead: "部门负责人",
+  hr: "人事行政",
+  finance: "财务",
+  admin: "系统管理员",
+  chairman: "董事长",
 };
 
 function actorName(row: AuditRow) {
@@ -55,18 +67,40 @@ function formatDateTime(value: string) {
   }).format(new Date(value));
 }
 
-export default async function AuditPage() {
+function roleList(value: unknown) {
+  return Array.isArray(value)
+    ? value.map((role) => roleLabels[String(role)] ?? String(role)).join("、")
+    : "—";
+}
+
+export default async function AuditPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string }>;
+}) {
   const employee = await requireCurrentEmployee();
   const canView = employee.roleCodes.includes("admin");
+  const params = await searchParams;
+  const category = params.category === "roles" ? "roles" : "all";
   const supabase = await createClient();
+  let query = supabase
+    .from("audit_logs")
+    .select(
+      "id, action, entity_type, entity_id, summary, metadata, created_at, actor:employees!audit_logs_actor_employee_id_fkey(name, employee_no)",
+    )
+    .order("created_at", { ascending: false })
+    .limit(100);
+
+  if (category === "roles") {
+    query = query.in("action", [
+      "employee_roles_updated",
+      "highest_admin_roles_granted",
+      "permission_template_published",
+    ]);
+  }
+
   const { data, error } = canView
-    ? await supabase
-        .from("audit_logs")
-        .select(
-          "id, action, entity_type, entity_id, summary, metadata, created_at, actor:employees!audit_logs_actor_employee_id_fkey(name, employee_no)",
-        )
-        .order("created_at", { ascending: false })
-        .limit(100)
+    ? await query
     : { data: [], error: null };
 
   const logs = (data ?? []) as AuditRow[];
@@ -161,11 +195,31 @@ export default async function AuditPage() {
             )}
 
             <section className="mt-5 overflow-hidden rounded-[22px] border border-border/80 bg-white">
-              <div className="border-b border-border/80 px-5 py-5 sm:px-6">
-                <h2 className="text-base font-semibold">审批操作记录</h2>
-                <p className="mt-1 text-[10px] text-muted-foreground">
-                  不记录请假事由、报销说明等敏感正文
-                </p>
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/80 px-5 py-5 sm:px-6">
+                <div>
+                  <h2 className="text-base font-semibold">
+                    {category === "roles"
+                      ? "角色与权限变更"
+                      : "关键操作记录"}
+                  </h2>
+                  <p className="mt-1 text-[10px] text-muted-foreground">
+                    审计记录只读，不记录业务敏感正文
+                  </p>
+                </div>
+                <div className="flex rounded-xl bg-[#f3f7fa] p-1 text-[10px]">
+                  <Link
+                    className={`rounded-lg px-3 py-1.5 ${category === "all" ? "bg-white font-medium text-primary shadow-sm" : "text-muted-foreground"}`}
+                    href="/audit"
+                  >
+                    全部
+                  </Link>
+                  <Link
+                    className={`rounded-lg px-3 py-1.5 ${category === "roles" ? "bg-white font-medium text-primary shadow-sm" : "text-muted-foreground"}`}
+                    href="/audit?category=roles"
+                  >
+                    角色权限
+                  </Link>
+                </div>
               </div>
               {logs.length === 0 ? (
                 <div className="py-12 text-center text-xs text-muted-foreground">
@@ -196,13 +250,31 @@ export default async function AuditPage() {
                             {actionLabels[log.action] ?? log.action}
                           </td>
                           <td className="px-5 py-4 text-muted-foreground">
-                            {log.entity_type === "leave_request"
-                              ? "请假申请"
-                              : "通用审批"}
+                            {log.action === "employee_roles_updated"
+                              ? `员工角色 · ${String(log.metadata.target_name ?? "未知员工")}`
+                              : log.action === "permission_template_published"
+                                ? "权限模板"
+                                : log.entity_type === "leave_request"
+                                  ? "请假申请"
+                                  : "通用审批"}
                           </td>
                           <td className="px-5 py-4 text-[10px] text-muted-foreground">
-                            {String(log.metadata.previous_status ?? "—")} →{" "}
-                            {String(log.metadata.next_status ?? "—")}
+                            {log.action === "employee_roles_updated" ? (
+                              <>
+                                {roleList(log.metadata.before)} →{" "}
+                                {roleList(log.metadata.after)}
+                                {log.metadata.high_risk === true && (
+                                  <span className="ml-2 rounded-full bg-[#fff4e7] px-2 py-0.5 text-[#9a6321]">
+                                    高危
+                                  </span>
+                                )}
+                              </>
+                            ) : (
+                              <>
+                                {String(log.metadata.previous_status ?? "—")} →{" "}
+                                {String(log.metadata.next_status ?? "—")}
+                              </>
+                            )}
                           </td>
                         </tr>
                       ))}

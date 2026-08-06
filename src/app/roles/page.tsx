@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import {
   EyeOff,
+  History,
   KeyRound,
   LockKeyhole,
   ShieldCheck,
@@ -17,6 +18,7 @@ import {
   type PermissionCell,
   type PermissionLevel,
 } from "@/features/permissions/role-permission-matrix";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "角色与权限",
@@ -33,6 +35,22 @@ const permissionTone: Record<PermissionLevel, string> = {
   configure: "border-[#c8d9d4] bg-[#eef4f8] text-[#285f53]",
   none: "border-[#ead8d8] bg-[#f8eeee] text-[#965151]",
 };
+
+type TemplateVersion = {
+  id: string;
+  template_key: string;
+  version: number;
+  change_note: string;
+  created_at: string;
+  creator: { name: string } | Array<{ name: string }> | null;
+};
+
+function creatorName(version: TemplateVersion) {
+  const creator = Array.isArray(version.creator)
+    ? version.creator[0]
+    : version.creator;
+  return creator?.name ?? "系统迁移";
+}
 
 function PermissionPill({ permission }: { permission: PermissionCell }) {
   return (
@@ -100,6 +118,18 @@ export default async function RolesPage() {
       ? "最高权限管理员"
       : "系统管理员"
     : "董事长";
+  const supabase = await createClient();
+  const { data: versionData } = canView
+    ? await supabase
+        .from("permission_template_versions")
+        .select(
+          "id, template_key, version, change_note, created_at, creator:employees!permission_template_versions_created_by_employee_id_fkey(name)",
+        )
+        .eq("template_key", "core_rbac")
+        .order("version", { ascending: false })
+        .limit(5)
+    : { data: [] };
+  const templateVersions = (versionData ?? []) as TemplateVersion[];
 
   return (
     <WorkflowShell
@@ -112,7 +142,7 @@ export default async function RolesPage() {
           <ShieldCheck className="pointer-events-none absolute right-12 top-1/2 hidden size-40 -translate-y-1/2 text-white/[0.055] sm:block" />
           <div className="relative max-w-3xl">
             <div className="text-xs font-medium tracking-[0.12em] text-[#79d8d5]">
-              ACCESS CONTROL · V1.0
+              ACCESS CONTROL · V2.0
             </div>
             <h1 className="mt-3 text-2xl font-semibold tracking-[-0.035em] sm:text-[30px]">
               角色与权限矩阵
@@ -201,9 +231,55 @@ export default async function RolesPage() {
               <MatrixTable rows={sensitiveFieldRows} />
             </section>
 
+            <section className="mt-5 rounded-[22px] border border-border/80 bg-white p-5 sm:p-6">
+              <div className="flex items-center gap-2">
+                <History className="size-4 text-primary" />
+                <h2 className="text-base font-semibold">权限模板版本</h2>
+              </div>
+              <p className="mt-2 text-[11px] text-muted-foreground">
+                每次权限模型发布都会保留组织级快照，便于审计和回溯。
+              </p>
+              {templateVersions.length === 0 ? (
+                <div className="mt-5 rounded-xl bg-[#f8fafb] px-4 py-6 text-center text-xs text-muted-foreground">
+                  暂无权限模板版本
+                </div>
+              ) : (
+                <div className="mt-5 overflow-hidden rounded-xl border border-border/80">
+                  {templateVersions.map((version, index) => (
+                    <div
+                      className="flex flex-wrap items-center gap-3 border-b border-border/70 px-4 py-3 last:border-b-0"
+                      key={version.id}
+                    >
+                      <span className="rounded-lg bg-[#eaf3f8] px-2.5 py-1 text-[10px] font-semibold text-primary">
+                        v{version.version}
+                      </span>
+                      <div className="min-w-[200px] flex-1">
+                        <div className="text-xs font-medium">
+                          {version.change_note}
+                        </div>
+                        <div className="mt-1 text-[9px] text-muted-foreground">
+                          {creatorName(version)} · {new Intl.DateTimeFormat("zh-CN", {
+                            timeZone: "Asia/Shanghai",
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                          }).format(new Date(version.created_at))}
+                        </div>
+                      </div>
+                      {index === 0 && (
+                        <span className="rounded-full bg-[#eef8f5] px-2.5 py-1 text-[9px] text-[#285f53]">
+                          当前版本
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+
             <section className="mt-5 rounded-[20px] border border-[#b9dbce] bg-[#eef8f5] p-5 text-xs leading-6 text-[#285f53]">
               当前状态：账号角色绑定、服务端授权函数和数据库 RLS
-              已接入；后续继续建设原子权限目录、临时授权和高风险变更复核。
+              已接入；高风险角色二次确认、模板版本和角色审计已启用。
             </section>
           </>
         )}

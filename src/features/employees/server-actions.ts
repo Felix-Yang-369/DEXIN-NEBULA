@@ -40,6 +40,7 @@ function errorCode(message?: string) {
   if (message?.includes("Auth 用户不存在")) return "auth_missing";
   if (message?.includes("管理员角色")) return "admin_protection";
   if (message?.includes("最后一位董事长")) return "governance_protection";
+  if (message?.includes("高危角色变更")) return "high_risk_confirmation";
   if (message?.includes("只有人事或管理员")) return "forbidden";
   if (message?.includes("员工异动参数")) return "invalid_employee_change";
   if (message?.includes("假期账户参数")) return "invalid_leave_balance";
@@ -105,6 +106,10 @@ const rolesSchema = z.object({
       ]),
     )
     .min(1),
+  highRiskConfirmation: z.preprocess(
+    (value) => (typeof value === "string" ? value : ""),
+    z.string().trim().max(50),
+  ),
 });
 
 export async function saveEmployeeRolesAction(formData: FormData) {
@@ -113,6 +118,7 @@ export async function saveEmployeeRolesAction(formData: FormData) {
   const parsed = rolesSchema.safeParse({
     employeeId: formData.get("employeeId"),
     roleCodes: formData.getAll("roleCodes"),
+    highRiskConfirmation: formData.get("highRiskConfirmation"),
   });
 
   if (!parsed.success) {
@@ -123,6 +129,7 @@ export async function saveEmployeeRolesAction(formData: FormData) {
   const { error } = await supabase.rpc("set_employee_roles", {
     p_employee_id: parsed.data.employeeId,
     p_role_codes: parsed.data.roleCodes,
+    p_high_risk_confirmation: parsed.data.highRiskConfirmation,
   });
 
   if (error) {
