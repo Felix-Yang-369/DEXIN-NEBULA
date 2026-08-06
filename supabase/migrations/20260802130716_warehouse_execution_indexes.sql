@@ -1,0 +1,15 @@
+create index if not exists delivery_records_created_by_employee_idx on public.delivery_records(created_by_employee_id);
+create index if not exists inventory_outbound_items_inventory_item_idx on public.inventory_outbound_items(inventory_item_id);
+create index if not exists inventory_outbound_items_organization_idx on public.inventory_outbound_items(organization_id);
+create index if not exists inventory_outbound_orders_created_by_employee_idx on public.inventory_outbound_orders(created_by_employee_id);
+create index if not exists inventory_outbound_orders_warehouse_idx on public.inventory_outbound_orders(warehouse_id);
+create index if not exists inventory_stocktake_items_inventory_item_idx on public.inventory_stocktake_items(inventory_item_id);
+create index if not exists inventory_stocktake_items_movement_idx on public.inventory_stocktake_items(movement_id);
+create index if not exists inventory_stocktake_items_organization_idx on public.inventory_stocktake_items(organization_id);
+create index if not exists inventory_stocktakes_created_by_employee_idx on public.inventory_stocktakes(created_by_employee_id);
+create index if not exists inventory_stocktakes_warehouse_idx on public.inventory_stocktakes(warehouse_id);
+create index if not exists inventory_transfers_created_by_employee_idx on public.inventory_transfers(created_by_employee_id);
+create index if not exists inventory_transfers_destination_item_idx on public.inventory_transfers(destination_inventory_item_id);
+create index if not exists inventory_transfers_destination_warehouse_idx on public.inventory_transfers(destination_warehouse_id);
+create index if not exists inventory_transfers_source_item_idx on public.inventory_transfers(source_inventory_item_id);
+create index if not exists inventory_transfers_source_warehouse_idx on public.inventory_transfers(source_warehouse_id);

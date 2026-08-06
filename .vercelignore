@@ -1,0 +1,10 @@
+node_modules
+.next
+.next-dev.nosync
+.next-build.nosync
+.codex_tmp
+.DS_Store
+*.dataless-backup-*
+*.tsbuildinfo
+/supabase
+tests

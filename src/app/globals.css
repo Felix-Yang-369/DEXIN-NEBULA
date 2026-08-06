@@ -1,0 +1,235 @@
+@import "tailwindcss" source(none);
+@source "../";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  --font-geist-sans:
+    -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei",
+    "Helvetica Neue", Arial, sans-serif;
+  --font-geist-mono:
+    "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  --background: #f5f8fb;
+  --foreground: #172b3f;
+  --card: #ffffff;
+  --card-foreground: #172b3f;
+  --popover: #ffffff;
+  --popover-foreground: #172b3f;
+  --primary: #0d6475;
+  --primary-foreground: #ffffff;
+  --secondary: #eaf2f7;
+  --secondary-foreground: #173a58;
+  --muted: #eef3f7;
+  --muted-foreground: #687b8d;
+  --accent: #dff5f4;
+  --accent-foreground: #0c5461;
+  --destructive: #d65d67;
+  --border: #dce6ed;
+  --input: #cbd9e3;
+  --ring: #19aeb2;
+  --chart-1: #0d6475;
+  --chart-2: #18afb3;
+  --chart-3: #e1a72d;
+  --chart-4: #397fc0;
+  --chart-5: #d8646e;
+  --radius: 0.75rem;
+  --sidebar: #0a2340;
+  --sidebar-foreground: #eaf5fa;
+  --sidebar-primary: #18afb3;
+  --sidebar-primary-foreground: #071d34;
+  --sidebar-accent: #123a5c;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: #51d4d2;
+  --brand-shadow: rgba(9, 57, 91, 0.42);
+  --nebula-navy-950: #06182c;
+  --nebula-navy-900: #0a2340;
+  --nebula-navy-800: #123a5c;
+  --nebula-navy-700: #1a4b70;
+  --nebula-teal-700: #0d7580;
+  --nebula-teal-500: #18afb3;
+  --nebula-teal-300: #6bd7d4;
+  --nebula-teal-100: #dff5f4;
+  --nebula-gold-500: #e1a72d;
+  --nebula-gold-100: #fff4d7;
+  --nebula-surface: #f5f8fb;
+  --nebula-surface-raised: #ffffff;
+  --nebula-ink: #172b3f;
+  --nebula-muted: #687b8d;
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply min-h-svh bg-background text-foreground;
+    font-family:
+      var(--font-geist-sans), "PingFang SC", "Microsoft YaHei", system-ui,
+      sans-serif;
+  }
+  html {
+    @apply font-sans;
+  }
+
+  button,
+  a,
+  input {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer utilities {
+  .nebula-panel {
+    background:
+      radial-gradient(circle at 20% 12%, rgba(24, 175, 179, 0.26), transparent 30%),
+      radial-gradient(circle at 86% 74%, rgba(47, 112, 166, 0.24), transparent 34%),
+      linear-gradient(145deg, #0a2b4b 0%, #0a2340 52%, #06182c 100%);
+  }
+
+  .nebula-grid {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.055) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: linear-gradient(to bottom, black, transparent 92%);
+  }
+
+  .nebula-orb {
+    position: absolute;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    pointer-events: none;
+  }
+
+  .nebula-orb::before {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: #6bd7d4;
+    box-shadow: 0 0 24px rgba(107, 215, 212, 0.8);
+    content: "";
+  }
+
+  .nebula-orb-one {
+    right: -220px;
+    top: 8%;
+    width: 560px;
+    height: 560px;
+    transform: rotate(-18deg);
+  }
+
+  .nebula-orb-one::before {
+    left: 51px;
+    top: 96px;
+  }
+
+  .nebula-orb-two {
+    bottom: -310px;
+    left: 18%;
+    width: 640px;
+    height: 640px;
+    opacity: 0.7;
+  }
+
+  .nebula-orb-two::before {
+    right: 87px;
+    top: 82px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .nebula-orb-one {
+    animation: nebula-drift 14s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes nebula-drift {
+  from {
+    transform: rotate(-18deg) translate3d(0, 0, 0);
+  }
+  to {
+    transform: rotate(-14deg) translate3d(-10px, 12px, 0);
+  }
+}
