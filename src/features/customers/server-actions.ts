@@ -16,12 +16,8 @@ function customerRedirect(params: Record<string, string>): never {
 async function requireCustomerManager() {
   const employee = await requireCurrentEmployee();
 
-  if (employee.roleCodes.includes("admin")) {
-    return employee;
-  }
-
   if (!employee.departmentId) {
-    customerRedirect({ error: "只有销售、客服或系统管理员可以执行此操作" });
+    customerRedirect({ error: "只有销售或客服人员可以执行此操作" });
   }
 
   const supabase = await createClient();
@@ -32,7 +28,7 @@ async function requireCustomerManager() {
     .maybeSingle();
 
   if (!["DX-SALES", "DX-CS"].includes(department?.code ?? "")) {
-    customerRedirect({ error: "只有销售、客服或系统管理员可以执行此操作" });
+    customerRedirect({ error: "只有销售或客服人员可以执行此操作" });
   }
 
   return employee;
@@ -41,15 +37,12 @@ async function requireCustomerManager() {
 async function requireLegalEntityManager() {
   const employee = await requireCurrentEmployee();
 
-  if (
-    employee.roleCodes.includes("admin") ||
-    employee.roleCodes.includes("finance")
-  ) {
+  if (employee.roleCodes.includes("finance")) {
     return employee;
   }
 
   if (!employee.departmentId) {
-    customerRedirect({ error: "只有销售、客服、财务或系统管理员可以维护法律实体" });
+    customerRedirect({ error: "只有销售、客服或财务人员可以维护法律实体" });
   }
 
   const supabase = await createClient();
@@ -60,7 +53,7 @@ async function requireLegalEntityManager() {
     .maybeSingle();
 
   if (!["DX-SALES", "DX-CS"].includes(department?.code ?? "")) {
-    customerRedirect({ error: "只有销售、客服、财务或系统管理员可以维护法律实体" });
+    customerRedirect({ error: "只有销售、客服或财务人员可以维护法律实体" });
   }
 
   return employee;

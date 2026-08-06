@@ -120,7 +120,7 @@ export default async function AttendancePage() {
   const currentYear = Number(currentDate.slice(0, 4));
   const month = monthRange(currentDate);
   const canViewTeam = currentEmployee.roleCodes.some((role) =>
-    ["hr", "admin", "chairman", "department_lead"].includes(role),
+    ["hr", "chairman", "department_lead"].includes(role),
   );
 
   const [leaveResult, balanceResult, usageResult] = await Promise.all([

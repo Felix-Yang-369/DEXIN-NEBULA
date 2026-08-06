@@ -215,7 +215,6 @@ export default async function CustomerDetailPage({
   const legalEntities = (legalEntityResult.data ?? []) as LegalEntity[];
   const owner = relatedOne(customer.employees);
   const canManage =
-    employee.roleCodes.includes("admin") ||
     ["DX-SALES", "DX-CS"].includes(departmentResult.data?.code ?? "");
   const canManageEntities =
     canManage || employee.roleCodes.includes("finance");

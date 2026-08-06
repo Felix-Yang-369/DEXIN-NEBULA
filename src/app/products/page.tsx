@@ -310,7 +310,6 @@ export default async function ProductsPage({
     : undefined;
   const canManage =
     !employee ||
-    employee.roleCodes.includes("admin") ||
     departmentCode === "DX-PROC";
   const hasChannelPricing = prices.some((price) =>
     ["group", "dropship", "procurement"].includes(price.price_type),

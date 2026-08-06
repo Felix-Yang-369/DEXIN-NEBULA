@@ -14,7 +14,7 @@ function label(value:string){return ({issued:"销项",received:"进项",recorded
 
 export default async function InvoicePage({searchParams}:{searchParams:Promise<{created?:string;error?:string}>}){
   const employee=await requireCurrentEmployee();const feedback=await searchParams;const supabase=await createClient();
-  const canWrite=employee.roleCodes.some(code=>["finance","admin"].includes(code));
+  const canWrite = employee.roleCodes.includes("finance");
   const [invoiceResult,documentResult]=await Promise.all([
     supabase.from("finance_invoices").select("id,invoice_record_no,direction,invoice_type,counterparty_name,invoice_code,invoice_no,issued_on,amount_excluding_tax,tax_amount,total_amount,status,verification_note,created_at").order("issued_on",{ascending:false}).limit(120),
     supabase.from("finance_documents").select("id,document_no,document_type,counterparty_name,total_amount,status,invoice_no").neq("status","void").order("issue_date",{ascending:false}).limit(240),

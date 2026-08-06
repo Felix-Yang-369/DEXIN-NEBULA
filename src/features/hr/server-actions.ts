@@ -17,7 +17,7 @@ function hrOrganizationRedirect(params: Record<string, string>): never {
 
 export async function saveJobLevelAction(formData: FormData) {
   const employee = await requireCurrentEmployee();
-  if (!employee.roleCodes.some((role) => ["hr", "admin"].includes(role))) {
+  if (!employee.roleCodes.includes("hr")) {
     hrOrganizationRedirect({ error: "forbidden" });
   }
 
@@ -57,7 +57,7 @@ export async function saveJobLevelAction(formData: FormData) {
 
 export async function savePositionAction(formData: FormData) {
   const employee = await requireCurrentEmployee();
-  if (!employee.roleCodes.some((role) => ["hr", "admin"].includes(role))) {
+  if (!employee.roleCodes.includes("hr")) {
     hrOrganizationRedirect({ error: "forbidden" });
   }
 

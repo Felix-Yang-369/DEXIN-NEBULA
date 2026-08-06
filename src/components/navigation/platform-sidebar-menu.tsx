@@ -3,19 +3,23 @@ import { ChevronDown } from "lucide-react";
 import { SidebarIcon } from "@/components/icons/sidebar-icons";
 import {
   isPlatformItemActive,
-  platformNavigationGroups,
+  navigationGroupsForRoles,
 } from "@/config/platform-navigation";
+import { getCurrentEmployee } from "@/features/auth/current-employee";
 
-export function PlatformSidebarMenu({
+export async function PlatformSidebarMenu({
   activeItem,
   breadcrumb,
 }: {
   activeItem: string;
   breadcrumb: string;
 }) {
+  const employee = await getCurrentEmployee();
+  const navigationGroups = navigationGroupsForRoles(employee?.roleCodes ?? []);
+
   return (
     <nav className="mt-7 min-h-0 flex-1 overflow-y-auto pb-5">
-      {platformNavigationGroups.map((group) => (
+      {navigationGroups.map((group) => (
         <div className="mb-4" key={group.label}>
           <div className="mb-1.5 flex items-center justify-between px-3 text-[9px] font-semibold tracking-[0.16em] text-[#79b9c7]/42">
             <span>{group.label}</span>

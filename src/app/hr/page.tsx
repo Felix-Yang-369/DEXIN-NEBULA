@@ -150,7 +150,7 @@ function monthStart() {
 export default async function HrPage() {
   const currentEmployee = await requireCurrentEmployee();
   const canViewManagement = currentEmployee.roleCodes.some((role) =>
-    ["hr", "admin", "chairman"].includes(role),
+    ["hr", "chairman"].includes(role),
   );
   const supabase = await createClient();
 

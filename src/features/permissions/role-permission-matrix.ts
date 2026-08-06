@@ -1,17 +1,8 @@
 export type RoleId =
-  | "employee"
-  | "department_lead"
-  | "hr"
-  | "finance"
-  | "admin";
+  "employee" | "department_lead" | "chairman" | "hr" | "finance" | "admin";
 
 export type PermissionLevel =
-  | "full"
-  | "department"
-  | "self"
-  | "limited"
-  | "configure"
-  | "none";
+  "full" | "department" | "self" | "limited" | "configure" | "none";
 
 export type PermissionCell = {
   level: PermissionLevel;
@@ -52,6 +43,15 @@ export const roles: Array<{
     mark: "负",
   },
   {
+    id: "chairman",
+    name: "董事长",
+    code: "CHAIRMAN",
+    summary: "查看全公司经营数据并处理明确分配的高风险审批。",
+    dataScope: "全公司只读",
+    accent: "bg-[#eef4f8] text-[#285f53]",
+    mark: "董",
+  },
+  {
     id: "hr",
     name: "人事行政",
     code: "HR_ADMIN",
@@ -87,6 +87,7 @@ export const pagePermissionRows: PermissionRow[] = [
     permissions: {
       employee: { level: "self", label: "本人" },
       department_lead: { level: "department", label: "本部门" },
+      chairman: { level: "full", label: "经营全局" },
       hr: { level: "limited", label: "人事视图" },
       finance: { level: "limited", label: "财务视图" },
       admin: { level: "configure", label: "系统视图" },
@@ -98,6 +99,7 @@ export const pagePermissionRows: PermissionRow[] = [
     permissions: {
       employee: { level: "limited", label: "公开内容" },
       department_lead: { level: "department", label: "部门内容" },
+      chairman: { level: "full", label: "全公司" },
       hr: { level: "full", label: "发布管理" },
       finance: { level: "limited", label: "公开内容" },
       admin: { level: "configure", label: "栏目配置" },
@@ -109,6 +111,7 @@ export const pagePermissionRows: PermissionRow[] = [
     permissions: {
       employee: { level: "self", label: "本人周报" },
       department_lead: { level: "department", label: "直属团队" },
+      chairman: { level: "full", label: "全公司已提交" },
       hr: { level: "full", label: "全公司已提交" },
       finance: { level: "self", label: "本人周报" },
       admin: { level: "configure", label: "全公司已提交" },
@@ -120,6 +123,7 @@ export const pagePermissionRows: PermissionRow[] = [
     permissions: {
       employee: { level: "self", label: "本人申请" },
       department_lead: { level: "department", label: "部门审批" },
+      chairman: { level: "limited", label: "分配审批" },
       hr: { level: "limited", label: "人事流程" },
       finance: { level: "limited", label: "财务流程" },
       admin: { level: "configure", label: "流程配置" },
@@ -131,6 +135,7 @@ export const pagePermissionRows: PermissionRow[] = [
     permissions: {
       employee: { level: "limited", label: "基础信息" },
       department_lead: { level: "department", label: "本部门" },
+      chairman: { level: "full", label: "全公司摘要" },
       hr: { level: "full", label: "全公司" },
       finance: { level: "limited", label: "基础信息" },
       admin: { level: "configure", label: "组织配置" },
@@ -142,6 +147,7 @@ export const pagePermissionRows: PermissionRow[] = [
     permissions: {
       employee: { level: "self", label: "本人档案" },
       department_lead: { level: "department", label: "部门摘要" },
+      chairman: { level: "limited", label: "管理摘要" },
       hr: { level: "full", label: "全公司" },
       finance: { level: "limited", label: "必要字段" },
       admin: { level: "limited", label: "账号字段" },
@@ -153,6 +159,7 @@ export const pagePermissionRows: PermissionRow[] = [
     permissions: {
       employee: { level: "self", label: "本人费用" },
       department_lead: { level: "department", label: "部门费用" },
+      chairman: { level: "full", label: "全公司只读" },
       hr: { level: "limited", label: "行政费用" },
       finance: { level: "full", label: "全公司" },
       admin: { level: "none", label: "默认不可见" },
@@ -164,6 +171,7 @@ export const pagePermissionRows: PermissionRow[] = [
     permissions: {
       employee: { level: "limited", label: "授权文件" },
       department_lead: { level: "department", label: "部门文件" },
+      chairman: { level: "limited", label: "经营文件" },
       hr: { level: "limited", label: "合同与人事" },
       finance: { level: "limited", label: "合同与财务" },
       admin: { level: "configure", label: "权限管理" },
@@ -175,6 +183,7 @@ export const pagePermissionRows: PermissionRow[] = [
     permissions: {
       employee: { level: "none", label: "不可访问" },
       department_lead: { level: "none", label: "不可访问" },
+      chairman: { level: "limited", label: "治理只读" },
       hr: { level: "limited", label: "组织维护" },
       finance: { level: "none", label: "不可访问" },
       admin: { level: "configure", label: "全局配置" },
@@ -189,6 +198,7 @@ export const operationPermissionRows: PermissionRow[] = [
     permissions: {
       employee: { level: "self", label: "本人" },
       department_lead: { level: "department", label: "本部门" },
+      chairman: { level: "full", label: "经营全局" },
       hr: { level: "full", label: "人事全量" },
       finance: { level: "full", label: "财务全量" },
       admin: { level: "configure", label: "配置数据" },
@@ -200,6 +210,7 @@ export const operationPermissionRows: PermissionRow[] = [
     permissions: {
       employee: { level: "self", label: "本人业务" },
       department_lead: { level: "self", label: "本人业务" },
+      chairman: { level: "none", label: "不参与日常录入" },
       hr: { level: "limited", label: "人事行政" },
       finance: { level: "limited", label: "财务单据" },
       admin: { level: "configure", label: "系统配置" },
@@ -211,6 +222,7 @@ export const operationPermissionRows: PermissionRow[] = [
     permissions: {
       employee: { level: "self", label: "本人草稿" },
       department_lead: { level: "department", label: "部门非敏感" },
+      chairman: { level: "none", label: "只读" },
       hr: { level: "full", label: "员工与组织" },
       finance: { level: "full", label: "财务单据" },
       admin: { level: "configure", label: "系统配置" },
@@ -222,6 +234,7 @@ export const operationPermissionRows: PermissionRow[] = [
     permissions: {
       employee: { level: "none", label: "无" },
       department_lead: { level: "department", label: "分配待办" },
+      chairman: { level: "limited", label: "分配待办" },
       hr: { level: "limited", label: "人事节点" },
       finance: { level: "limited", label: "财务节点" },
       admin: { level: "none", label: "不参与业务" },
@@ -233,6 +246,7 @@ export const operationPermissionRows: PermissionRow[] = [
     permissions: {
       employee: { level: "self", label: "本人记录" },
       department_lead: { level: "limited", label: "部门脱敏" },
+      chairman: { level: "limited", label: "授权经营报表" },
       hr: { level: "limited", label: "授权导出" },
       finance: { level: "full", label: "财务导出" },
       admin: { level: "limited", label: "审计日志" },
@@ -244,6 +258,7 @@ export const operationPermissionRows: PermissionRow[] = [
     permissions: {
       employee: { level: "none", label: "无" },
       department_lead: { level: "none", label: "无" },
+      chairman: { level: "none", label: "无" },
       hr: { level: "limited", label: "人事归档" },
       finance: { level: "limited", label: "财务归档" },
       admin: { level: "configure", label: "配置归档" },
@@ -255,6 +270,7 @@ export const operationPermissionRows: PermissionRow[] = [
     permissions: {
       employee: { level: "none", label: "无" },
       department_lead: { level: "none", label: "无" },
+      chairman: { level: "limited", label: "只读监督" },
       hr: { level: "none", label: "无" },
       finance: { level: "none", label: "无" },
       admin: { level: "configure", label: "可配置" },
@@ -269,6 +285,7 @@ export const sensitiveFieldRows: PermissionRow[] = [
     permissions: {
       employee: { level: "self", label: "本人完整" },
       department_lead: { level: "none", label: "不可见" },
+      chairman: { level: "none", label: "不可见" },
       hr: { level: "full", label: "完整" },
       finance: { level: "none", label: "不可见" },
       admin: { level: "limited", label: "仅脱敏" },
@@ -280,6 +297,7 @@ export const sensitiveFieldRows: PermissionRow[] = [
     permissions: {
       employee: { level: "self", label: "本人脱敏" },
       department_lead: { level: "none", label: "不可见" },
+      chairman: { level: "none", label: "不可见" },
       hr: { level: "limited", label: "仅脱敏" },
       finance: { level: "full", label: "付款使用" },
       admin: { level: "none", label: "不可见" },
@@ -291,6 +309,7 @@ export const sensitiveFieldRows: PermissionRow[] = [
     permissions: {
       employee: { level: "self", label: "本人" },
       department_lead: { level: "none", label: "默认不可见" },
+      chairman: { level: "none", label: "默认不可见" },
       hr: { level: "limited", label: "单独授权" },
       finance: { level: "full", label: "核算使用" },
       admin: { level: "none", label: "不可见" },
@@ -302,6 +321,7 @@ export const sensitiveFieldRows: PermissionRow[] = [
     permissions: {
       employee: { level: "self", label: "本人" },
       department_lead: { level: "none", label: "不可见" },
+      chairman: { level: "none", label: "不可见" },
       hr: { level: "full", label: "完整" },
       finance: { level: "none", label: "不可见" },
       admin: { level: "none", label: "不可见" },
@@ -313,6 +333,7 @@ export const sensitiveFieldRows: PermissionRow[] = [
     permissions: {
       employee: { level: "self", label: "本人" },
       department_lead: { level: "department", label: "审批相关" },
+      chairman: { level: "limited", label: "审批相关" },
       hr: { level: "limited", label: "行政相关" },
       finance: { level: "full", label: "完整" },
       admin: { level: "none", label: "不可见" },

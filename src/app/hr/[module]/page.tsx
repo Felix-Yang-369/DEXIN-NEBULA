@@ -23,7 +23,7 @@ const modules = {
     english: "Recruitment",
     stage: "规划中",
     description: "从招聘需求、候选人、面试到 Offer 和入职转化的人才获取流程。",
-    roles: ["hr", "admin", "chairman"],
+    roles: ["hr", "chairman"],
     capabilities: [
       ["招聘需求", "岗位、人数、到岗时间与审批"],
       ["候选人库", "简历来源、阶段、标签与负责人"],
@@ -37,7 +37,7 @@ const modules = {
     english: "Onboarding & Offboarding",
     stage: "下一阶段",
     description: "将资料、合同、设备、企业微信、邮箱、系统权限和工作交接变成标准清单。",
-    roles: ["hr", "admin", "chairman"],
+    roles: ["hr", "chairman"],
     capabilities: [
       ["入职资料", "员工档案、照片、合同和紧急资料核验"],
       ["账号开通", "企业邮箱、企业微信、德馨星云和角色权限"],
@@ -79,7 +79,7 @@ const modules = {
     english: "Performance",
     stage: "规划中",
     description: "按岗位建立目标、指标、评价周期和结果，避免直接套用不适合小团队的复杂模型。",
-    roles: ["hr", "admin", "chairman", "department_lead"],
+    roles: ["hr", "chairman", "department_lead"],
     capabilities: [
       ["指标模板", "销售、客服、仓储等岗位指标库"],
       ["目标周期", "月度或季度目标及权重"],

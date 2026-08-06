@@ -52,7 +52,7 @@ export async function savePerformancePlanAction(formData: FormData) {
   const currentEmployee = await requireCurrentEmployee();
   if (
     !currentEmployee.roleCodes.some((role) =>
-      ["hr", "admin", "chairman"].includes(role),
+      ["hr", "chairman"].includes(role),
     )
   ) {
     redirectWithError("当前账号没有绩效方案配置权限");

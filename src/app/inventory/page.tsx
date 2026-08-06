@@ -339,7 +339,6 @@ export default async function InventoryPage({
 
   const canManage =
     !employee ||
-    employee.roleCodes.includes("admin") ||
     departmentCode === "DX-WH";
   const activeInventory = inventory.filter((item) => item.status === "active");
   const totalPhysicalQuantity = activeInventory.reduce(

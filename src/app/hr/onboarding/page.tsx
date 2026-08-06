@@ -125,7 +125,7 @@ export default async function EmployeeLifecyclePage({
   const currentEmployee = await requireCurrentEmployee();
   const feedback = await searchParams;
   const canManage = currentEmployee.roleCodes.some((role) =>
-    ["hr", "admin"].includes(role),
+    ["hr"].includes(role),
   );
   const canView =
     canManage || currentEmployee.roleCodes.includes("chairman");

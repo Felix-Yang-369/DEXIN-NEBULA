@@ -273,12 +273,10 @@ export default async function CustomersPage({
 
   const canView =
     !employee ||
-    employee.roleCodes.includes("admin") ||
     employee.roleCodes.includes("chairman") ||
     ["DX-SALES", "DX-CS"].includes(departmentCode ?? "");
   const canManage =
     !employee ||
-    employee.roleCodes.includes("admin") ||
     ["DX-SALES", "DX-CS"].includes(departmentCode ?? "");
   const today = new Date().toISOString().slice(0, 10);
   const currentMonth = today.slice(0, 7);

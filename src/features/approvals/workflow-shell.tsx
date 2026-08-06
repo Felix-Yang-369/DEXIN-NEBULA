@@ -6,9 +6,12 @@ import { EmployeeAvatar } from "@/components/business/employee-avatar";
 import { SidebarIcon } from "@/components/icons/sidebar-icons";
 import {
   isPlatformItemActive,
-  platformNavigationGroups,
+  navigationGroupsForRoles,
 } from "@/config/platform-navigation";
-import { getCurrentEmployeeAvatarUrl } from "@/features/auth/current-employee";
+import {
+  getCurrentEmployee,
+  getCurrentEmployeeAvatarUrl,
+} from "@/features/auth/current-employee";
 
 export async function WorkflowShell({
   breadcrumb,
@@ -26,7 +29,9 @@ export async function WorkflowShell({
 }) {
   const displayName = currentUser?.name ?? "系统管理员";
   const roleLabel = currentUser?.roleLabel ?? "德馨淼盛";
+  const employee = await getCurrentEmployee();
   const avatarUrl = currentUser ? await getCurrentEmployeeAvatarUrl() : null;
+  const navigationGroups = navigationGroupsForRoles(employee?.roleCodes ?? []);
 
   return (
     <div className="min-h-svh bg-background text-foreground">
@@ -35,7 +40,7 @@ export async function WorkflowShell({
           <NebulaLogo inverse />
         </div>
         <nav className="mt-4 flex-1 overflow-y-auto pb-4">
-          {platformNavigationGroups.map((group) => (
+          {navigationGroups.map((group) => (
             <div className="mb-4" key={group.label}>
               <div className="mb-1.5 flex items-center justify-between px-3 text-[9px] font-semibold tracking-[0.16em] text-[#79d8d5]/48">
                 <span>{group.label}</span>

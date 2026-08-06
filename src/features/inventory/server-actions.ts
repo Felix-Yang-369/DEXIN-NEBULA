@@ -17,12 +17,8 @@ function inventoryRedirect(params: Record<string, string>): never {
 async function requireInventoryManager() {
   const employee = await requireCurrentEmployee();
 
-  if (employee.roleCodes.includes("admin")) {
-    return employee;
-  }
-
   if (!employee.departmentId) {
-    inventoryRedirect({ error: "只有仓储人员或系统管理员可以执行此操作" });
+    inventoryRedirect({ error: "只有仓储人员可以执行此操作" });
   }
 
   const supabase = await createClient();
@@ -33,7 +29,7 @@ async function requireInventoryManager() {
     .maybeSingle();
 
   if (department?.code !== "DX-WH") {
-    inventoryRedirect({ error: "只有仓储人员或系统管理员可以执行此操作" });
+    inventoryRedirect({ error: "只有仓储人员可以执行此操作" });
   }
 
   return employee;

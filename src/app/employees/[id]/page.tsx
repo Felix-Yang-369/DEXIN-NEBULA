@@ -192,7 +192,7 @@ export default async function EmployeeDetailPage({
   const [{ id }, feedback] = await Promise.all([params, searchParams]);
   const currentEmployee = await requireCurrentEmployee();
   const canManage = currentEmployee.roleCodes.some((role) =>
-    ["hr", "admin"].includes(role),
+    ["hr"].includes(role),
   );
   const canView =
     canManage || currentEmployee.roleCodes.includes("chairman");

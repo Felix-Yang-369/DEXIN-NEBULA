@@ -11,7 +11,7 @@ function lifecycleRedirect(params: Record<string, string>): never {
 }
 
 function ensureHrAccess(roleCodes: string[]) {
-  if (!roleCodes.some((role) => ["hr", "admin"].includes(role))) {
+  if (!roleCodes.includes("hr")) {
     lifecycleRedirect({ error: "forbidden" });
   }
 }

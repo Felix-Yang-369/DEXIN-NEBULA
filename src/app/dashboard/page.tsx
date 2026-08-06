@@ -22,7 +22,7 @@ function roleLabel(roleCodes: string[], title: string | null) {
   if (roleCodes.includes("hr")) {
     return "人事管理";
   }
-  if (roleCodes.includes("department_manager")) {
+  if (roleCodes.includes("department_lead")) {
     return title ?? "部门负责人";
   }
   return title ?? "内部员工";

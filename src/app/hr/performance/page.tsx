@@ -203,10 +203,10 @@ export default async function PerformancePage({
   const month = normalizedMonth(query.month);
   const supabase = await createClient();
   const canConfigure = currentEmployee.roleCodes.some((role) =>
-    ["hr", "admin", "chairman"].includes(role),
+    ["hr", "chairman"].includes(role),
   );
   const canSeeTeam = currentEmployee.roleCodes.some((role) =>
-    ["hr", "finance", "admin", "chairman"].includes(role),
+    ["hr", "finance", "chairman"].includes(role),
   );
 
   const [summaryResult, employeeResult] = await Promise.all([
