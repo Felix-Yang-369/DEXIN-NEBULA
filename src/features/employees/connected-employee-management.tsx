@@ -121,6 +121,7 @@ function feedbackMessage(params: {
     auth_email: "Auth 账号邮箱必须与员工档案邮箱一致。",
     auth_missing: "没有找到对应的 Supabase Auth 用户。",
     admin_protection: "不能移除当前账号的管理员角色。",
+    governance_protection: "必须保留至少一位在职董事长。",
     invalid_employee: "员工资料格式不正确。",
     invalid_roles: "请至少保留普通员工角色。",
     invalid_auth_user: "Auth User UUID 格式不正确。",

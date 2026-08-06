@@ -39,6 +39,7 @@ function errorCode(message?: string) {
   if (message?.includes("Auth 邮箱")) return "auth_email";
   if (message?.includes("Auth 用户不存在")) return "auth_missing";
   if (message?.includes("管理员角色")) return "admin_protection";
+  if (message?.includes("最后一位董事长")) return "governance_protection";
   if (message?.includes("只有人事或管理员")) return "forbidden";
   if (message?.includes("员工异动参数")) return "invalid_employee_change";
   if (message?.includes("假期账户参数")) return "invalid_leave_balance";
