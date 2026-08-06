@@ -38,6 +38,8 @@ const actionLabels: Record<string, string> = {
   resubmitted: "重新提交",
   employee_roles_updated: "角色变更",
   permission_template_published: "权限模板发布",
+  temporary_role_granted: "临时角色授予",
+  temporary_role_revoked: "临时角色撤销",
 };
 
 const roleLabels: Record<string, string> = {
@@ -96,6 +98,8 @@ export default async function AuditPage({
       "employee_roles_updated",
       "highest_admin_roles_granted",
       "permission_template_published",
+      "temporary_role_granted",
+      "temporary_role_revoked",
     ]);
   }
 
@@ -252,6 +256,9 @@ export default async function AuditPage({
                           <td className="px-5 py-4 text-muted-foreground">
                             {log.action === "employee_roles_updated"
                               ? `员工角色 · ${String(log.metadata.target_name ?? "未知员工")}`
+                              : log.action === "temporary_role_granted" ||
+                                  log.action === "temporary_role_revoked"
+                                ? `临时角色 · ${String(log.metadata.target_name ?? "未知员工")}`
                               : log.action === "permission_template_published"
                                 ? "权限模板"
                                 : log.entity_type === "leave_request"
@@ -268,6 +275,20 @@ export default async function AuditPage({
                                     高危
                                   </span>
                                 )}
+                              </>
+                            ) : log.action === "temporary_role_granted" ? (
+                              <>
+                                {roleLabels[String(log.metadata.role_code)] ??
+                                  String(log.metadata.role_code ?? "—")}
+                                <span className="ml-2 text-[#9a6321]">
+                                  至 {formatDateTime(String(log.metadata.expires_at))}
+                                </span>
+                              </>
+                            ) : log.action === "temporary_role_revoked" ? (
+                              <>
+                                {roleLabels[String(log.metadata.role_code)] ??
+                                  String(log.metadata.role_code ?? "—")}
+                                <span className="ml-2 text-[#965151]">已撤销</span>
                               </>
                             ) : (
                               <>

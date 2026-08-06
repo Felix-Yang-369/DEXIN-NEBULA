@@ -45,12 +45,22 @@ export const getCurrentEmployee = cache(async (): Promise<CurrentEmployee | null
     return null;
   }
 
-  const { data: roleRows } = await supabase
-    .from("employee_roles")
-    .select("roles(code)")
-    .eq("employee_id", employee.id);
+  const now = new Date().toISOString();
+  const [{ data: roleRows }, { data: temporaryRoleRows }] = await Promise.all([
+    supabase
+      .from("employee_roles")
+      .select("roles(code)")
+      .eq("employee_id", employee.id),
+    supabase
+      .from("temporary_role_grants")
+      .select("roles(code)")
+      .eq("employee_id", employee.id)
+      .eq("status", "active")
+      .lte("starts_at", now)
+      .gt("expires_at", now),
+  ]);
 
-  const roleCodes = (roleRows ?? [])
+  const roleCodes = [...(roleRows ?? []), ...(temporaryRoleRows ?? [])]
     .map((row) => {
       const role = Array.isArray(row.roles) ? row.roles[0] : row.roles;
       return role?.code;
@@ -69,7 +79,7 @@ export const getCurrentEmployee = cache(async (): Promise<CurrentEmployee | null
     title: employee.title,
     avatarPath: employee.avatar_path,
     status: employee.status,
-    roleCodes,
+    roleCodes: [...new Set(roleCodes)],
   };
 });
 

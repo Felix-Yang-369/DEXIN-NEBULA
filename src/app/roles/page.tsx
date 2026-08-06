@@ -4,7 +4,9 @@ import {
   History,
   KeyRound,
   LockKeyhole,
+  Clock3,
   ShieldCheck,
+  ShieldAlert,
   UserRoundCheck,
 } from "lucide-react";
 import { WorkflowShell } from "@/features/approvals/workflow-shell";
@@ -18,6 +20,10 @@ import {
   type PermissionCell,
   type PermissionLevel,
 } from "@/features/permissions/role-permission-matrix";
+import {
+  grantTemporaryRoleAction,
+  revokeTemporaryRoleAction,
+} from "@/features/permissions/server-actions";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
@@ -44,6 +50,41 @@ type TemplateVersion = {
   created_at: string;
   creator: { name: string } | Array<{ name: string }> | null;
 };
+
+type EmployeeOption = {
+  id: string;
+  name: string;
+  employee_no: string;
+};
+
+type TemporaryGrant = {
+  id: string;
+  expires_at: string;
+  reason: string;
+  created_at: string;
+  employee: EmployeeOption | EmployeeOption[] | null;
+  role:
+    | { code: string; name: string }
+    | Array<{ code: string; name: string }>
+    | null;
+  granter: { name: string } | Array<{ name: string }> | null;
+};
+
+function relationOne<T>(value: T | T[] | null) {
+  return Array.isArray(value) ? (value[0] ?? null) : value;
+}
+
+function formatDateTime(value: string) {
+  return new Intl.DateTimeFormat("zh-CN", {
+    timeZone: "Asia/Shanghai",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(new Date(value));
+}
 
 function creatorName(version: TemplateVersion) {
   const creator = Array.isArray(version.creator)
@@ -108,7 +149,15 @@ function MatrixTable({ rows }: { rows: typeof pagePermissionRows }) {
   );
 }
 
-export default async function RolesPage() {
+export default async function RolesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    temporarySaved?: string;
+    temporaryRevoked?: string;
+    temporaryError?: string;
+  }>;
+}) {
   const employee = await requireCurrentEmployee();
   const canView = employee.roleCodes.some((role) =>
     ["admin", "chairman"].includes(role),
@@ -118,18 +167,62 @@ export default async function RolesPage() {
       ? "最高权限管理员"
       : "系统管理员"
     : "董事长";
+  const canManage = employee.roleCodes.includes("admin");
+  const feedback = await searchParams;
   const supabase = await createClient();
-  const { data: versionData } = canView
-    ? await supabase
-        .from("permission_template_versions")
-        .select(
-          "id, template_key, version, change_note, created_at, creator:employees!permission_template_versions_created_by_employee_id_fkey(name)",
-        )
-        .eq("template_key", "core_rbac")
-        .order("version", { ascending: false })
-        .limit(5)
-    : { data: [] };
+  const now = new Date();
+  const [{ data: versionData }, { data: employeeData }, { data: grantData }] =
+    canView
+      ? await Promise.all([
+          supabase
+            .from("permission_template_versions")
+            .select(
+              "id, template_key, version, change_note, created_at, creator:employees!permission_template_versions_created_by_employee_id_fkey(name)",
+            )
+            .eq("template_key", "core_rbac")
+            .order("version", { ascending: false })
+            .limit(5),
+          canManage
+            ? supabase
+                .from("employees")
+                .select("id, name, employee_no")
+                .eq("status", "active")
+                .order("name")
+            : Promise.resolve({ data: [] }),
+          supabase
+            .from("temporary_role_grants")
+            .select(
+              "id, expires_at, reason, created_at, employee:employees!temporary_role_grants_employee_id_fkey(id, name, employee_no), role:roles!temporary_role_grants_role_id_fkey(code, name), granter:employees!temporary_role_grants_granted_by_employee_id_fkey(name)",
+            )
+            .eq("status", "active")
+            .gt("expires_at", now.toISOString())
+            .order("expires_at"),
+        ])
+      : [{ data: [] }, { data: [] }, { data: [] }];
   const templateVersions = (versionData ?? []) as TemplateVersion[];
+  const employeeOptions = (employeeData ?? []) as EmployeeOption[];
+  const temporaryGrants = (grantData ?? []) as TemporaryGrant[];
+  const expiringSoon = temporaryGrants.filter(
+    (grant) =>
+      new Date(grant.expires_at).getTime() - now.getTime() <=
+      24 * 60 * 60 * 1000,
+  ).length;
+  const temporaryFeedback = feedback.temporarySaved
+    ? "临时角色已授予，到期后将自动失效。"
+    : feedback.temporaryRevoked
+      ? "临时角色已撤销。"
+      : feedback.temporaryError
+        ? {
+            invalid_input: "请完整填写员工、角色、期限和授权原因。",
+            invalid_reason: "授权或撤销原因至少需要 5 个字。",
+            permanent_role: "该员工已经永久拥有此角色。",
+            duplicate_grant: "该员工已有未到期的同角色授权。",
+            forbidden_role: "系统管理员和董事长不能临时授予。",
+            invalid_employee: "目标员工不存在或不在职。",
+            forbidden: "当前账号无权管理临时授权。",
+            operation_failed: "临时授权操作失败，请稍后重试。",
+          }[feedback.temporaryError] ?? "临时授权操作失败，请稍后重试。"
+        : "";
 
   return (
     <WorkflowShell
@@ -142,7 +235,7 @@ export default async function RolesPage() {
           <ShieldCheck className="pointer-events-none absolute right-12 top-1/2 hidden size-40 -translate-y-1/2 text-white/[0.055] sm:block" />
           <div className="relative max-w-3xl">
             <div className="text-xs font-medium tracking-[0.12em] text-[#79d8d5]">
-              ACCESS CONTROL · V2.0
+              ACCESS CONTROL · V3.0
             </div>
             <h1 className="mt-3 text-2xl font-semibold tracking-[-0.035em] sm:text-[30px]">
               角色与权限矩阵
@@ -184,6 +277,166 @@ export default async function RolesPage() {
                   </div>
                 </article>
               ))}
+            </section>
+
+            <section
+              className="mt-5 rounded-[22px] border border-border/80 bg-white p-5 sm:p-6"
+              id="temporary-grants"
+            >
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Clock3 className="size-4 text-primary" />
+                    <h2 className="text-base font-semibold">临时角色授权</h2>
+                  </div>
+                  <p className="mt-2 text-[11px] text-muted-foreground">
+                    仅支持部门负责人、人事和财务角色，最长 30 天，到期即时失效。
+                  </p>
+                </div>
+                <div className="flex gap-2 text-[10px]">
+                  <span className="rounded-full bg-[#eaf3f8] px-3 py-1.5 text-primary">
+                    生效中 {temporaryGrants.length}
+                  </span>
+                  <span className="rounded-full bg-[#fff4e7] px-3 py-1.5 text-[#9a6321]">
+                    24 小时内到期 {expiringSoon}
+                  </span>
+                </div>
+              </div>
+
+              {temporaryFeedback && (
+                <div
+                  className={`mt-4 rounded-xl px-4 py-3 text-[10px] ${
+                    feedback.temporaryError
+                      ? "border border-[#ead8d8] bg-[#f8eeee] text-[#965151]"
+                      : "border border-[#b9dbce] bg-[#eef8f5] text-[#285f53]"
+                  }`}
+                >
+                  {temporaryFeedback}
+                </div>
+              )}
+
+              {canManage && (
+                <form
+                  action={grantTemporaryRoleAction}
+                  className="mt-5 grid gap-3 rounded-2xl border border-border/80 bg-[#fafcfe] p-4 lg:grid-cols-[1.2fr_1fr_.8fr_1.6fr_auto] lg:items-end"
+                >
+                  <label className="text-[10px]">
+                    <span className="font-medium">目标员工</span>
+                    <select
+                      className="mt-2 h-9 w-full rounded-lg border border-border bg-white px-2 text-[10px]"
+                      name="employeeId"
+                      required
+                    >
+                      <option value="">请选择</option>
+                      {employeeOptions.map((option) => (
+                        <option key={option.id} value={option.id}>
+                          {option.name} · {option.employee_no}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="text-[10px]">
+                    <span className="font-medium">临时角色</span>
+                    <select
+                      className="mt-2 h-9 w-full rounded-lg border border-border bg-white px-2 text-[10px]"
+                      name="roleCode"
+                      required
+                    >
+                      <option value="department_lead">部门负责人</option>
+                      <option value="hr">人事行政</option>
+                      <option value="finance">财务</option>
+                    </select>
+                  </label>
+                  <label className="text-[10px]">
+                    <span className="font-medium">有效期</span>
+                    <select
+                      className="mt-2 h-9 w-full rounded-lg border border-border bg-white px-2 text-[10px]"
+                      name="durationHours"
+                      required
+                    >
+                      <option value="8">8 小时</option>
+                      <option value="24">1 天</option>
+                      <option value="72">3 天</option>
+                      <option value="168">7 天</option>
+                      <option value="720">30 天</option>
+                    </select>
+                  </label>
+                  <label className="text-[10px]">
+                    <span className="font-medium">授权原因</span>
+                    <input
+                      className="mt-2 h-9 w-full rounded-lg border border-border bg-white px-3 text-[10px]"
+                      maxLength={200}
+                      minLength={5}
+                      name="reason"
+                      placeholder="说明业务场景和必要性"
+                      required
+                    />
+                  </label>
+                  <button
+                    className="h-9 rounded-lg bg-primary px-4 text-[10px] font-medium text-white"
+                    type="submit"
+                  >
+                    授予
+                  </button>
+                </form>
+              )}
+
+              <div className="mt-5 overflow-hidden rounded-xl border border-border/80">
+                {temporaryGrants.length === 0 ? (
+                  <div className="py-10 text-center text-xs text-muted-foreground">
+                    当前没有生效中的临时授权
+                  </div>
+                ) : (
+                  temporaryGrants.map((grant) => {
+                    const target = relationOne(grant.employee);
+                    const role = relationOne(grant.role);
+                    const granter = relationOne(grant.granter);
+                    return (
+                      <div
+                        className="flex flex-wrap items-center gap-4 border-b border-border/70 px-4 py-4 last:border-b-0"
+                        key={grant.id}
+                      >
+                        <span className="grid size-9 place-items-center rounded-xl bg-[#fff4e7] text-[#9a6321]">
+                          <ShieldAlert className="size-4" />
+                        </span>
+                        <div className="min-w-[180px] flex-1">
+                          <div className="text-xs font-semibold">
+                            {target?.name ?? "未知员工"} · {role?.name ?? role?.code}
+                          </div>
+                          <div className="mt-1 text-[9px] text-muted-foreground">
+                            授权人 {granter?.name ?? "系统"} · 到期 {formatDateTime(grant.expires_at)}
+                          </div>
+                          <div className="mt-1 text-[9px] text-muted-foreground">
+                            原因：{grant.reason}
+                          </div>
+                        </div>
+                        {canManage && (
+                          <form
+                            action={revokeTemporaryRoleAction}
+                            className="flex items-center gap-2"
+                          >
+                            <input name="grantId" type="hidden" value={grant.id} />
+                            <input
+                              className="h-8 w-48 rounded-lg border border-border px-2 text-[9px]"
+                              maxLength={200}
+                              minLength={5}
+                              name="reason"
+                              placeholder="填写撤销原因"
+                              required
+                            />
+                            <button
+                              className="h-8 rounded-lg border border-[#ead8d8] px-3 text-[9px] text-[#965151]"
+                              type="submit"
+                            >
+                              立即撤销
+                            </button>
+                          </form>
+                        )}
+                      </div>
+                    );
+                  })
+                )}
+              </div>
             </section>
 
             <section className="mt-5 rounded-[22px] border border-border/80 bg-white p-5 sm:p-6">
@@ -279,7 +532,7 @@ export default async function RolesPage() {
 
             <section className="mt-5 rounded-[20px] border border-[#b9dbce] bg-[#eef8f5] p-5 text-xs leading-6 text-[#285f53]">
               当前状态：账号角色绑定、服务端授权函数和数据库 RLS
-              已接入；高风险角色二次确认、模板版本和角色审计已启用。
+              已接入；临时授权、自动到期、主动撤销和全链路审计已启用。
             </section>
           </>
         )}
