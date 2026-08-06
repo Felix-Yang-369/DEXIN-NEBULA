@@ -152,7 +152,7 @@ npm run dev
 
 ```bash
 npm run check          # ESLint + TypeScript
-npm run test:workflow  # 当前 44 项业务规则测试
+npm run test:workflow  # 当前 48 项业务与登录安全测试
 npm run build          # 生产构建
 npm run start          # 启动生产服务
 ```
@@ -164,6 +164,7 @@ npm run start          # 启动生产服务
 - 迁移位于 [`supabase/migrations`](./supabase/migrations)，已经执行的迁移不得修改，修复必须新增迁移。
 - 执行迁移前必须确认目标项目、RLS、备份和回滚路径。
 - [Supabase 接入](./docs/setup/supabase.md)
+- [企业微信扫码登录](./docs/setup/wecom.md)
 - [DeepSeek 接入](./docs/setup/deepseek.md)
 - [角色权限](./docs/product/user-roles.md)
 - [审批流程](./docs/processes/approval.md)

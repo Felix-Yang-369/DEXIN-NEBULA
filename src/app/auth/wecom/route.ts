@@ -2,15 +2,10 @@ import { randomBytes } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import { buildWeComQrLoginUrl } from "@/lib/wecom/client";
 import { isWeComConfigured } from "@/lib/wecom/config";
+import { safeWeComReturnPath } from "@/lib/wecom/oauth";
 
 const STATE_COOKIE = "dexin-wecom-state";
 const NEXT_COOKIE = "dexin-wecom-next";
-
-function safeNext(value: string | null) {
-  return value?.startsWith("/") && !value.startsWith("//")
-    ? value
-    : "/dashboard";
-}
 
 export async function GET(request: NextRequest) {
   if (!isWeComConfigured()) {
@@ -31,7 +26,7 @@ export async function GET(request: NextRequest) {
   response.cookies.set(STATE_COOKIE, state, cookieOptions);
   response.cookies.set(
     NEXT_COOKIE,
-    safeNext(request.nextUrl.searchParams.get("next")),
+    safeWeComReturnPath(request.nextUrl.searchParams.get("next")),
     cookieOptions,
   );
   return response;

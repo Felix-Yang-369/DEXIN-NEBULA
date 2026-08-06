@@ -1,6 +1,7 @@
 import "server-only";
 
 import { getWeComConfig } from "./config";
+import { createWeComQrConnectUrl } from "./oauth";
 
 type WeComErrorResponse = {
   errcode?: number;
@@ -69,16 +70,18 @@ async function getAccessToken() {
 
 export function buildWeComQrLoginUrl(state: string) {
   const { corpId, agentId, callbackUrl } = getWeComConfig();
-  const url = new URL("https://open.work.weixin.qq.com/wwopen/sso/qrConnect");
-  url.searchParams.set("appid", corpId);
-  url.searchParams.set("agentid", agentId);
-  url.searchParams.set("redirect_uri", callbackUrl);
-  url.searchParams.set("state", state);
-  url.searchParams.set("lang", "zh");
-  return url;
+  return createWeComQrConnectUrl({
+    corpId,
+    agentId,
+    callbackUrl,
+    state,
+  });
 }
 
 export async function getWeComMemberFromCode(code: string) {
+  if (!/^[A-Za-z0-9_-]{4,512}$/.test(code)) {
+    throw new Error("企业微信登录 code 无效。");
+  }
   const accessToken = await getAccessToken();
   const identityUrl = new URL(
     "https://qyapi.weixin.qq.com/cgi-bin/user/getuserinfo",

@@ -1,29 +1,17 @@
-import { timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { getWeComMemberFromCode } from "@/lib/wecom/client";
 import { isWeComConfigured } from "@/lib/wecom/config";
+import {
+  normalizedWeComEmails,
+  safeWeComReturnPath,
+  weComStateMatches,
+} from "@/lib/wecom/oauth";
 
 const STATE_COOKIE = "dexin-wecom-state";
 const NEXT_COOKIE = "dexin-wecom-next";
-
-function safeNext(value: string | undefined) {
-  return value?.startsWith("/") && !value.startsWith("//")
-    ? value
-    : "/dashboard";
-}
-
-function stateMatches(actual: string | null, expected: string | undefined) {
-  if (!actual || !expected) return false;
-  const actualBuffer = Buffer.from(actual);
-  const expectedBuffer = Buffer.from(expected);
-  return (
-    actualBuffer.length === expectedBuffer.length &&
-    timingSafeEqual(actualBuffer, expectedBuffer)
-  );
-}
 
 function loginError(request: NextRequest, code: string) {
   return NextResponse.redirect(new URL(`/login?error=${code}`, request.url));
@@ -38,11 +26,11 @@ export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get("code");
   const state = request.nextUrl.searchParams.get("state");
   const expectedState = cookieStore.get(STATE_COOKIE)?.value;
-  const nextPath = safeNext(cookieStore.get(NEXT_COOKIE)?.value);
+  const nextPath = safeWeComReturnPath(cookieStore.get(NEXT_COOKIE)?.value);
   cookieStore.delete(STATE_COOKIE);
   cookieStore.delete(NEXT_COOKIE);
 
-  if (!stateMatches(state, expectedState)) {
+  if (!weComStateMatches(state, expectedState)) {
     return loginError(request, "wecom_invalid_state");
   }
   if (!code) {
@@ -51,35 +39,38 @@ export async function GET(request: NextRequest) {
 
   try {
     const member = await getWeComMemberFromCode(code);
-    const memberEmails = [member.biz_mail, member.email]
-      .filter((email): email is string => Boolean(email?.trim()))
-      .map((email) => email.trim().toLowerCase());
+    const memberEmails = normalizedWeComEmails([
+      member.biz_mail,
+      member.email,
+    ]);
     if (memberEmails.length === 0) {
       return loginError(request, "wecom_account_unavailable");
     }
 
     const admin = createAdminClient();
-    const matchedEmployees = [];
-    for (const email of [...new Set(memberEmails)]) {
-      const { data, error } = await admin
-        .from("employees")
-        .select("id, auth_user_id, email, status")
-        .ilike("email", email)
-        .limit(2);
-      if (error) throw error;
-      matchedEmployees.push(...(data ?? []));
+    const { data: resolvedRows, error: resolveError } = await admin.rpc(
+      "resolve_wecom_login",
+      {
+        p_wecom_user_id: member.userid,
+        p_member_emails: memberEmails,
+        p_member_name: member.name ?? null,
+      },
+    );
+    if (resolveError?.code === "23505") {
+      return loginError(request, "wecom_identity_conflict");
     }
+    if (resolveError?.code === "P0002") {
+      return loginError(request, "wecom_account_unavailable");
+    }
+    if (resolveError) throw resolveError;
 
-    const uniqueEmployees = [
-      ...new Map(matchedEmployees.map((employee) => [employee.id, employee])).values(),
-    ];
-    const employee = uniqueEmployees.length === 1 ? uniqueEmployees[0] : null;
-    if (!employee || employee.status !== "active" || !employee.auth_user_id) {
+    const resolved = resolvedRows?.[0];
+    if (!resolved?.resolved_auth_user_id || !resolved.resolved_identity_id) {
       return loginError(request, "wecom_account_unavailable");
     }
 
     const { data: authUserData, error: authUserError } =
-      await admin.auth.admin.getUserById(employee.auth_user_id);
+      await admin.auth.admin.getUserById(resolved.resolved_auth_user_id);
     const authEmail = authUserData.user?.email?.trim().toLowerCase();
     if (authUserError || !authEmail) {
       return loginError(request, "wecom_account_unavailable");
@@ -102,10 +93,18 @@ export async function GET(request: NextRequest) {
     if (
       sessionError ||
       !sessionData.user ||
-      sessionData.user.id !== employee.auth_user_id
+      sessionData.user.id !== resolved.resolved_auth_user_id
     ) {
       await supabase.auth.signOut();
       throw sessionError ?? new Error("登录账号校验失败");
+    }
+
+    const { error: auditError } = await admin.rpc("record_wecom_login", {
+      p_identity_id: resolved.resolved_identity_id,
+    });
+    if (auditError) {
+      await supabase.auth.signOut();
+      throw auditError;
     }
 
     return NextResponse.redirect(new URL(nextPath, request.url));

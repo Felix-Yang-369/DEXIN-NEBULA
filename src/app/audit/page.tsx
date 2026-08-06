@@ -40,6 +40,8 @@ const actionLabels: Record<string, string> = {
   permission_template_published: "权限模板发布",
   temporary_role_granted: "临时角色授予",
   temporary_role_revoked: "临时角色撤销",
+  wecom_identity_bound: "企业微信身份绑定",
+  wecom_signed_in: "企业微信扫码登录",
 };
 
 const roleLabels: Record<string, string> = {
@@ -261,6 +263,9 @@ export default async function AuditPage({
                                 ? `临时角色 · ${String(log.metadata.target_name ?? "未知员工")}`
                               : log.action === "permission_template_published"
                                 ? "权限模板"
+                                : log.action === "wecom_identity_bound" ||
+                                    log.action === "wecom_signed_in"
+                                  ? "登录身份"
                                 : log.entity_type === "leave_request"
                                   ? "请假申请"
                                   : "通用审批"}

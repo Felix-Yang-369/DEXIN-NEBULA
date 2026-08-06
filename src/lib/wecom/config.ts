@@ -11,14 +11,13 @@ const appSecret = process.env.WECOM_APP_SECRET;
 const callbackUrl = process.env.WECOM_CALLBACK_URL;
 
 export function isWeComConfigured() {
-  return Boolean(
-    corpId &&
-      agentId &&
-      appSecret &&
-      callbackUrl &&
-      isSupabaseConfigured() &&
-      isSupabaseAdminConfigured(),
-  );
+  if (!isSupabaseConfigured() || !isSupabaseAdminConfigured()) return false;
+  try {
+    getWeComConfig();
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function getWeComConfig() {
@@ -29,9 +28,28 @@ export function getWeComConfig() {
   }
 
   const parsedCallbackUrl = new URL(callbackUrl);
-  if (parsedCallbackUrl.protocol !== "https:" && parsedCallbackUrl.hostname !== "localhost") {
+  if (
+    parsedCallbackUrl.protocol !== "https:" &&
+    parsedCallbackUrl.hostname !== "localhost"
+  ) {
     throw new Error("企业微信登录回调地址必须使用 HTTPS。");
   }
 
-  return { corpId, agentId, appSecret, callbackUrl: parsedCallbackUrl.toString() };
+  if (
+    parsedCallbackUrl.username ||
+    parsedCallbackUrl.password ||
+    parsedCallbackUrl.hash ||
+    parsedCallbackUrl.pathname !== "/auth/wecom/callback"
+  ) {
+    throw new Error(
+      "企业微信登录回调地址必须精确指向 /auth/wecom/callback。",
+    );
+  }
+
+  return {
+    corpId: corpId.trim(),
+    agentId: agentId.trim(),
+    appSecret: appSecret.trim(),
+    callbackUrl: parsedCallbackUrl.toString(),
+  };
 }

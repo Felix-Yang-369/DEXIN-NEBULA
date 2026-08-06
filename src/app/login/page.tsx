@@ -46,6 +46,9 @@ export default async function LoginPage({
       wecom_account_unavailable: isEnglish
         ? "This WeCom member is not linked to an active employee account."
         : "该企业微信成员未匹配到在职员工账号，请联系管理员。",
+      wecom_identity_conflict: isEnglish
+        ? "This WeCom identity is already linked to another employee account."
+        : "该企业微信身份已绑定其他员工账号，请联系管理员处理。",
       wecom_failed: isEnglish
         ? "WeCom sign-in failed. Please try again or use your password."
         : "企业微信登录失败，请重试或使用密码登录。",
