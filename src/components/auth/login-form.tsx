@@ -105,7 +105,7 @@ export function LoginForm({
           />
           {isEnglish ? "Remember me" : "记住我"}
         </label>
-        <Link className="font-medium text-[#0c8294] transition hover:text-[#096776]" href="/help">
+        <Link className="font-medium text-[#0c8294] transition hover:text-[#096776]" href="/forgot-password">
           {isEnglish ? "Forgot password?" : "忘记密码？"}
         </Link>
       </div>

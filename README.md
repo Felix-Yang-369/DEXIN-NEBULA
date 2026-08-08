@@ -152,7 +152,7 @@ npm run dev
 
 ```bash
 npm run check          # ESLint + TypeScript
-npm run test:workflow  # 当前 48 项业务与登录安全测试
+npm run test:workflow  # 当前 51 项业务与登录安全测试
 npm run build          # 生产构建
 npm run start          # 启动生产服务
 ```

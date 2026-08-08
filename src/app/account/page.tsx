@@ -253,6 +253,9 @@ export default async function AccountPage({
             <section className="rounded-[20px] border border-border/75 bg-white p-5">
               <h2 className="text-sm font-semibold">账号操作</h2>
               <div className="mt-4 grid gap-2">
+                <Link className="flex h-10 items-center justify-center rounded-xl border border-primary/20 bg-primary/[0.04] px-4 text-[10px] font-medium text-primary hover:bg-primary/[0.08]" href="/account/password">
+                  修改登录密码
+                </Link>
                 <Link className="flex h-10 items-center justify-center rounded-xl bg-primary px-4 text-[10px] font-medium text-primary-foreground" href={`/employees/${currentEmployee.id}`}>
                   查看我的完整员工档案
                 </Link>

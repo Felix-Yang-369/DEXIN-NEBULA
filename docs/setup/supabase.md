@@ -187,3 +187,28 @@ supabase/seed.example.sql
 | `hr.dev@dxmstech.cn` | 人事、管理员 |
 
 测试密码不写入项目文件，保存在当前开发电脑的 macOS 钥匙串服务 `DEXIN Nebula Dev` 中。重新生成或交接测试账号时，应同步更新钥匙串，不得把密码补充到本文件。
+
+## 10. 密码找回与修改
+
+应用提供两条用户自助路径：
+
+- `/forgot-password`：未登录用户申请密码重置邮件。
+- `/account/password`：已登录用户验证当前密码后修改。
+
+在 Supabase Dashboard 的 **Authentication → URL Configuration** 中：
+
+1. 将 `Site URL` 设为德馨星云的正式 HTTPS 域名。
+2. 将本地与正式回调加入 Redirect URLs：
+   - `http://localhost:3000/auth/confirm`
+   - `https://正式域名/auth/confirm`
+3. 生产环境配置自定义 SMTP，不依赖 Supabase 默认邮件服务。
+
+如果希望重置链接可在不同浏览器或设备打开，将 **Authentication → Email Templates → Reset password** 中的链接配置为：
+
+```html
+<a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/reset-password">
+  重置德馨星云密码
+</a>
+```
+
+密码更新成功后，应用会执行全局退出，要求用户使用新密码重新登录。

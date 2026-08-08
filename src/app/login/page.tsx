@@ -52,6 +52,9 @@ export default async function LoginPage({
       wecom_failed: isEnglish
         ? "WeCom sign-in failed. Please try again or use your password."
         : "企业微信登录失败，请重试或使用密码登录。",
+      password_changed: isEnglish
+        ? "Your password has been updated. Sign in again with the new password."
+        : "密码已更新，请使用新密码重新登录。",
     }[params.error ?? ""];
   const languageHref = (language: "zh" | "en") => {
     const query = new URLSearchParams({ lang: language });

@@ -23,6 +23,7 @@ const protectedPrefixes = [
   "/audit",
   "/search",
   "/help",
+  "/account",
 ];
 
 function isProtectedPath(pathname: string) {
