@@ -156,8 +156,8 @@ export default async function WeeklyReportsPage({
 
   return (
     <WorkflowShell
-      activeItem="协同办公"
-      breadcrumb="协同办公 / 周报管理"
+      activeItem="协同工作台"
+      breadcrumb="协同办公 / 协同工作台 / 周报"
       currentUser={{
         name: employee.name,
         roleLabel: employee.title ?? "内部员工",

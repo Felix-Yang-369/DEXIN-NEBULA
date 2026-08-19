@@ -217,7 +217,7 @@ export default async function OrganizationPage() {
         </div>
         <PlatformSidebarMenu
           activeItem="人力资源"
-          breadcrumb="人力资源 / 组织架构"
+          breadcrumb="组织运营 / 人力资源 / 组织架构"
         />
         <div className="rounded-2xl border border-white/10 bg-white/[0.055] p-3">
           <div className="flex items-center gap-3">

@@ -4,6 +4,10 @@ import {
   getSupabasePublicConfig,
   isSupabaseConfigured,
 } from "./config";
+import {
+  isFinanceScopeAllowedPath,
+  isScopedFinanceUser,
+} from "@/lib/auth/access-scope";
 
 const protectedPrefixes = [
   "/dashboard",
@@ -12,11 +16,21 @@ const protectedPrefixes = [
   "/announcements",
   "/organization",
   "/employees",
+  "/hr",
   "/roles",
   "/finance",
+  "/bi",
+  "/ai",
   "/inventory",
   "/customers",
+  "/quotes",
+  "/sales",
+  "/suppliers",
+  "/purchasing",
   "/products",
+  "/oa",
+  "/operations",
+  "/system",
   "/reports",
   "/knowledge",
   "/notifications",
@@ -72,6 +86,37 @@ export async function updateSession(request: NextRequest) {
     dashboardUrl.pathname = "/dashboard";
     dashboardUrl.search = "";
     return NextResponse.redirect(dashboardUrl);
+  }
+
+  if (isAuthenticated && !isFinanceScopeAllowedPath(pathname)) {
+    const authUserId = verifiedToken?.claims.sub;
+    const { data: employee } = await supabase
+      .from("employees")
+      .select("id")
+      .eq("auth_user_id", authUserId)
+      .eq("status", "active")
+      .maybeSingle();
+
+    if (employee) {
+      const { data: roleRows } = await supabase
+        .from("employee_roles")
+        .select("roles(code)")
+        .eq("employee_id", employee.id);
+      const roleCodes = (roleRows ?? [])
+        .map((row) => {
+          const role = Array.isArray(row.roles) ? row.roles[0] : row.roles;
+          return role?.code;
+        })
+        .filter((code): code is string => Boolean(code));
+
+      if (isScopedFinanceUser(roleCodes)) {
+        const financeUrl = request.nextUrl.clone();
+        financeUrl.pathname = "/finance";
+        financeUrl.search = "";
+        financeUrl.searchParams.set("error", "restricted_access");
+        return NextResponse.redirect(financeUrl);
+      }
+    }
   }
 
   return response;

@@ -81,7 +81,7 @@ export default async function BankReconciliationPage({
   const migrationMissing = linesResult.error?.code === "42P01" || linesResult.error?.code === "PGRST205";
 
   return (
-    <WorkflowShell activeItem="银行流水" breadcrumb="财务管理 / 银行流水与核销" currentUser={{ name: employee.name, roleLabel: employee.title ?? "内部员工" }}>
+    <WorkflowShell activeItem="资金管理" breadcrumb="财务管理 / 资金管理 / 银行流水与核销" currentUser={{ name: employee.name, roleLabel: employee.title ?? "内部员工" }}>
       <main className="mx-auto max-w-[1450px] p-4 sm:p-6 xl:p-8">
         <section className="relative overflow-hidden rounded-[26px] bg-[linear-gradient(135deg,#092c4b,#0b4964_60%,#087c78)] px-6 py-8 text-white sm:px-8">
           <Banknote className="absolute right-10 top-1/2 hidden size-40 -translate-y-1/2 text-white/[0.06] sm:block" />

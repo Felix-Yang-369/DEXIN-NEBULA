@@ -190,8 +190,8 @@ export default async function QuoteDetailPage({
 
   return (
     <WorkflowShell
-      activeItem="客户管理"
-      breadcrumb={`客户管理 / 报价中心 / ${quote.quote_no}`}
+      activeItem="销售管理"
+      breadcrumb={`客户与销售 / 销售管理 / 报价 / ${quote.quote_no}`}
       currentUser={{
         name: employee.name,
         roleLabel: roleLabel(employee.roleCodes) || employee.title || "内部员工",

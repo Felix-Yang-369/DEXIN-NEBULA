@@ -148,8 +148,8 @@ export default async function ReceivableSummaryPage({
 
   return (
     <WorkflowShell
-      activeItem="财务管理"
-      breadcrumb="业务应用 / 财务管理 / 应收账款汇总"
+      activeItem="会计核算"
+      breadcrumb="财务管理 / 会计核算 / 应收账款"
       currentUser={{
         name: employee.name,
         roleLabel: roleLabel(employee.roleCodes),

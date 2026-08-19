@@ -208,7 +208,7 @@ export default async function AttendancePage() {
   return (
     <WorkflowShell
       activeItem="人力资源"
-      breadcrumb="人力资源 / 考勤管理"
+      breadcrumb="组织运营 / 人力资源 / 考勤"
       currentUser={{
         name: currentEmployee.name,
         roleLabel: currentEmployee.title ?? "内部员工",

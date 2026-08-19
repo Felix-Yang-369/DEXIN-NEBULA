@@ -49,8 +49,8 @@ export default async function NewAnnouncementPage({
 
   return (
     <WorkflowShell
-      activeItem="协同办公"
-      breadcrumb="协同办公 / 公告中心 / 新建公告"
+      activeItem="协同工作台"
+      breadcrumb="协同办公 / 协同工作台 / 公告 / 新建"
       currentUser={{
         name: employee.name,
         roleLabel: employee.title ?? "内部员工",

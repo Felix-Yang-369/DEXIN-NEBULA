@@ -6,6 +6,10 @@ import {
   BanknoteArrowDown,
   CalendarClock,
   ChartNoAxesCombined,
+  CheckCircle2,
+  ChevronRight,
+  CircleAlert,
+  CircleDashed,
   FileClock,
   FileCheck2,
   FileSpreadsheet,
@@ -66,6 +70,18 @@ type FinanceVoucher = {
   amount: number;
   attachment_count: number;
   status: "draft" | "posted" | "void";
+};
+
+type BankStatementSummary = {
+  id: string;
+  amount: number;
+  reconciled_amount: number;
+  status: "unmatched" | "partial" | "matched" | "ignored";
+};
+
+type FinanceInvoiceSummary = {
+  id: string;
+  status: "recorded" | "verified" | "void";
 };
 
 type LegalEntityOption = {
@@ -221,6 +237,8 @@ export default async function FinancePage({
   let transactions: FinanceTransaction[] = [];
   let documents: FinanceDocumentRow[] = [];
   let vouchers: FinanceVoucher[] = [];
+  let bankStatementLines: BankStatementSummary[] = [];
+  let financeInvoices: FinanceInvoiceSummary[] = [];
   let legalEntityOptions: LegalEntityOption[] = [];
   let dataAvailable = !configured;
 
@@ -248,8 +266,14 @@ export default async function FinancePage({
       .order("due_date", { ascending: true })
       .limit(1000);
 
-    const [transactionResult, documentResult, voucherResult, legalEntityResult] =
-      await Promise.all([
+    const [
+      transactionResult,
+      documentResult,
+      voucherResult,
+      bankStatementResult,
+      invoiceResult,
+      legalEntityResult,
+    ] = await Promise.all([
         query,
         documentQuery,
         supabase
@@ -260,6 +284,16 @@ export default async function FinancePage({
           .order("voucher_date", { ascending: false })
           .order("created_at", { ascending: false })
           .limit(30),
+        supabase
+          .from("bank_statement_lines")
+          .select("id, amount, reconciled_amount, status")
+          .order("transaction_date", { ascending: false })
+          .limit(500),
+        supabase
+          .from("finance_invoices")
+          .select("id, status")
+          .order("issued_on", { ascending: false })
+          .limit(500),
         supabase
           .from("customer_legal_entities")
           .select(
@@ -277,6 +311,8 @@ export default async function FinancePage({
     transactions = (transactionResult.data ?? []) as FinanceTransaction[];
     documents = (documentResult.data ?? []) as FinanceDocumentRow[];
     vouchers = (voucherResult.data ?? []) as FinanceVoucher[];
+    bankStatementLines = (bankStatementResult.data ?? []) as BankStatementSummary[];
+    financeInvoices = (invoiceResult.data ?? []) as FinanceInvoiceSummary[];
     legalEntityOptions = (legalEntityResult.data ?? []) as LegalEntityOption[];
   }
 
@@ -367,11 +403,72 @@ export default async function FinancePage({
       (bookFilter === "all" || row.document_type === bookFilter) &&
       (monthFilter === "all" || row.issue_date.startsWith(monthFilter)),
   );
+  const overdueReceivableRows = activeDocuments.filter(
+    (row) =>
+      row.document_type === "receivable" &&
+      agingBucket(row.due_date, today()) !== "current",
+  );
+  const overduePayableRows = activeDocuments.filter(
+    (row) =>
+      row.document_type === "payable" &&
+      agingBucket(row.due_date, today()) !== "current",
+  );
+  const unmatchedBankLines = bankStatementLines.filter(
+    (row) => !["matched", "ignored"].includes(row.status),
+  );
+  const unmatchedBankAmount = unmatchedBankLines.reduce(
+    (sum, row) =>
+      sum + Math.max(0, Number(row.amount) - Number(row.reconciled_amount)),
+    0,
+  );
+  const uninvoicedDocumentCount = activeDocuments.filter(
+    (row) => !row.invoice_no,
+  ).length;
+  const draftVoucherCount = vouchers.filter(
+    (row) => row.status === "draft",
+  ).length;
+  const unverifiedInvoiceCount = financeInvoices.filter(
+    (row) => row.status === "recorded",
+  ).length;
+  const financeTasks = [
+    {
+      label: "逾期应收催办",
+      value: `${overdueReceivableRows.length} 笔`,
+      detail: compactCurrency.format(overdueReceivable),
+      href: "/finance?book=receivable#documents",
+      tone: "border-[#efcfbf] bg-[#fff8f4] text-[#9d553d]",
+      icon: <CircleAlert className="size-4" />,
+    },
+    {
+      label: "到期应付安排",
+      value: `${overduePayableRows.length} 笔`,
+      detail: "核对付款计划与资金账户",
+      href: "/finance?book=payable#documents",
+      tone: "border-[#eadcaf] bg-[#fffaf0] text-[#8c681f]",
+      icon: <CalendarClock className="size-4" />,
+    },
+    {
+      label: "银行流水待匹配",
+      value: `${unmatchedBankLines.length} 笔`,
+      detail: compactCurrency.format(unmatchedBankAmount),
+      href: "/finance/bank-reconciliation#reconcile",
+      tone: "border-[#c7e2df] bg-[#f3fbfa] text-[#087c78]",
+      icon: <Landmark className="size-4" />,
+    },
+    {
+      label: "发票待核验",
+      value: `${unverifiedInvoiceCount} 张`,
+      detail: "完成票据台账复核",
+      href: "/finance/invoices",
+      tone: "border-[#d6dfeb] bg-[#f7f9fc] text-[#47647d]",
+      icon: <ReceiptText className="size-4" />,
+    },
+  ];
 
   return (
     <WorkflowShell
-      activeItem="财务管理"
-      breadcrumb="业务应用 / 财务中心"
+      activeItem="财务总览"
+      breadcrumb="财务管理 / 财务总览"
       currentUser={
         employee
           ? {
@@ -474,19 +571,120 @@ export default async function FinancePage({
               </div>
             )}
 
+            <section className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(330px,.55fr)]">
+              <article className="overflow-hidden rounded-[22px] border border-border/75 bg-white">
+                <div className="flex flex-col gap-3 border-b border-border/70 px-5 py-5 sm:flex-row sm:items-end sm:justify-between sm:px-6">
+                  <div>
+                    <div className="text-[10px] font-semibold tracking-[0.16em] text-[#087c78]">
+                      TODAY · FINANCE DESK
+                    </div>
+                    <h2 className="mt-2 text-base font-semibold">财务待办工作台</h2>
+                    <p className="mt-1 text-[11px] text-muted-foreground">
+                      按风险和处理顺序汇总真实业务数据，点击即可进入对应台账。
+                    </p>
+                  </div>
+                  <span className="w-fit rounded-full bg-[#edf7f5] px-3 py-1.5 text-[10px] font-medium text-[#087c78]">
+                    {financeTasks.reduce(
+                      (sum, item) => sum + Number.parseInt(item.value, 10),
+                      0,
+                    )}{" "}
+                    项待处理
+                  </span>
+                </div>
+                <div className="grid gap-3 p-4 sm:grid-cols-2 sm:p-5">
+                  {financeTasks.map((task) => (
+                    <Link
+                      className={`group flex min-h-28 items-start gap-3 rounded-[18px] border p-4 transition hover:-translate-y-0.5 hover:shadow-sm ${task.tone}`}
+                      href={task.href}
+                      key={task.label}
+                    >
+                      <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-white/80 shadow-sm">
+                        {task.icon}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-[11px] font-medium opacity-80">
+                          {task.label}
+                        </span>
+                        <span className="mt-2 block text-xl font-semibold tracking-[-0.03em]">
+                          {task.value}
+                        </span>
+                        <span className="mt-1 block truncate text-[10px] opacity-65">
+                          {task.detail}
+                        </span>
+                      </span>
+                      <ChevronRight className="mt-2 size-4 shrink-0 opacity-35 transition group-hover:translate-x-0.5 group-hover:opacity-70" />
+                    </Link>
+                  ))}
+                </div>
+              </article>
+
+              <article className="rounded-[22px] border border-border/75 bg-[linear-gradient(160deg,#0c3554,#0b4b61)] p-5 text-white sm:p-6">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <div className="text-[10px] font-semibold tracking-[0.16em] text-[#79d8d5]">
+                      PERIOD READINESS
+                    </div>
+                    <h2 className="mt-2 text-base font-semibold">
+                      {monthLabel(startOfCurrentMonth().slice(0, 7))}月结准备
+                    </h2>
+                  </div>
+                  <FileClock className="size-5 text-white/55" />
+                </div>
+                <div className="mt-5 space-y-2.5">
+                  {[
+                    {
+                      label: "往来单据发票关联",
+                      pending: uninvoicedDocumentCount,
+                    },
+                    {
+                      label: "银行流水核销",
+                      pending: unmatchedBankLines.length,
+                    },
+                    { label: "凭证过账", pending: draftVoucherCount },
+                    { label: "发票核验", pending: unverifiedInvoiceCount },
+                  ].map((step) => {
+                    const ready = step.pending === 0;
+                    return (
+                      <div
+                        className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.055] px-3 py-3"
+                        key={step.label}
+                      >
+                        {ready ? (
+                          <CheckCircle2 className="size-4 shrink-0 text-[#79d8d5]" />
+                        ) : (
+                          <CircleDashed className="size-4 shrink-0 text-[#f0c66b]" />
+                        )}
+                        <span className="min-w-0 flex-1 text-[11px] text-white/75">
+                          {step.label}
+                        </span>
+                        <span
+                          className={`text-[10px] font-medium ${ready ? "text-[#79d8d5]" : "text-[#f0c66b]"}`}
+                        >
+                          {ready ? "已就绪" : `${step.pending} 项`}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <p className="mt-4 text-[9px] leading-5 text-white/42">
+                  当前为月结前检查清单，不执行正式会计结账；总账、法定报表和反结账将在会计科目体系完成后接入。
+                </p>
+              </article>
+            </section>
+
             <section className="mt-5 rounded-[20px] border border-border/75 bg-white p-4 sm:p-5">
               <div className="mb-4 flex items-end justify-between gap-4">
                 <div>
                   <h2 className="text-sm font-semibold">财务业务导航</h2>
                   <p className="mt-1 text-[11px] text-muted-foreground">
-                    按金蝶常用业务路径组织应收、应付、资金、核销与凭证
+                    按财务工作流组织应收、应付、资金、核销与凭证
                   </p>
                 </div>
                 <span className="rounded-full bg-[#eaf3f8] px-2.5 py-1 text-[10px] font-medium text-[#0d6c78]">
                   FMS
                 </span>
               </div>
-              <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-6">
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
                 {[
                   {
                     href: "/finance/receivables",
@@ -523,6 +721,24 @@ export default async function FinancePage({
                     label: "记账凭证",
                     note: "核销自动联动",
                     icon: <FileCheck2 className="size-4" />,
+                  },
+                  {
+                    href: "/finance/bank-reconciliation",
+                    label: "银行对账",
+                    note: "流水匹配与核销",
+                    icon: <Landmark className="size-4" />,
+                  },
+                  {
+                    href: "/finance/invoices",
+                    label: "发票台账",
+                    note: "登记、关联与核验",
+                    icon: <ReceiptText className="size-4" />,
+                  },
+                  {
+                    href: "/finance/cash-documents",
+                    label: "收付款单",
+                    note: "制单、审批与多单核销",
+                    icon: <BanknoteArrowDown className="size-4" />,
                   },
                 ].map((item) => (
                   <Link

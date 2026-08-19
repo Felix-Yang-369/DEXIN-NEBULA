@@ -37,6 +37,7 @@ export default async function DashboardPage() {
       identity={{
         name: employee.name,
         role: roleLabel(employee.roleCodes, employee.title),
+        roleCodes: employee.roleCodes,
         avatarUrl,
       }}
     />

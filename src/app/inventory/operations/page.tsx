@@ -46,7 +46,7 @@ export default async function InventoryOperationsPage({ searchParams }:{ searchP
   const deliveries=(deliveryResult.data??[]) as Array<Record<string,unknown>>;
   const migrationMissing=[outboundResult,transferResult,stocktakeResult,deliveryResult].some(result=>result.error);
 
-  return <WorkflowShell activeItem="仓储管理" breadcrumb="业务应用 / 仓储管理 / 仓储作业" currentUser={{name:employee.name,roleLabel:employee.roleCodes.join(" · ")}}>
+  return <WorkflowShell activeItem="仓储管理" breadcrumb="供应链 / 仓储管理 / 仓储作业" currentUser={{name:employee.name,roleLabel:employee.roleCodes.join(" · ")}}>
     <main className="relative isolate mx-auto max-w-[1600px] overflow-hidden p-4 sm:p-6 xl:p-8">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_10%_0%,rgba(25,180,187,.13),transparent_30%),radial-gradient(circle_at_92%_10%,rgba(53,126,191,.12),transparent_28%),linear-gradient(180deg,#f3f9fc,#f7f9fb)]"/>
       <section className="overflow-hidden rounded-[26px] bg-[radial-gradient(circle_at_82%_15%,rgba(41,196,196,.27),transparent_25%),linear-gradient(135deg,#071d34,#0b3153_55%,#0d5966)] px-7 py-8 text-white shadow-[0_28px_75px_-42px_rgba(5,29,51,.95)]">

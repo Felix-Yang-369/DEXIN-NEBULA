@@ -2,24 +2,28 @@ import {
   BookOpenText,
   Bot,
   BellRing,
+  Building2,
+  Calculator,
   ChartNoAxesCombined,
   ClipboardCheck,
+  ContactRound,
   Files,
   Handshake,
   CalendarDays,
   LayoutDashboard,
+  Landmark,
   Megaphone,
   Network,
   NotebookPen,
   PackageSearch,
   PanelsTopLeft,
   RadioTower,
+  ReceiptText,
   Settings2,
   ScrollText,
   ShieldCheck,
   ShoppingCart,
   TrendingUp,
-  Workflow,
   UsersRound,
   UserRoundSearch,
   Warehouse,
@@ -29,6 +33,9 @@ import { cn } from "@/lib/utils";
 
 export type SidebarIconName =
   | "dashboard"
+  | "accounting"
+  | "treasury"
+  | "tax"
   | "approvals"
   | "announcements"
   | "notifications"
@@ -38,6 +45,7 @@ export type SidebarIconName =
   | "policies"
   | "weekly"
   | "customers"
+  | "crm"
   | "sales"
   | "orders"
   | "supply"
@@ -57,6 +65,9 @@ export type SidebarIconName =
 
 const sidebarIcons: Record<SidebarIconName, LucideIcon> = {
   dashboard: LayoutDashboard,
+  accounting: Calculator,
+  treasury: Landmark,
+  tax: ReceiptText,
   approvals: ClipboardCheck,
   announcements: Megaphone,
   notifications: BellRing,
@@ -66,9 +77,10 @@ const sidebarIcons: Record<SidebarIconName, LucideIcon> = {
   policies: BookOpenText,
   weekly: NotebookPen,
   customers: Handshake,
+  crm: ContactRound,
   sales: TrendingUp,
   orders: ShoppingCart,
-  supply: Workflow,
+  supply: Building2,
   media: RadioTower,
   publicity: Megaphone,
   events: CalendarDays,

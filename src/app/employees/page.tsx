@@ -1,42 +1,23 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { NebulaLogo } from "@/components/brand/nebula-logo";
-import {
-  SidebarIcon,
-  type SidebarIconName,
-} from "@/components/icons/sidebar-icons";
+import { PlatformNavigationList } from "@/components/navigation/platform-navigation-list";
 import { requireCurrentEmployee } from "@/features/auth/current-employee";
 import { WorkflowShell } from "@/features/approvals/workflow-shell";
 import { ConnectedEmployeeManagement } from "@/features/employees/connected-employee-management";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
-import { platformNavigation } from "@/config/platform-navigation";
+import {
+  navigationGroupsForRoles,
+  splitNavigationGroups,
+} from "@/config/platform-navigation";
 
 export const metadata: Metadata = {
   title: "员工档案",
   description: "德馨淼盛员工档案、账号和入职流程管理",
 };
 
-type NavGroup = {
-  label: string;
-  items: Array<{
-    label: string;
-    icon: SidebarIconName;
-    active?: boolean;
-    href?: string;
-    badge?: string;
-    future?: boolean;
-  }>;
-};
-
-const navGroups: NavGroup[] = [
-  {
-    label: "德馨星云",
-    items: platformNavigation.map((item) => ({
-      ...item,
-      active: item.href === "/hr",
-    })),
-  },
-];
+const demoNavigation = splitNavigationGroups(
+  navigationGroupsForRoles(["admin"]),
+);
 
 const archiveGroups = [
   {
@@ -107,7 +88,7 @@ export default async function EmployeesPage({
   return (
     <WorkflowShell
       activeItem="人力资源"
-      breadcrumb="人力资源 / 员工档案"
+      breadcrumb="组织运营 / 人力资源 / 员工档案"
       currentUser={{
         name: employee.name,
         roleLabel: employee.title ?? "内部员工",
@@ -128,45 +109,22 @@ function EmployeesDemoPage() {
         <div className="px-2">
           <NebulaLogo inverse />
         </div>
-        <nav className="mt-9 flex-1 overflow-y-auto pb-5">
-          {navGroups.map((group) => (
-            <div className="mb-7" key={group.label}>
-              <div className="mb-2 px-3 text-[10px] font-medium uppercase tracking-[0.16em] text-white/34">
-                {group.label}
-              </div>
-              <div className="space-y-1">
-                {group.items.map((item) => (
-                  <Link
-                    className={`flex h-10 items-center gap-3 rounded-xl px-3 text-[13px] transition-colors ${
-                      item.active
-                        ? "bg-white/12 text-white shadow-sm"
-                        : "text-white/58 hover:bg-white/[0.07] hover:text-white"
-                    }`}
-                    href={item.href ?? "#"}
-                    key={item.label}
-                  >
-                    <span
-                      className={`grid size-6 place-items-center rounded-lg ${
-                        item.active ? "bg-[#6bd7d4] text-[#0b3152]" : "bg-white/8"
-                      }`}
-                    >
-                      <SidebarIcon name={item.icon} />
-                    </span>
-                    <span>{item.label}</span>
-                    {item.badge && (
-                      <span className="ml-auto rounded-full bg-white/8 px-2 py-0.5 text-[10px] text-white/42">
-                        {item.badge}
-                      </span>
-                    )}
-                    {item.future && (
-                      <span className="ml-auto text-[9px] text-white/25">规划</span>
-                    )}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          ))}
+        <nav className="mt-4 min-h-0 flex-1 overflow-y-auto pb-3">
+          <PlatformNavigationList
+            activeItem="人力资源"
+            breadcrumb="组织运营 / 人力资源 / 员工档案"
+            groups={demoNavigation.mainGroups}
+          />
         </nav>
+        {demoNavigation.bottomGroups.length ? (
+          <nav className="shrink-0 border-t border-white/10 pt-3">
+            <PlatformNavigationList
+              activeItem="人力资源"
+              breadcrumb="组织运营 / 人力资源 / 员工档案"
+              groups={demoNavigation.bottomGroups}
+            />
+          </nav>
+        ) : null}
         <div className="rounded-2xl border border-white/10 bg-white/[0.055] p-3">
           <div className="flex items-center gap-3">
             <div className="grid size-9 place-items-center rounded-xl bg-[#6bd7d4] text-xs font-semibold text-[#0b3152]">

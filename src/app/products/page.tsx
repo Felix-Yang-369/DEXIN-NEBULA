@@ -349,8 +349,8 @@ export default async function ProductsPage({
 
   return (
     <WorkflowShell
-      activeItem="产品中心"
-      breadcrumb="产品中心 / PIM"
+      activeItem="产品管理"
+      breadcrumb="供应链 / 产品管理 / PIM"
       currentUser={
         employee
           ? {

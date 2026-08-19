@@ -29,6 +29,7 @@ import type {
 type DashboardIdentity = {
   name: string;
   role: string;
+  roleCodes: string[];
   avatarUrl: string | null;
 };
 
@@ -129,8 +130,8 @@ export function DashboardClient({
         aria-hidden="true"
         className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_79%_4%,rgba(24,175,179,.11),transparent_26%),radial-gradient(circle_at_18%_78%,rgba(69,128,184,.07),transparent_24%),linear-gradient(180deg,rgba(255,255,255,.55),transparent_30%)]"
       />
-      <Sidebar pendingCount={pendingCount} />
-      <div className="relative lg:pl-[248px]">
+      <Sidebar pendingCount={pendingCount} roleCodes={identity.roleCodes} />
+      <div className="relative lg:pl-[252px]">
         <Header
           name={identity.name}
           role={identity.role}

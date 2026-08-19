@@ -28,8 +28,8 @@ export default async function SealRequestPage() {
 
   return (
     <WorkflowShell
-      activeItem="协同办公"
-      breadcrumb="协同办公 / 用印申请"
+      activeItem="审批"
+      breadcrumb="协同办公 / 审批 / 用印申请"
       currentUser={{
         name: employee.name,
         roleLabel: employee.title ?? "内部员工",

@@ -46,7 +46,8 @@ export default async function ApprovalsPage({
 
   return (
     <WorkflowShell
-      breadcrumb="协同办公 / 审批中心"
+      activeItem="审批"
+      breadcrumb="协同办公 / 审批 / 待办"
       currentUser={
         employee
           ? {

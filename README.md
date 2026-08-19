@@ -7,49 +7,47 @@
 
 ## 当前状态
 
-更新时间：2026-08-06
+更新时间：2026-08-14
 
 | 项目 | 当前结论 |
 | --- | --- |
 | 当前版本 | `V0.9-alpha` |
-| 当前阶段 | 供应链与财务闭环完成首版，进入内部验收与部署阶段 |
-| 工程规模 | 52 个页面、19 个业务 feature、50 个数据库迁移 |
+| 当前阶段 | 2026-08-14 新版已部署到阿里云，等待业务验收 |
+| 工程规模 | 多模块 Next.js 应用、业务服务层和 PostgreSQL 迁移体系 |
 | 运行模式 | Next.js App Router + Supabase + PostgreSQL RLS |
 | 使用对象 | 内部员工、负责人、人事、财务、董事长和管理员 |
 | 数据原则 | 真实数据优先；无来源指标显示空状态，不伪造经营趋势 |
-| 本地验证 | ESLint、TypeScript、44 项自动化测试、生产构建已通过 |
-| 云端部署 | 阿里云旧版本仍在线；新版本尚未正式切换，详见“部署状态” |
+| 正式域名 | 系统 `app.nebula.dexinmiaosheng.cn`；介绍站 `nebula.dexinmiaosheng.cn` |
+| 本地验证 | ESLint、TypeScript、77 项自动化测试和生产构建已通过 |
+| 云端部署 | 阿里云 ECS 生产环境正常，正式入口为 `app.nebula.dexinmiaosheng.cn` |
 
 ## 当前产品架构
 
 ```text
 德馨星云 DEXIN NEBULA
-├── 驾驶舱 Dashboard
-├── 业务管理
+├── 经营总览 OVERVIEW
+│   ├── 驾驶舱 DASHBOARD
+│   ├── 数据分析 BI
+│   ├── 智能助手 AI ASSISTANT
+├── 业务管理 BUSINESS
 │   ├── 客户管理 CRM
 │   ├── 销售管理
 │   ├── 订单管理
 │   ├── 供应链管理（SRM / 采购 / WMS）
 │   └── 产品管理 PIM
-├── 运营管理
-│   ├── 新媒体管理（V0.10 规划入口）
-│   ├── 企业宣传（V0.10 规划入口）
-│   └── 企业活动（V0.10 规划入口）
-├── 财务管理
-│   ├── 应收、应付
+├── 运营管理 OPERATION
+│   ├── 新媒体管理
+│   ├── 人力资源 HRM
+│   └── 文件中心
+├── 财务管理 FINANCE
+│   ├── 应收应付
 │   ├── 银行流水与核销
 │   ├── 发票与凭证
 │   └── 财务报表与利润分析
-├── AI 助手
-│   ├── 德小馨 AI
-│   └── BI 数据分析
-└── 组织协同
-    ├── 人力资源 HRM
-    ├── 协同办公 OA
-    └── 系统管理 IAM / 审计
+└── 协同办公 OA
+    ├── 审批、公告、周报与通知
+    └── 系统管理 IAM
 ```
-
-运营管理三个入口已经建立页面与能力边界，但尚未建立账号、内容、发布计划、活动和舆情的数据表及完整业务流程，当前属于规划原型。
 
 ## 模块进度
 
@@ -100,7 +98,7 @@
 
 - Supabase Auth、服务端权限和 PostgreSQL Row Level Security 同时生效。
 - 普通员工、负责人、人事、财务、董事长和管理员拥有不同页面、操作和数据范围。
-- 员工头像、客户 Logo、合同及业务文件使用受控存储与签名访问。
+- 文件中心正文存入公司 NAS，Supabase 保存文件元数据并通过 RLS 控制访问；其他图片仍使用受控 Supabase Storage。
 - 身份证、银行卡、工资、合同、客户价格和供应商结算信息按敏感数据处理。
 - 写操作、审批、导出、权限变化和关键财务动作记录审计日志。
 - `.env.local`、服务端密钥和真实测试密码不得提交到 Git。
@@ -114,10 +112,10 @@
 | 数据 | Supabase、PostgreSQL、Supabase JS/SSR |
 | 数据库变更 | `supabase/migrations/*.sql` |
 | 校验 | Zod + 服务端业务校验 |
-| 文件 | Supabase Storage |
+| 文件 | 绿联 NAS WebDAV（文件中心正文）+ Supabase（元数据、权限与其他图片） |
 | AI | DeepSeek API 服务端调用 |
 | Excel | ExcelJS |
-| 部署 | PM2、Nginx、阿里云 ECS |
+| 部署 | 阿里云 ECS + PM2 + Nginx；Vercel 保留历史部署 |
 | 包管理 | npm + `package-lock.json` |
 
 当前没有使用 Prisma、React Hook Form、Vitest 或 Playwright，不要为了匹配旧规划而无目的引入。
@@ -152,72 +150,51 @@ npm run dev
 
 ```bash
 npm run check          # ESLint + TypeScript
-npm run test:workflow  # 当前 51 项业务与登录安全测试
+npm run test:workflow  # 业务流程、权限与登录安全测试
 npm run build          # 生产构建
 npm run start          # 启动生产服务
 ```
 
 环境变量键名以 [.env.example](./.env.example) 为准。主要包括 Supabase、企业微信、DeepSeek、`NEXT_PUBLIC_APP_URL` 和数据库连接变量。
 
-## 数据库与接入文档
+## 项目文档
 
-- 迁移位于 [`supabase/migrations`](./supabase/migrations)，已经执行的迁移不得修改，修复必须新增迁移。
-- 执行迁移前必须确认目标项目、RLS、备份和回滚路径。
-- [Supabase 接入](./docs/setup/supabase.md)
-- [企业微信扫码登录](./docs/setup/wecom.md)
-- [DeepSeek 接入](./docs/setup/deepseek.md)
-- [角色权限](./docs/product/user-roles.md)
-- [审批流程](./docs/processes/approval.md)
-- [通知与审计](./docs/security/notifications-and-audit.md)
+统一入口见 [文档中心](./docs/README.md)，其中包括：
+
+- 产品需求、路线图、角色权限和品牌规范
+- 业务流程、开发规范与测试标准
+- Supabase、企业微信、DeepSeek 和小程序接入
+- 部署、域名、回滚和正式版本记录
+
+数据库迁移位于 [`supabase/migrations`](./supabase/migrations)。已经执行的迁移不得修改，修复必须新增迁移。
 
 ## 部署状态
 
-阿里云 ECS：`8.134.18.12`，Alibaba Cloud Linux，Node.js 22、PM2、Nginx。
+当前正式业务系统托管在阿里云 ECS：
 
-1. 当前旧版本仍由 PM2 的 `dexin-nebula` 在 `3103` 端口运行，本次部署未中断旧版本。
-2. 2026-08-04 新代码已上传到独立发布目录 `/srv/dexin/releases/nebula-20260804-100106`。
-3. 新版本远程构建完成代码编译后，在 TypeScript 后续阶段因服务器内存限制被终止，尚未切换。
-4. 公网 IP 的 Nginx 默认入口目前仍指向德馨淼盛官网，没有切换到德馨星云。
-5. 备案完成前只计划通过公网 IP 内测；正式域名和企业微信扫码需备案、DNS 与 HTTPS 完成后验收。
+- `https://app.nebula.dexinmiaosheng.cn`：德馨星云业务系统、登录、Supabase 邮件回调和企业微信登录回调。
+- `https://nebula.dexinmiaosheng.cn`：德馨星云对外介绍站，只通过明确按钮进入业务系统。
 
-下一次部署应使用本地或 CI 构建产物上传，或增加交换空间并降低构建并行度。新构建验证成功前不得覆盖当前在线目录。
+当前生产版本和部署验证见 [2026-08-14 阿里云发布记录](./docs/releases/2026-08-14-aliyun.md)。上一版见 [2026-08-12 发布记录](./docs/releases/2026-08-12-production.md)，部署与回滚约定见 [部署与回滚规范](./docs/operations/deployment.md)。
+
+本次已发布内容见 [下一版本记录](./docs/releases/next.md)，完成业务验收后再归档为正式版本范围。
 
 ## 下一阶段优先级
 
-### P0：部署与内测
-
-1. 完成阿里云新版本构建和原子切换。
-2. 验证登录、Dashboard、CRM、销售、库存、财务和文件下载。
-3. 建立数据库备份、恢复验证和部署回滚记录。
-4. 使用老板、财务主管、客服、仓储四类账号完成权限验收。
-
-### P1：真实业务验收
-
-1. 用少量真实单据贯通销售与采购闭环。
-2. 验证库存扣减、应收应付、核销、凭证和毛利口径。
-3. 修复空状态、重复提交、错误反馈和移动端关键流程。
-4. 明确金蝶协同边界，不重复建设成熟会计能力。
-
-### P2：V0.10 运营管理
-
-1. 新媒体账号与品牌主数据。
-2. 内容、素材、审核和发布计划。
-3. 企业宣传资料与版本管理。
-4. 企业活动立项、预算、执行和复盘。
-5. 平台接口明确后再建设数据分析和舆情监控。
+详细优先级与上线门槛见 [版本路线图](./docs/product/roadmap.md)。README 不重复保存容易过期的计划清单。
 
 ## 上线边界
 
 - 核心角色权限验收通过。
 - 数据库备份与恢复演练完成。
-- 阿里云部署、重启和回滚流程可重复执行。
+- Vercel 部署和回滚流程可重复执行；历史阿里云环境有独立维护说明。
 - 敏感文件与财务数据访问验证通过。
 - 手机和电脑完成核心流程验收。
 - 域名备案、HTTPS 和企业微信回调完成后，再开放正式域名。
 
 ## 协作规范
 
-开发和 AI Agent 必须先阅读 [AGENT.md](./AGENT.md)。README 只记录当前事实、稳定结构和运行方式；详细设计放入 `docs/`，后续版本变化建议记录到 `CHANGELOG.md`。
+开发和 AI Agent 必须先阅读 [AGENTS.md](./AGENTS.md)。README 只记录当前事实、稳定结构和运行方式；详细设计放入 [文档中心](./docs/README.md)，每次正式上线记录到 `docs/releases/`。
 
 ## 版权
 

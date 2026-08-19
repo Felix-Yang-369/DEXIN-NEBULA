@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 
 const systemModules = [
   { title: "组织与账号", description: "组织、部门、员工账号与启停状态", href: "/employees", icon: UserCog },
-  { title: "角色与权限 IAM", description: "角色、页面、操作与数据范围权限", href: "/roles", icon: ShieldCheck },
+  { title: "员工权限分配", description: "逐人分配角色权限，董事长默认拥有全部权限", href: "/roles#employee-permissions", icon: ShieldCheck },
   { title: "审批流程 BPM", description: "统一审批实例与流程运行状态", href: "/approvals", icon: ClipboardCheck },
   { title: "消息通知", description: "站内通知与业务状态提醒", href: "/notifications", icon: BellRing },
   { title: "系统配置", description: "组织级参数与模块配置，逐步建设", href: "/help", icon: Settings2 },

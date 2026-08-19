@@ -80,8 +80,8 @@ export default async function KnowledgeDetailPage({
 
   return (
     <WorkflowShell
-      activeItem="协同办公"
-      breadcrumb={`协同办公 / 制度与知识 / ${document.title}`}
+      activeItem="协同工作台"
+      breadcrumb={`协同办公 / 协同工作台 / 制度与知识 / ${document.title}`}
       currentUser={{
         name: employee.name,
         roleLabel: employee.title ?? "内部员工",

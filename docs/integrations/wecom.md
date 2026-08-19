@@ -6,10 +6,10 @@
 
 1. 在企业微信管理后台创建自建应用，并记录企业 ID、AgentId 和应用 Secret。
 2. 将需要登录德馨星云的员工加入应用可见范围。
-3. 在应用的企业微信授权登录配置中登记可信域名。
+3. 在应用的企业微信授权登录配置中将 `app.nebula.dexinmiaosheng.cn` 登记为可信域名。
 4. 将回调地址精确配置为：
 
-   `https://你的正式域名/auth/wecom/callback`
+   `https://app.nebula.dexinmiaosheng.cn/auth/wecom/callback`
 
 5. 回调地址必须使用 HTTPS；本地开发仅允许 `localhost`。
 
@@ -19,7 +19,7 @@
 WECOM_CORP_ID=wwxxxxxxxxxxxxxxxx
 WECOM_AGENT_ID=1000002
 WECOM_APP_SECRET=服务端密钥
-WECOM_CALLBACK_URL=https://你的正式域名/auth/wecom/callback
+WECOM_CALLBACK_URL=https://app.nebula.dexinmiaosheng.cn/auth/wecom/callback
 SUPABASE_SERVICE_ROLE_KEY=Supabase服务端管理密钥
 ```
 

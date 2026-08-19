@@ -197,10 +197,10 @@ supabase/seed.example.sql
 
 在 Supabase Dashboard 的 **Authentication → URL Configuration** 中：
 
-1. 将 `Site URL` 设为德馨星云的正式 HTTPS 域名。
+1. 将 `Site URL` 设为 `https://app.nebula.dexinmiaosheng.cn`。
 2. 将本地与正式回调加入 Redirect URLs：
    - `http://localhost:3000/auth/confirm`
-   - `https://正式域名/auth/confirm`
+   - `https://app.nebula.dexinmiaosheng.cn/auth/confirm`
 3. 生产环境配置自定义 SMTP，不依赖 Supabase 默认邮件服务。
 
 如果希望重置链接可在不同浏览器或设备打开，将 **Authentication → Email Templates → Reset password** 中的链接配置为：

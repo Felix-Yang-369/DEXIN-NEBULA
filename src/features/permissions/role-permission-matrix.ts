@@ -46,8 +46,8 @@ export const roles: Array<{
     id: "chairman",
     name: "董事长",
     code: "CHAIRMAN",
-    summary: "查看全公司经营数据并处理明确分配的高风险审批。",
-    dataScope: "全公司只读",
+    summary: "拥有全部页面、操作、数据范围和系统管理权限。",
+    dataScope: "全公司全部权限",
     accent: "bg-[#eef4f8] text-[#285f53]",
     mark: "董",
   },
@@ -80,7 +80,7 @@ export const roles: Array<{
   },
 ];
 
-export const pagePermissionRows: PermissionRow[] = [
+const configuredPagePermissionRows: PermissionRow[] = [
   {
     name: "工作台",
     description: "个人待办、公告与快捷入口",
@@ -191,7 +191,7 @@ export const pagePermissionRows: PermissionRow[] = [
   },
 ];
 
-export const operationPermissionRows: PermissionRow[] = [
+const configuredOperationPermissionRows: PermissionRow[] = [
   {
     name: "查看",
     description: "读取页面和记录",
@@ -278,7 +278,7 @@ export const operationPermissionRows: PermissionRow[] = [
   },
 ];
 
-export const sensitiveFieldRows: PermissionRow[] = [
+const configuredSensitiveFieldRows: PermissionRow[] = [
   {
     name: "身份证号",
     description: "员工身份识别信息",
@@ -352,3 +352,28 @@ export const permissionLegend: Array<{
   { level: "configure", label: "配置权限" },
   { level: "none", label: "无权限" },
 ];
+
+const chairmanFullPermission: PermissionCell = {
+  level: "full",
+  label: "全部权限",
+};
+
+function withChairmanFullPermission(rows: PermissionRow[]) {
+  return rows.map((row) => ({
+    ...row,
+    permissions: {
+      ...row.permissions,
+      chairman: chairmanFullPermission,
+    },
+  }));
+}
+
+export const pagePermissionRows = withChairmanFullPermission(
+  configuredPagePermissionRows,
+);
+export const operationPermissionRows = withChairmanFullPermission(
+  configuredOperationPermissionRows,
+);
+export const sensitiveFieldRows = withChairmanFullPermission(
+  configuredSensitiveFieldRows,
+);

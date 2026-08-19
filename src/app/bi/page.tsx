@@ -69,7 +69,7 @@ export default async function BiPage({
   return (
     <WorkflowShell
       activeItem="数据分析"
-      breadcrumb="数据分析 / 经营分析中心"
+      breadcrumb="经营决策 / 数据分析 / BI"
       currentUser={{
         name: employee.name,
         roleLabel: roleLabel(employee.roleCodes) || "内部员工",

@@ -1,12 +1,14 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
 import {
+  getPasswordRecoveryRedirectUrl,
   PASSWORD_RECOVERY_COOKIE,
   safePasswordReturnPath,
 } from "@/lib/auth/password";
 import { createClient } from "@/lib/supabase/server";
 
 export async function GET(request: NextRequest) {
+  const publicOrigin = new URL(getPasswordRecoveryRedirectUrl()).origin;
   const code = request.nextUrl.searchParams.get("code");
   const tokenHash = request.nextUrl.searchParams.get("token_hash");
   const type = request.nextUrl.searchParams.get("type") as EmailOtpType | null;
@@ -30,18 +32,18 @@ export async function GET(request: NextRequest) {
   if (error) {
     console.error("Password recovery confirmation failed", error);
     return NextResponse.redirect(
-      new URL("/forgot-password?error=invalid_link", request.url),
+      new URL("/forgot-password?error=invalid_link", publicOrigin),
     );
   }
 
   const { data } = await supabase.auth.getUser();
   if (!data.user) {
     return NextResponse.redirect(
-      new URL("/forgot-password?error=invalid_link", request.url),
+      new URL("/forgot-password?error=invalid_link", publicOrigin),
     );
   }
 
-  const response = NextResponse.redirect(new URL(nextPath, request.url));
+  const response = NextResponse.redirect(new URL(nextPath, publicOrigin));
   response.cookies.set(PASSWORD_RECOVERY_COOKIE, data.user.id, {
     httpOnly: true,
     maxAge: 15 * 60,

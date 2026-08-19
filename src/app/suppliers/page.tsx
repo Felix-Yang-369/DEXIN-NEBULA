@@ -158,7 +158,7 @@ export default async function SuppliersPage({
   return (
     <WorkflowShell
       activeItem="供应商管理"
-      breadcrumb="供应商管理 / SRM"
+      breadcrumb="供应链 / 供应商管理 / SRM"
       currentUser={{
         name: employee.name,
         roleLabel: employee.title ?? "内部员工",

@@ -175,7 +175,7 @@ export default async function EmployeeLifecyclePage({
   return (
     <WorkflowShell
       activeItem="人力资源"
-      breadcrumb="人力资源 / 入职离职"
+      breadcrumb="组织运营 / 人力资源 / 入职离职"
       currentUser={{
         name: currentEmployee.name,
         roleLabel: currentEmployee.title ?? "内部员工",

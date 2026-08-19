@@ -4,7 +4,8 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ["192.168.0.193"],
   experimental: {
     serverActions: {
-      bodySizeLimit: "20mb",
+      // Leave room for multipart form fields around the 20 MB file limit.
+      bodySizeLimit: "22mb",
     },
   },
   // Keep Turbopack's frequently-written caches out of iCloud sync.

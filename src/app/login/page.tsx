@@ -165,7 +165,15 @@ export default async function LoginPage({
         <div className="absolute bottom-5 right-6 text-right text-[11px] leading-5 text-muted-foreground/65 sm:right-10 lg:right-12 xl:right-16">
           <div>{isEnglish ? "Copyright © 2026 DEXIN NEBULA" : "Copyright © 2026 德馨星云 版权所有"}</div>
           <div className="flex items-center justify-end gap-2">
-            <span>{isEnglish ? "ICP filing: Pending" : "ICP备案号：待补充"}</span>
+            <Link
+              aria-label={isEnglish ? "View ICP filing information" : "查看ICP备案信息"}
+              className="transition hover:text-primary"
+              href="https://beian.miit.gov.cn/"
+              rel="noreferrer"
+              target="_blank"
+            >
+              湘ICP备2026033795号-1
+            </Link>
             <span className="h-3 w-px bg-border" />
             <Link
               aria-label={isEnglish ? "HARVESTFLOW website (coming soon)" : "HARVESTFLOW 官网入口（待开放）"}

@@ -246,7 +246,7 @@ export default async function SalesPage({
   return (
     <WorkflowShell
       activeItem="销售管理"
-      breadcrumb="业务管理 / 销售业务"
+      breadcrumb="客户与销售 / 销售管理 / 销售业务"
       currentUser={{
         name: employee.name,
         roleLabel: roleLabel(employee.roleCodes) || employee.title || "内部员工",

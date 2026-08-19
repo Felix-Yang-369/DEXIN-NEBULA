@@ -394,7 +394,7 @@ export default async function InventoryPage({
   return (
     <WorkflowShell
       activeItem="仓储管理"
-      breadcrumb="业务应用 / 仓储库存"
+      breadcrumb="供应链 / 仓储管理 / 仓储库存"
       currentUser={
         employee
           ? {

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { assignableRoleCodes } from "@/features/permissions/employee-role-assignment";
 
 export type CurrentEmployee = {
   id: string;
@@ -66,6 +67,9 @@ export const getCurrentEmployee = cache(async (): Promise<CurrentEmployee | null
       return role?.code;
     })
     .filter((code): code is string => Boolean(code));
+  const effectiveRoleCodes = roleCodes.includes("chairman")
+    ? [...assignableRoleCodes]
+    : [...new Set(roleCodes)];
 
   return {
     id: employee.id,
@@ -79,7 +83,7 @@ export const getCurrentEmployee = cache(async (): Promise<CurrentEmployee | null
     title: employee.title,
     avatarPath: employee.avatar_path,
     status: employee.status,
-    roleCodes: [...new Set(roleCodes)],
+    roleCodes: effectiveRoleCodes,
   };
 });
 

@@ -183,7 +183,7 @@ export default async function SupplierDetailPage({
   return (
     <WorkflowShell
       activeItem="供应商管理"
-      breadcrumb={`供应商管理 / ${supplier.short_name ?? supplier.name}`}
+      breadcrumb={`供应链 / 供应商管理 / ${supplier.short_name ?? supplier.name}`}
       currentUser={{
         name: currentEmployee.name,
         roleLabel: currentEmployee.title ?? "内部员工",

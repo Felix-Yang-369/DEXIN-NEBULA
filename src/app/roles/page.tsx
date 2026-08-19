@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { WorkflowShell } from "@/features/approvals/workflow-shell";
 import { requireCurrentEmployee } from "@/features/auth/current-employee";
+import { saveEmployeeRolesAction } from "@/features/employees/server-actions";
 import {
   operationPermissionRows,
   pagePermissionRows,
@@ -51,10 +52,20 @@ type TemplateVersion = {
   creator: { name: string } | Array<{ name: string }> | null;
 };
 
-type EmployeeOption = {
+type EmployeeIdentity = {
   id: string;
   name: string;
   employee_no: string;
+};
+
+type EmployeeOption = EmployeeIdentity & {
+  title: string | null;
+  employee_roles: Array<{
+    role:
+      | { code: string; name: string }
+      | Array<{ code: string; name: string }>
+      | null;
+  }>;
 };
 
 type TemporaryGrant = {
@@ -62,7 +73,7 @@ type TemporaryGrant = {
   expires_at: string;
   reason: string;
   created_at: string;
-  employee: EmployeeOption | EmployeeOption[] | null;
+  employee: EmployeeIdentity | EmployeeIdentity[] | null;
   role:
     | { code: string; name: string }
     | Array<{ code: string; name: string }>
@@ -91,6 +102,12 @@ function creatorName(version: TemplateVersion) {
     ? version.creator[0]
     : version.creator;
   return creator?.name ?? "系统迁移";
+}
+
+function employeeRoleCodes(employee: EmployeeOption) {
+  return employee.employee_roles
+    .map((assignment) => relationOne(assignment.role)?.code)
+    .filter((code): code is string => Boolean(code));
 }
 
 function PermissionPill({ permission }: { permission: PermissionCell }) {
@@ -153,6 +170,8 @@ export default async function RolesPage({
   searchParams,
 }: {
   searchParams: Promise<{
+    rolesSaved?: string;
+    rolesError?: string;
     temporarySaved?: string;
     temporaryRevoked?: string;
     temporaryError?: string;
@@ -167,7 +186,9 @@ export default async function RolesPage({
       ? "最高权限管理员"
       : "系统管理员"
     : "董事长";
-  const canManage = employee.roleCodes.includes("admin");
+  const canManage = employee.roleCodes.some((role) =>
+    ["admin", "chairman"].includes(role),
+  );
   const feedback = await searchParams;
   const supabase = await createClient();
   const now = new Date();
@@ -185,7 +206,9 @@ export default async function RolesPage({
           canManage
             ? supabase
                 .from("employees")
-                .select("id, name, employee_no")
+                .select(
+                  "id, name, employee_no, title, employee_roles(role:roles(code, name))",
+                )
                 .eq("status", "active")
                 .order("name")
             : Promise.resolve({ data: [] }),
@@ -223,6 +246,20 @@ export default async function RolesPage({
             operation_failed: "临时授权操作失败，请稍后重试。",
           }[feedback.temporaryError] ?? "临时授权操作失败，请稍后重试。"
         : "";
+  const roleAssignmentFeedback = feedback.rolesSaved
+    ? "员工权限已保存。董事长角色会自动获得全部权限。"
+    : feedback.rolesError
+      ? {
+          invalid_roles: "权限选择不完整，请重新选择。",
+          forbidden: "当前账号无权分配员工权限。",
+          admin_protection: "不能移除当前账号的管理员权限。",
+          last_admin: "必须保留至少一位在职系统管理员。",
+          governance_protection: "必须保留至少一位在职董事长。",
+          high_risk_confirmation:
+            "新增或移除系统管理员、董事长时，必须输入该员工姓名确认。",
+          operation_failed: "权限保存失败，请刷新后重试。",
+        }[feedback.rolesError] ?? "权限保存失败，请刷新后重试。"
+      : "";
 
   return (
     <WorkflowShell
@@ -277,6 +314,141 @@ export default async function RolesPage({
                   </div>
                 </article>
               ))}
+            </section>
+
+            <section
+              className="mt-5 rounded-[22px] border border-border/80 bg-white p-5 sm:p-6"
+              id="employee-permissions"
+            >
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <UserRoundCheck className="size-4 text-primary" />
+                    <h2 className="text-base font-semibold">员工权限分配</h2>
+                  </div>
+                  <p className="mt-2 text-[11px] leading-5 text-muted-foreground">
+                    按员工分配长期角色权限。普通员工为基础角色；选择董事长后，系统会自动授予全部角色和权限。
+                  </p>
+                </div>
+                <span className="rounded-full bg-[#eef8f5] px-3 py-1.5 text-[10px] text-[#285f53]">
+                  在职员工 {employeeOptions.length}
+                </span>
+              </div>
+
+              {roleAssignmentFeedback && (
+                <div
+                  className={`mt-4 rounded-xl px-4 py-3 text-[10px] ${
+                    feedback.rolesError
+                      ? "border border-[#ead8d8] bg-[#f8eeee] text-[#965151]"
+                      : "border border-[#b9dbce] bg-[#eef8f5] text-[#285f53]"
+                  }`}
+                >
+                  {roleAssignmentFeedback}
+                </div>
+              )}
+
+              {!canManage ? (
+                <div className="mt-5 rounded-xl bg-[#f8fafb] px-4 py-6 text-center text-xs text-muted-foreground">
+                  只有系统管理员或董事长可以分配员工权限。
+                </div>
+              ) : employeeOptions.length === 0 ? (
+                <div className="mt-5 rounded-xl bg-[#f8fafb] px-4 py-6 text-center text-xs text-muted-foreground">
+                  当前没有可分配权限的在职员工。
+                </div>
+              ) : (
+                <div className="mt-5 space-y-3">
+                  {employeeOptions.map((target) => {
+                    const assignedCodes = employeeRoleCodes(target);
+                    const assignedNames = roles
+                      .filter((role) => assignedCodes.includes(role.id))
+                      .map((role) => role.name);
+
+                    return (
+                      <details
+                        className="rounded-2xl border border-border/80 bg-[#fafcfe] open:bg-white"
+                        key={target.id}
+                      >
+                        <summary className="flex cursor-pointer list-none flex-wrap items-center gap-3 px-4 py-4">
+                          <span className="grid size-9 place-items-center rounded-xl bg-[#eaf3f8] text-xs font-semibold text-primary">
+                            {target.name.slice(0, 1)}
+                          </span>
+                          <span className="min-w-[160px] flex-1">
+                            <span className="block text-xs font-semibold">
+                              {target.name}
+                            </span>
+                            <span className="mt-1 block text-[9px] text-muted-foreground">
+                              {target.employee_no} · {target.title ?? "未设置职位"}
+                            </span>
+                          </span>
+                          <span className="text-[9px] text-muted-foreground">
+                            {assignedNames.length > 0
+                              ? assignedNames.join("、")
+                              : "尚未分配"}
+                          </span>
+                        </summary>
+
+                        <form
+                          action={saveEmployeeRolesAction}
+                          className="border-t border-border/70 p-4"
+                        >
+                          <input name="employeeId" type="hidden" value={target.id} />
+                          <input name="returnTo" type="hidden" value="roles" />
+                          <input name="roleCodes" type="hidden" value="employee" />
+                          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+                            {roles.map((role) =>
+                              role.id === "employee" ? (
+                                <div
+                                  className="flex items-center gap-2 rounded-xl border border-[#b9dbce] bg-[#eef8f5] px-3 py-3 text-[10px] text-[#285f53]"
+                                  key={role.id}
+                                >
+                                  <input checked readOnly type="checkbox" />
+                                  {role.name}（必选）
+                                </div>
+                              ) : (
+                                <label
+                                  className="flex cursor-pointer items-center gap-2 rounded-xl border border-border bg-white px-3 py-3 text-[10px]"
+                                  key={role.id}
+                                >
+                                  <input
+                                    defaultChecked={assignedCodes.includes(role.id)}
+                                    name="roleCodes"
+                                    type="checkbox"
+                                    value={role.id}
+                                  />
+                                  {role.name}
+                                </label>
+                              ),
+                            )}
+                          </div>
+
+                          <div className="mt-3 grid gap-3 lg:grid-cols-[1fr_auto] lg:items-end">
+                            <label className="rounded-xl border border-[#f0dec5] bg-[#fff9ef] p-3">
+                              <span className="block text-[9px] font-medium text-[#9a6321]">
+                                高风险变更确认
+                              </span>
+                              <span className="mt-1 block text-[9px] leading-4 text-muted-foreground">
+                                新增或移除系统管理员、董事长时，请输入“{target.name}”。
+                              </span>
+                              <input
+                                autoComplete="off"
+                                className="mt-2 h-8 w-full rounded-lg border border-[#ead8b8] bg-white px-2.5 text-[9px] outline-none focus:border-[#c89a52]"
+                                name="highRiskConfirmation"
+                                placeholder={`输入 ${target.name} 确认`}
+                              />
+                            </label>
+                            <button
+                              className="h-9 rounded-xl bg-primary px-5 text-[10px] font-medium text-white"
+                              type="submit"
+                            >
+                              保存该员工权限
+                            </button>
+                          </div>
+                        </form>
+                      </details>
+                    );
+                  })}
+                </div>
+              )}
             </section>
 
             <section

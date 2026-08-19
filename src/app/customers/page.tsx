@@ -294,7 +294,7 @@ export default async function CustomersPage({
   return (
     <WorkflowShell
       activeItem="客户管理"
-      breadcrumb="业务应用 / 客户管理"
+      breadcrumb="客户与销售 / 客户管理 / 客户"
       currentUser={
         employee
           ? {

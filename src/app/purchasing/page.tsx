@@ -195,7 +195,7 @@ export default async function PurchasingPage({
   return (
     <WorkflowShell
       activeItem="采购管理"
-      breadcrumb="供应商管理 / 采购管理"
+      breadcrumb="供应链 / 采购管理"
       currentUser={{ name: employee.name, roleLabel: employee.title ?? "内部员工" }}
     >
       <main className="mx-auto max-w-[1500px] p-4 sm:p-6 xl:p-8">

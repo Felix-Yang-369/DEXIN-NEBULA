@@ -7,8 +7,8 @@ type OperationsModule = "media" | "publicity" | "events";
 
 const modules = {
   media: {
-    activeItem: "新媒体管理",
-    breadcrumb: "运营管理 / 新媒体管理",
+    activeItem: "市场营销",
+    breadcrumb: "组织运营 / 市场营销 / 内容与新媒体",
     eyebrow: "OPERATIONS · NEW MEDIA MANAGEMENT",
     title: "新媒体管理",
     description:
@@ -28,8 +28,8 @@ const modules = {
     ],
   },
   publicity: {
-    activeItem: "企业宣传",
-    breadcrumb: "运营管理 / 企业宣传",
+    activeItem: "市场营销",
+    breadcrumb: "组织运营 / 市场营销 / 企业宣传",
     eyebrow: "OPERATIONS · CORPORATE COMMUNICATIONS",
     title: "企业宣传",
     description:
@@ -48,8 +48,8 @@ const modules = {
     ],
   },
   events: {
-    activeItem: "企业活动",
-    breadcrumb: "运营管理 / 企业活动",
+    activeItem: "市场营销",
+    breadcrumb: "组织运营 / 市场营销 / 活动",
     eyebrow: "OPERATIONS · CORPORATE EVENTS",
     title: "企业活动",
     description:

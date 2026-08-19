@@ -241,7 +241,7 @@ export default async function HrPage() {
   return (
     <WorkflowShell
       activeItem="人力资源"
-      breadcrumb="人力资源 / HRM 总览"
+      breadcrumb="组织运营 / 人力资源 / HRM 总览"
       currentUser={{
         name: currentEmployee.name,
         roleLabel: currentEmployee.title ?? "内部员工",

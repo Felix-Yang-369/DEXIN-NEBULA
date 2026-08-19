@@ -108,8 +108,8 @@ export default async function CustomerStatementPage({
 
   return (
     <WorkflowShell
-      activeItem="财务管理"
-      breadcrumb="财务管理 / 应收汇总 / 客户对账单"
+      activeItem="会计核算"
+      breadcrumb="财务管理 / 会计核算 / 应收 / 客户对账单"
       currentUser={{
         name: employee.name,
         roleLabel: roleLabel(employee.roleCodes),

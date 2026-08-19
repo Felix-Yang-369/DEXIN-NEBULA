@@ -4,6 +4,10 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireCurrentEmployee } from "@/features/auth/current-employee";
+import {
+  assignableRoleCodes,
+  normalizeEmployeeRoleCodes,
+} from "@/features/permissions/employee-role-assignment";
 import { createClient } from "@/lib/supabase/server";
 
 const nullableUuid = z.preprocess(
@@ -31,6 +35,8 @@ const employeeSchema = z.object({
 });
 
 function errorCode(message?: string) {
+  if (message?.includes("只有系统管理员或董事长")) return "forbidden";
+  if (message?.includes("只有系统管理员可以分配角色")) return "forbidden";
   if (message?.includes("只有人事或管理员")) return "forbidden";
   if (message?.includes("员工编号或邮箱已存在")) return "duplicate";
   if (message?.includes("直属负责人")) return "manager";
@@ -39,6 +45,7 @@ function errorCode(message?: string) {
   if (message?.includes("Auth 邮箱")) return "auth_email";
   if (message?.includes("Auth 用户不存在")) return "auth_missing";
   if (message?.includes("管理员角色")) return "admin_protection";
+  if (message?.includes("最后一位系统管理员")) return "last_admin";
   if (message?.includes("最后一位董事长")) return "governance_protection";
   if (message?.includes("高危角色变更")) return "high_risk_confirmation";
   if (message?.includes("只有人事或管理员")) return "forbidden";
@@ -95,21 +102,13 @@ export async function saveEmployeeAction(formData: FormData) {
 const rolesSchema = z.object({
   employeeId: z.uuid(),
   roleCodes: z
-    .array(
-      z.enum([
-        "employee",
-        "department_lead",
-        "hr",
-        "finance",
-        "admin",
-        "chairman",
-      ]),
-    )
+    .array(z.enum(assignableRoleCodes))
     .min(1),
   highRiskConfirmation: z.preprocess(
     (value) => (typeof value === "string" ? value : ""),
     z.string().trim().max(50),
   ),
+  returnTo: z.enum(["employees", "roles"]).default("employees"),
 });
 
 export async function saveEmployeeRolesAction(formData: FormData) {
@@ -119,25 +118,44 @@ export async function saveEmployeeRolesAction(formData: FormData) {
     employeeId: formData.get("employeeId"),
     roleCodes: formData.getAll("roleCodes"),
     highRiskConfirmation: formData.get("highRiskConfirmation"),
+    returnTo: formData.get("returnTo") ?? "employees",
   });
 
   if (!parsed.success) {
-    redirect("/employees?error=invalid_roles");
+    const returnTo = formData.get("returnTo") === "roles" ? "roles" : "employees";
+    redirect(
+      returnTo === "roles"
+        ? "/roles?rolesError=invalid_roles#employee-permissions"
+        : "/employees?error=invalid_roles",
+    );
   }
+
+  const normalizedRoleCodes = normalizeEmployeeRoleCodes(parsed.data.roleCodes);
 
   const supabase = await createClient();
   const { error } = await supabase.rpc("set_employee_roles", {
     p_employee_id: parsed.data.employeeId,
-    p_role_codes: parsed.data.roleCodes,
+    p_role_codes: normalizedRoleCodes,
     p_high_risk_confirmation: parsed.data.highRiskConfirmation,
   });
 
   if (error) {
-    redirect(`/employees?error=${errorCode(error.message)}`);
+    const code = errorCode(error.message);
+    redirect(
+      parsed.data.returnTo === "roles"
+        ? `/roles?rolesError=${code}#employee-permissions`
+        : `/employees?error=${code}`,
+    );
   }
 
   revalidatePath("/employees");
-  redirect("/employees?rolesSaved=1");
+  revalidatePath("/roles");
+  revalidatePath("/system");
+  redirect(
+    parsed.data.returnTo === "roles"
+      ? "/roles?rolesSaved=1#employee-permissions"
+      : "/employees?rolesSaved=1",
+  );
 }
 
 const accountSchema = z.object({

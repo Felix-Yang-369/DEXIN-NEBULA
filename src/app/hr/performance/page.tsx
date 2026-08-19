@@ -246,7 +246,7 @@ export default async function PerformancePage({
   return (
     <WorkflowShell
       activeItem="人力资源"
-      breadcrumb="人力资源 / 绩效考核"
+      breadcrumb="组织运营 / 人力资源 / 绩效"
       currentUser={{
         name: currentEmployee.name,
         roleLabel: roleLabel(currentEmployee.roleCodes, currentEmployee.title),

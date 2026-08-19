@@ -32,7 +32,7 @@ export default async function LeaveRequestPage() {
   return (
     <WorkflowShell
       activeItem="人力资源"
-      breadcrumb="人力资源 / 请假申请"
+      breadcrumb="组织运营 / 人力资源 / 请假"
       currentUser={
         employee
           ? {

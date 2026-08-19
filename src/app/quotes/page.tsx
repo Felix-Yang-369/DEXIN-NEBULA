@@ -216,8 +216,8 @@ export default async function QuotesPage({
 
   return (
     <WorkflowShell
-      activeItem="客户管理"
-      breadcrumb="客户管理 / 报价中心"
+      activeItem="销售管理"
+      breadcrumb="客户与销售 / 销售管理 / 报价"
       currentUser={{
         name: employee.name,
         roleLabel: roleLabel(employee.roleCodes) || employee.title || "内部员工",

@@ -1,100 +1,153 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  Archive,
-  Building2,
+  ArrowLeft,
+  Check,
+  ChevronRight,
+  Clock3,
+  Columns3,
   Download,
   FileArchive,
-  FileCheck2,
-  FileClock,
   FileText,
+  Folder,
+  FolderInput,
   FolderKey,
+  HardDrive,
+  History,
+  Info,
+  List,
+  Lock,
+  MoreHorizontal,
+  Pencil,
+  Plus,
+  RotateCcw,
   Search,
   ShieldCheck,
+  Trash2,
   Upload,
-  UsersRound,
+  UserRound,
+  X,
 } from "lucide-react";
 import { WorkflowShell } from "@/features/approvals/workflow-shell";
 import { requireCurrentEmployee } from "@/features/auth/current-employee";
 import {
   archiveBusinessDocument,
+  createDocumentFolder,
+  moveBusinessDocument,
+  processDocumentFolderAccess,
+  renameBusinessDocument,
+  requestDocumentFolderAccess,
+  restoreBusinessDocument,
   uploadBusinessDocument,
 } from "@/features/documents/server-actions";
+import { DirectDocumentUpload } from "@/features/documents/direct-document-upload";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "文件中心",
-  description: "德馨星云合同、客户文件、供应商资质和内部资料管理",
+  description: "德馨星云企业文件目录、权限审批与 NAS 安全存储",
 };
 
 export const dynamic = "force-dynamic";
 
 type DocumentCategory = "contract" | "customer" | "supplier" | "internal";
-type DocumentVisibility = "organization" | "department" | "restricted";
+type DocumentView = "all" | "mine" | "recent" | "archived";
+
+type DocumentFolder = {
+  id: string;
+  parent_id: string | null;
+  code: string;
+  name: string;
+  description: string | null;
+  access_level: number;
+  sort_order: number;
+  owner_name: string | null;
+  is_locked: boolean;
+  can_download: boolean;
+  can_upload: boolean;
+  can_manage: boolean;
+  can_authorize: boolean;
+  is_requestable: boolean;
+  pending_request_id: string | null;
+  file_count: number;
+};
 
 type BusinessDocument = {
   id: string;
+  folder_id: string;
   document_no: string;
   category: DocumentCategory;
   title: string;
   description: string | null;
   original_file_name: string;
-  mime_type: string;
   file_size: number;
   related_party_name: string | null;
   reference_no: string | null;
-  effective_on: string | null;
-  expires_on: string | null;
-  visibility: DocumentVisibility;
-  viewer_role_codes: string[];
   uploaded_by_employee_id: string;
   status: "active" | "archived";
   created_at: string;
   employees: { name: string } | { name: string }[] | null;
-  departments: { name: string } | { name: string }[] | null;
   customers: { name: string } | { name: string }[] | null;
+};
+
+type FolderAccessDetail = {
+  folder_id: string;
+  reason: string;
+  related_context: string | null;
+  duration_hours: number;
+  requested_can_download: boolean;
+  urgency: "normal" | "urgent";
+  folder:
+    | { name: string; access_level: number }
+    | { name: string; access_level: number }[]
+    | null;
+};
+
+type FolderAccessRequest = {
+  id: string;
+  request_no: string;
+  applicant_employee_id: string;
+  current_approver_employee_id: string | null;
+  status: "pending" | "approved" | "rejected" | "returned" | "withdrawn";
+  current_step_order: number;
+  total_steps: number;
+  version: number;
+  created_at: string;
+  applicant: { name: string } | { name: string }[] | null;
+  folder_access: FolderAccessDetail | FolderAccessDetail[] | null;
 };
 
 const categoryLabels: Record<DocumentCategory, string> = {
   contract: "合同文件",
   customer: "客户文件",
-  supplier: "供应商资质",
+  supplier: "供应商资料",
   internal: "内部资料",
 };
 
-const categoryTones: Record<DocumentCategory, string> = {
-  contract: "bg-[#eaf3f8] text-[#0d6c78]",
-  customer: "bg-[#edf3fb] text-[#426c9b]",
-  supplier: "bg-[#fff4df] text-[#96651f]",
-  internal: "bg-[#f1edfa] text-[#72529a]",
+const levelLabels: Record<number, string> = {
+  1: "L1 公开",
+  2: "L2 部门",
+  3: "L3 高级",
+  4: "L4 核心",
 };
 
-const visibilityLabels: Record<DocumentVisibility, string> = {
-  organization: "全公司可见",
-  department: "本部门可见",
-  restricted: "指定角色可见",
+const levelTones: Record<number, string> = {
+  1: "bg-[#e8f6ef] text-[#27765b]",
+  2: "bg-[#eaf3f8] text-[#0d6c78]",
+  3: "bg-[#fff4df] text-[#96651f]",
+  4: "bg-[#fff0ed] text-[#a34e42]",
 };
 
-const roleLabels: Record<string, string> = {
-  employee: "普通员工",
-  department_lead: "部门负责人",
-  hr: "人事行政",
-  finance: "财务",
-  admin: "管理员",
-  chairman: "董事长",
+const statusLabels: Record<FolderAccessRequest["status"], string> = {
+  pending: "审批中",
+  approved: "已通过",
+  rejected: "已拒绝",
+  returned: "已退回",
+  withdrawn: "已撤回",
 };
 
-function relatedOne<T>(value: T | T[] | null) {
-  return Array.isArray(value) ? (value[0] ?? null) : value;
-}
-
-function displayDate(value: string | null) {
-  if (!value) return "—";
-  return new Intl.DateTimeFormat("zh-CN", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date(value));
+function one<T>(input: T | T[] | null) {
+  return Array.isArray(input) ? (input[0] ?? null) : input;
 }
 
 function displaySize(bytes: number) {
@@ -102,143 +155,184 @@ function displaySize(bytes: number) {
   return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 }
 
-function roleLabel(roleCodes: string[]) {
-  return roleCodes.map((code) => roleLabels[code]).filter(Boolean).join(" · ");
+function displayDate(value: string) {
+  return new Intl.DateTimeFormat("zh-CN", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(value));
 }
 
-function MetricCard({
-  icon,
-  label,
-  value,
-  note,
-  tone,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  note: string;
-  tone: string;
-}) {
-  return (
-    <article className="rounded-[20px] border border-border/75 bg-white p-5 shadow-[0_8px_30px_-24px_rgba(23,57,50,.35)]">
-      <div className="flex items-start justify-between">
-        <div>
-          <div className="text-xs text-muted-foreground">{label}</div>
-          <div className="mt-3 text-[27px] font-semibold tracking-[-0.04em]">
-            {value}
-          </div>
-        </div>
-        <span className={`grid size-10 place-items-center rounded-xl ${tone}`}>
-          {icon}
-        </span>
-      </div>
-      <div className="mt-4 border-t border-border/70 pt-3 text-[10px] text-muted-foreground">
-        {note}
-      </div>
-    </article>
-  );
+function roleLabel(roleCodes: string[]) {
+  const labels: Record<string, string> = {
+    employee: "员工",
+    department_lead: "部门负责人",
+    hr: "人力资源",
+    finance: "财务",
+    admin: "系统管理员",
+    chairman: "董事长",
+  };
+  return roleCodes
+    .map((code) => labels[code])
+    .filter(Boolean)
+    .join(" · ");
+}
+
+function durationLabel(hours: number) {
+  if (hours === 0) return "长期";
+  if (hours === 24) return "24 小时";
+  if (hours === 168) return "7 天";
+  if (hours === 720) return "30 天";
+  return "90 天";
+}
+
+function folderHref(folderId?: string | null, extras?: Record<string, string>) {
+  const query = new URLSearchParams(extras);
+  if (folderId) query.set("folder", folderId);
+  const suffix = query.toString();
+  return suffix ? `/documents?${suffix}` : "/documents";
 }
 
 export default async function DocumentsPage({
   searchParams,
 }: {
   searchParams: Promise<{
+    folder?: string;
     q?: string;
     category?: string;
     status?: string;
+    view?: string;
     created?: string;
     updated?: string;
     error?: string;
+    document?: string;
   }>;
 }) {
   const employee = await requireCurrentEmployee();
   const params = await searchParams;
+  const supabase = await createClient();
   const query = (params.q ?? "").trim().slice(0, 80);
+  const fileView: DocumentView = ["mine", "recent", "archived"].includes(
+    params.view ?? "",
+  )
+    ? (params.view as DocumentView)
+    : "all";
   const category = ["contract", "customer", "supplier", "internal"].includes(
     params.category ?? "",
   )
     ? (params.category as DocumentCategory)
     : "all";
-  const status = params.status === "archived" ? "archived" : "active";
-  const supabase = await createClient();
+  const status =
+    fileView === "archived" || params.status === "archived"
+      ? "archived"
+      : "active";
 
-  const [
-    departmentResult,
-    contractPermission,
-    customerPermission,
-    supplierPermission,
-    internalPermission,
-    customerResult,
-  ] = await Promise.all([
-    employee.departmentId
-      ? supabase
-          .from("departments")
-          .select("code")
-          .eq("id", employee.departmentId)
-          .maybeSingle()
-      : Promise.resolve({ data: null }),
-    supabase.rpc("can_upload_business_document", { p_category: "contract" }),
-    supabase.rpc("can_upload_business_document", { p_category: "customer" }),
-    supabase.rpc("can_upload_business_document", { p_category: "supplier" }),
-    supabase.rpc("can_upload_business_document", { p_category: "internal" }),
-    supabase
-      .from("customers")
-      .select("id, name, customer_no")
-      .neq("status", "inactive")
-      .order("name")
-      .limit(200),
-  ]);
+  const [folderResult, customerResult, accessRequestResult] = await Promise.all(
+    [
+      supabase.rpc("list_document_folder_tree"),
+      supabase
+        .from("customers")
+        .select("id, name, customer_no")
+        .neq("status", "inactive")
+        .order("name")
+        .limit(200),
+      supabase
+        .from("approval_requests")
+        .select(
+          "id, request_no, applicant_employee_id, current_approver_employee_id, status, current_step_order, total_steps, version, created_at, applicant:employees!approval_requests_applicant_employee_id_fkey(name), folder_access:document_folder_access_requests(folder_id, reason, related_context, duration_hours, requested_can_download, urgency, folder:document_folders(name, access_level))",
+        )
+        .eq("request_type", "folder_access")
+        .order("created_at", { ascending: false })
+        .limit(100),
+    ],
+  );
 
-  let documentQuery = supabase
-    .from("business_documents")
-    .select(
-      "id, document_no, category, title, description, original_file_name, mime_type, file_size, related_party_name, reference_no, effective_on, expires_on, visibility, viewer_role_codes, uploaded_by_employee_id, status, created_at, employees!business_documents_uploaded_by_employee_id_fkey(name), departments!business_documents_owner_department_id_fkey(name), customers(name)",
-    )
-    .eq("status", status)
-    .order("created_at", { ascending: false })
-    .limit(200);
+  const folders = (folderResult.data ?? []) as DocumentFolder[];
+  const folderMap = new Map(folders.map((folder) => [folder.id, folder]));
+  const rootFolders = folders.filter((folder) => !folder.parent_id);
+  const selectedFolder = params.folder
+    ? (folderMap.get(params.folder) ?? null)
+    : null;
+  const uploadFolders = folders.filter(
+    (folder) => !folder.is_locked && folder.can_upload,
+  );
+  const accessRequests = (accessRequestResult.data ??
+    []) as unknown as FolderAccessRequest[];
+  const myRequests = accessRequests.filter(
+    (request) => request.applicant_employee_id === employee.id,
+  );
+  const myPendingApprovals = accessRequests.filter(
+    (request) =>
+      request.status === "pending" &&
+      request.current_approver_employee_id === employee.id,
+  );
 
-  if (category !== "all") documentQuery = documentQuery.eq("category", category);
-  if (query) {
-    const safeQuery = query.replaceAll(",", "");
-    documentQuery = documentQuery.or(
-      `title.ilike.%${safeQuery}%,document_no.ilike.%${safeQuery}%,related_party_name.ilike.%${safeQuery}%,reference_no.ilike.%${safeQuery}%`,
-    );
+  let documents: BusinessDocument[] = [];
+  let documentError = null as { code?: string } | null;
+  if (!selectedFolder?.is_locked) {
+    let documentQuery = supabase
+      .from("business_documents")
+      .select(
+        "id, folder_id, document_no, category, title, description, original_file_name, file_size, related_party_name, reference_no, uploaded_by_employee_id, status, created_at, employees!business_documents_uploaded_by_employee_id_fkey(name), customers(name)",
+      )
+      .eq("status", status)
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (selectedFolder)
+      documentQuery = documentQuery.eq("folder_id", selectedFolder.id);
+    if (fileView === "mine")
+      documentQuery = documentQuery.eq("uploaded_by_employee_id", employee.id);
+    if (fileView === "recent") {
+      const recentFrom = new Date();
+      recentFrom.setDate(recentFrom.getDate() - 30);
+      documentQuery = documentQuery.gte("created_at", recentFrom.toISOString());
+    }
+    if (category !== "all")
+      documentQuery = documentQuery.eq("category", category);
+    if (query) {
+      const safeQuery = query.replaceAll(",", "");
+      documentQuery = documentQuery.or(
+        `title.ilike.%${safeQuery}%,document_no.ilike.%${safeQuery}%,related_party_name.ilike.%${safeQuery}%,reference_no.ilike.%${safeQuery}%`,
+      );
+    }
+    const result = await documentQuery;
+    documents = (result.data ?? []) as BusinessDocument[];
+    documentError = result.error;
   }
 
-  const { data, error } = await documentQuery;
-  const documents = (data ?? []) as BusinessDocument[];
-  const customers = customerResult.data ?? [];
-  const departmentCode = departmentResult.data?.code ?? null;
-  const canUpload: Record<DocumentCategory, boolean> = {
-    contract: Boolean(contractPermission.data),
-    customer: Boolean(customerPermission.data),
-    supplier: Boolean(supplierPermission.data),
-    internal: Boolean(internalPermission.data),
-  };
-  const availableCategories = (
-    Object.keys(categoryLabels) as DocumentCategory[]
-  ).filter((item) => canUpload[item]);
-  const canAdminAll = employee.roleCodes.includes("admin");
-  const today = new Date();
-  const expiryLimit = new Date();
-  expiryLimit.setDate(today.getDate() + 30);
-  const expiringCount = documents.filter((document) => {
-    if (!document.expires_on || document.status !== "active") return false;
-    const expiresOn = new Date(document.expires_on);
-    return expiresOn >= today && expiresOn <= expiryLimit;
-  }).length;
+  const hasAdminView = employee.roleCodes.includes("admin");
+  const isChairman = employee.roleCodes.includes("chairman");
+  const canDownload = (document: BusinessDocument) =>
+    document.uploaded_by_employee_id === employee.id ||
+    hasAdminView ||
+    Boolean(folderMap.get(document.folder_id)?.can_download);
   const canArchive = (document: BusinessDocument) =>
     document.uploaded_by_employee_id === employee.id ||
-    canAdminAll ||
-    (document.category === "contract" && employee.roleCodes.includes("hr")) ||
-    (document.category === "customer" &&
-      ["DX-SALES", "DX-CS"].includes(departmentCode ?? "")) ||
-    (document.category === "supplier" && departmentCode === "DX-PROC");
+    isChairman ||
+    Boolean(folderMap.get(document.folder_id)?.can_manage);
+
+  const breadcrumbs: DocumentFolder[] = [];
+  let breadcrumbFolder = selectedFolder;
+  while (breadcrumbFolder) {
+    breadcrumbs.unshift(breadcrumbFolder);
+    breadcrumbFolder = breadcrumbFolder.parent_id
+      ? (folderMap.get(breadcrumbFolder.parent_id) ?? null)
+      : null;
+  }
+  const selectedDocument = params.document
+    ? (documents.find((document) => document.id === params.document) ?? null)
+    : null;
+  const explorerRoot = breadcrumbs[0] ?? null;
+  const explorerFolderParent = selectedFolder?.parent_id
+    ? (folderMap.get(selectedFolder.parent_id) ?? null)
+    : selectedFolder;
+  const explorerFolders = explorerFolderParent
+    ? folders.filter((folder) => folder.parent_id === explorerFolderParent.id)
+    : [];
 
   return (
     <WorkflowShell
-      activeItem="协同办公"
+      activeItem="文件中心"
       breadcrumb="协同办公 / 文件中心"
       currentUser={{
         name: employee.name,
@@ -246,224 +340,982 @@ export default async function DocumentsPage({
       }}
     >
       <main className="mx-auto max-w-[1600px] p-4 sm:p-6 xl:p-8">
-        <section className="relative overflow-hidden rounded-[24px] bg-[#0a385d] px-6 py-7 text-white shadow-[0_18px_50px_-32px_rgba(12,47,41,.75)] sm:px-8 lg:px-10">
-          <div className="absolute -right-16 -top-24 size-80 rounded-full border border-white/8" />
+        <section className="relative overflow-hidden rounded-[24px] bg-[#0a385d] px-6 py-7 text-white sm:px-8 lg:px-10">
           <FileArchive className="pointer-events-none absolute right-10 top-1/2 hidden size-40 -translate-y-1/2 text-white/[0.055] sm:block" />
-          <div className="relative flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+          <div className="relative flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
             <div>
               <div className="text-xs font-medium tracking-[0.13em] text-[#79d8d5]">
-                DOCUMENT CENTER · SECURE ARCHIVE
+                DOCUMENT CENTER · NAS PRIVATE STORAGE
               </div>
               <h1 className="mt-3 text-2xl font-semibold tracking-[-0.035em] sm:text-[30px]">
-                企业文件中心
+                企业网盘
               </h1>
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-white/55">
-                统一归档合同、客户文件、供应商资质和内部资料，以私有存储、数据范围和下载审计保护企业文件。
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-white/60">
+                像使用企业网盘一样管理公司文件：按目录浏览、快速搜索、上传下载和权限申请；文件正文安全保存在公司
+                NAS。
               </p>
             </div>
-            <div className="inline-flex items-center gap-2 self-start rounded-xl border border-white/12 bg-white/8 px-4 py-3 text-[11px] text-white/68 lg:self-auto">
-              <FolderKey className="size-4" />
-              私有存储 · 权限访问 · 审计留痕
+            <div className="flex flex-wrap gap-2 text-[11px]">
+              <Link
+                className="rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-white/80"
+                href="/documents?view=my-requests"
+              >
+                我的申请{" "}
+                {myRequests.filter((item) => item.status === "pending").length}
+              </Link>
+              <Link
+                className="rounded-xl bg-white px-4 py-3 font-medium text-[#0a385d]"
+                href="/documents?view=approvals"
+              >
+                权限审批 {myPendingApprovals.length}
+              </Link>
             </div>
           </div>
         </section>
 
         {(params.created || params.updated || params.error) && (
           <div
-            className={`mt-5 rounded-2xl border px-4 py-3 text-xs ${
-              params.error
-                ? "border-[#eed3cd] bg-[#fff4f1] text-[#985846]"
-                : "border-[#cfe8ec] bg-[#edf7f2] text-[#0d6c78]"
-            }`}
+            className={`mt-5 rounded-2xl border px-4 py-3 text-xs ${params.error ? "border-[#eed3cd] bg-[#fff4f1] text-[#985846]" : "border-[#cfe8ec] bg-[#edf7f2] text-[#0d6c78]"}`}
           >
             {params.error || params.created || params.updated}
           </div>
         )}
 
-        <section className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <MetricCard
-            icon={<FileText className="size-5" />}
-            label="当前文件"
-            note="当前权限和筛选范围"
-            tone="bg-[#eaf3f8] text-[#0d6c78]"
-            value={`${documents.length}`}
-          />
-          <MetricCard
-            icon={<FileCheck2 className="size-5" />}
-            label="合同文件"
-            note="合同与协议资料"
-            tone="bg-[#edf3fb] text-[#426c9b]"
-            value={`${documents.filter((item) => item.category === "contract").length}`}
-          />
-          <MetricCard
-            icon={<Building2 className="size-5" />}
-            label="业务资料"
-            note="客户文件与供应商资质"
-            tone="bg-[#f1edfa] text-[#72529a]"
-            value={`${
-              documents.filter((item) =>
-                ["customer", "supplier"].includes(item.category),
-              ).length
-            }`}
-          />
-          <MetricCard
-            icon={<FileClock className="size-5" />}
-            label="30天内到期"
-            note="建议提前检查或续期"
-            tone="bg-[#fff4df] text-[#96651f]"
-            value={`${expiringCount}`}
-          />
-        </section>
+        {folderResult.error && (
+          <div className="mt-5 rounded-2xl border border-[#eed3cd] bg-[#fff4f1] px-5 py-4 text-xs text-[#985846]">
+            文件夹权限数据尚未就绪。请先执行本次 Supabase 数据库迁移。
+          </div>
+        )}
 
-        <div className="mt-5 grid items-start gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(340px,.55fr)]">
-          <section className="overflow-hidden rounded-[20px] border border-border/75 bg-white">
-            <div className="border-b border-border/70 px-5 py-5 sm:px-6">
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                <div>
-                  <h2 className="text-base font-semibold">文件档案</h2>
-                  <p className="mt-1 text-[11px] text-muted-foreground">
-                    只展示当前账号有权查看的文件
-                  </p>
-                </div>
-                <form className="flex gap-2" method="get">
-                  {category !== "all" && (
-                    <input name="category" type="hidden" value={category} />
+        <nav className="mt-5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+          <Link className="hover:text-primary" href="/documents">
+            全部文件
+          </Link>
+          {breadcrumbs.map((folder) => (
+            <span className="flex items-center gap-1.5" key={folder.id}>
+              <ChevronRight className="size-3" />
+              <Link className="hover:text-primary" href={folderHref(folder.id)}>
+                {folder.name}
+              </Link>
+            </span>
+          ))}
+        </nav>
+
+        {params.view === "approvals" ? (
+          <AccessRequestList
+            currentEmployeeId={employee.id}
+            mode="approvals"
+            requests={myPendingApprovals}
+          />
+        ) : params.view === "my-requests" ? (
+          <AccessRequestList
+            currentEmployeeId={employee.id}
+            mode="mine"
+            requests={myRequests}
+          />
+        ) : (
+          <>
+            {fileView === "all" ? (
+              <>
+                <MicrodriveExplorer
+                  canArchive={canArchive}
+                  canDownload={canDownload}
+                  documentError={documentError}
+                  documents={documents}
+                  explorerFolders={explorerFolders}
+                  explorerRoot={explorerRoot}
+                  rootFolders={rootFolders}
+                  selectedDocument={selectedDocument}
+                  selectedFolder={selectedFolder}
+                  uploadFolders={uploadFolders}
+                />
+                {selectedFolder?.is_locked ? (
+                  <LockedFolder folder={selectedFolder} />
+                ) : (
+                  selectedFolder?.can_manage && (
+                    <div className="mt-5 max-w-2xl">
+                      <CreateFolderPanel folder={selectedFolder} />
+                    </div>
+                  )
+                )}
+              </>
+            ) : selectedFolder?.is_locked ? (
+              <LockedFolder folder={selectedFolder} />
+            ) : (
+              <div className="mt-5 grid items-start gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(340px,.55fr)]">
+                <DocumentList
+                  canArchive={canArchive}
+                  canDownload={canDownload}
+                  category={category}
+                  documentError={documentError}
+                  documents={documents}
+                  folders={folderMap}
+                  fileView={fileView}
+                  query={query}
+                  selectedFolder={selectedFolder}
+                  status={status}
+                  uploadFolders={uploadFolders}
+                />
+                <aside className="space-y-5">
+                  <UploadPanel
+                    customers={customerResult.data ?? []}
+                    selectedFolder={selectedFolder}
+                    uploadFolders={uploadFolders}
+                  />
+                  {selectedFolder?.can_manage && (
+                    <CreateFolderPanel folder={selectedFolder} />
                   )}
-                  <label className="relative">
-                    <Search className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
-                    <input
-                      className="h-9 w-48 rounded-xl border border-border bg-[#fafcfe] pl-9 pr-3 text-[10px] outline-none focus:border-primary/40 sm:w-60"
-                      defaultValue={query}
-                      name="q"
-                      placeholder="搜索标题、编号或往来单位"
-                    />
-                  </label>
-                  <button
-                    className="h-9 rounded-xl bg-primary px-3 text-[10px] text-white"
-                    type="submit"
-                  >
-                    搜索
-                  </button>
-                </form>
+                </aside>
               </div>
-              <div className="mt-4 flex flex-wrap gap-2 text-[10px]">
-                {[
-                  ["all", "全部"],
-                  ["contract", "合同"],
-                  ["customer", "客户"],
-                  ["supplier", "供应商"],
-                  ["internal", "内部资料"],
-                ].map(([value, label]) => (
-                  <Link
-                    className={`rounded-full px-3 py-1.5 ${
-                      category === value
-                        ? "bg-primary text-white"
-                        : "bg-[#f2f5f4] text-muted-foreground"
-                    }`}
-                    href={
-                      value === "all"
-                        ? "/documents"
-                        : `/documents?category=${value}`
-                    }
-                    key={value}
-                  >
-                    {label}
-                  </Link>
-                ))}
-                <Link
-                  className={`ml-auto rounded-full px-3 py-1.5 ${
-                    status === "archived"
-                      ? "bg-[#eee9e2] text-[#756657]"
-                      : "bg-[#f2f5f4] text-muted-foreground"
-                  }`}
-                  href="/documents?status=archived"
-                >
-                  已归档
-                </Link>
-              </div>
-            </div>
+            )}
+          </>
+        )}
 
-            {error ? (
-              <div className="px-6 py-16 text-center text-xs text-[#985846]">
-                无法读取文件数据，请确认数据库迁移已经执行。
-              </div>
-            ) : documents.length === 0 ? (
-              <div className="px-6 py-16 text-center">
-                <FileArchive className="mx-auto size-9 text-primary/50" />
-                <h3 className="mt-4 text-sm font-medium">暂无可见文件</h3>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  上传第一份文件，或调整搜索和分类条件。
+        <DriveNavigation
+          activeView={params.view ?? fileView}
+          myPendingApprovals={myPendingApprovals.length}
+          myPendingRequests={
+            myRequests.filter((item) => item.status === "pending").length
+          }
+        />
+      </main>
+    </WorkflowShell>
+  );
+}
+
+function DriveNavigation({
+  activeView,
+  myPendingApprovals,
+  myPendingRequests,
+}: {
+  activeView: string;
+  myPendingApprovals: number;
+  myPendingRequests: number;
+}) {
+  const items = [
+    {
+      key: "all",
+      label: "全部文件",
+      note: "目录与文件",
+      href: "/documents",
+      icon: <HardDrive className="size-4" />,
+    },
+    {
+      key: "mine",
+      label: "我的文件",
+      note: "由我上传",
+      href: "/documents?view=mine",
+      icon: <UserRound className="size-4" />,
+    },
+    {
+      key: "recent",
+      label: "最近文件",
+      note: "近 30 天",
+      href: "/documents?view=recent",
+      icon: <History className="size-4" />,
+    },
+    {
+      key: "archived",
+      label: "回收站",
+      note: "可恢复文件",
+      href: "/documents?view=archived",
+      icon: <Trash2 className="size-4" />,
+    },
+    {
+      key: "my-requests",
+      label: "权限申请",
+      note: `${myPendingRequests} 项处理中`,
+      href: "/documents?view=my-requests",
+      icon: <FolderKey className="size-4" />,
+    },
+    {
+      key: "approvals",
+      label: "待我审批",
+      note: `${myPendingApprovals} 项待处理`,
+      href: "/documents?view=approvals",
+      icon: <ShieldCheck className="size-4" />,
+    },
+  ];
+
+  return (
+    <section className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
+      {items.map((item) => {
+        const active = activeView === item.key;
+        return (
+          <Link
+            className={`flex items-center gap-3 rounded-2xl border px-4 py-3 transition ${
+              active
+                ? "border-primary/25 bg-primary text-white shadow-sm"
+                : "border-border/75 bg-white hover:border-primary/20 hover:bg-[#f7faf9]"
+            }`}
+            href={item.href}
+            key={item.key}
+          >
+            <span
+              className={`grid size-9 shrink-0 place-items-center rounded-xl ${
+                active ? "bg-white/15" : "bg-[#edf4f3] text-primary"
+              }`}
+            >
+              {item.icon}
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[11px] font-medium">
+                {item.label}
+              </span>
+              <span
+                className={`mt-0.5 block truncate text-[9px] ${
+                  active ? "text-white/65" : "text-muted-foreground"
+                }`}
+              >
+                {item.note}
+              </span>
+            </span>
+          </Link>
+        );
+      })}
+    </section>
+  );
+}
+
+function MicrodriveExplorer({
+  canArchive,
+  canDownload,
+  documentError,
+  documents,
+  explorerFolders,
+  explorerRoot,
+  rootFolders,
+  selectedDocument,
+  selectedFolder,
+  uploadFolders,
+}: {
+  canArchive: (document: BusinessDocument) => boolean;
+  canDownload: (document: BusinessDocument) => boolean;
+  documentError: { code?: string } | null;
+  documents: BusinessDocument[];
+  explorerFolders: DocumentFolder[];
+  explorerRoot: DocumentFolder | null;
+  rootFolders: DocumentFolder[];
+  selectedDocument: BusinessDocument | null;
+  selectedFolder: DocumentFolder | null;
+  uploadFolders: DocumentFolder[];
+}) {
+  const selectedUploader = selectedDocument
+    ? one(selectedDocument.employees)
+    : null;
+  const selectedCustomer = selectedDocument
+    ? one(selectedDocument.customers)
+    : null;
+
+  return (
+    <section className="mt-4 overflow-hidden rounded-[22px] border border-border/75 bg-white shadow-sm">
+      <div className="flex min-h-16 flex-wrap items-center gap-3 border-b border-border/70 bg-[#fbfcfd] px-4 py-3 sm:px-5">
+        <Link
+          aria-label="返回全部共享空间"
+          className="grid size-9 place-items-center rounded-xl border border-border bg-white text-muted-foreground hover:text-primary"
+          href="/documents"
+        >
+          <ArrowLeft className="size-4" />
+        </Link>
+        <div className="flex min-w-0 flex-1 items-center gap-1.5 text-xs">
+          <Link
+            className="text-muted-foreground hover:text-primary"
+            href="/documents"
+          >
+            共享空间
+          </Link>
+          {explorerRoot && (
+            <>
+              <ChevronRight className="size-3 text-muted-foreground" />
+              <Link
+                className="truncate text-muted-foreground hover:text-primary"
+                href={folderHref(explorerRoot.id)}
+              >
+                {explorerRoot.name}
+              </Link>
+            </>
+          )}
+          {selectedFolder?.parent_id && (
+            <>
+              <ChevronRight className="size-3 text-muted-foreground" />
+              <span className="truncate font-medium">
+                {selectedFolder.name}
+              </span>
+            </>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <DirectDocumentUpload
+            folderId={selectedFolder?.can_upload ? selectedFolder.id : null}
+          />
+          <a
+            className={`inline-flex h-9 items-center gap-1.5 rounded-xl border px-4 text-[11px] ${selectedFolder?.can_manage ? "border-border bg-white text-foreground" : "pointer-events-none border-border/60 bg-[#f7f8f9] text-muted-foreground"}`}
+            href="#drive-new"
+          >
+            <Plus className="size-3.5" />
+            新建文件夹
+          </a>
+          <span className="hidden items-center rounded-xl bg-[#eef1f3] p-1 text-muted-foreground sm:flex">
+            <span className="grid size-8 place-items-center rounded-lg">
+              <List className="size-4" />
+            </span>
+            <span className="grid size-8 place-items-center rounded-lg bg-white text-primary shadow-sm">
+              <Columns3 className="size-4" />
+            </span>
+            <span className="grid size-8 place-items-center rounded-lg">
+              <Info className="size-4" />
+            </span>
+          </span>
+        </div>
+      </div>
+
+      <div className="overflow-x-auto">
+        <div className="grid min-h-[560px] min-w-[1080px] grid-cols-[230px_270px_410px_minmax(280px,1fr)] divide-x divide-border/70">
+          <aside className="bg-[#f8fafb] px-3 py-4">
+            <div className="px-3 text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+              共享空间
+            </div>
+            <div className="mt-3 space-y-1">
+              {rootFolders.map((folder) => {
+                const active = explorerRoot?.id === folder.id;
+                return (
+                  <Link
+                    className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-[11px] transition ${active ? "bg-[#e6ebee] font-medium text-foreground" : "text-muted-foreground hover:bg-white hover:text-foreground"}`}
+                    href={folderHref(folder.id)}
+                    key={folder.id}
+                  >
+                    <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-white text-primary shadow-sm">
+                      {folder.is_locked ? (
+                        <Lock className="size-3.5 text-[#8f7557]" />
+                      ) : (
+                        <HardDrive className="size-3.5" />
+                      )}
+                    </span>
+                    <span className="min-w-0 flex-1 truncate">
+                      {folder.name}
+                    </span>
+                    {folder.is_locked && <FolderKey className="size-3" />}
+                  </Link>
+                );
+              })}
+            </div>
+          </aside>
+
+          <div className="px-3 py-4">
+            <div className="flex items-center justify-between px-3">
+              <h2 className="truncate text-xs font-semibold">
+                {explorerRoot?.name || "请选择共享空间"}
+              </h2>
+              {explorerRoot && (
+                <span
+                  className={`rounded-full px-2 py-1 text-[8px] ${levelTones[explorerRoot.access_level]}`}
+                >
+                  {levelLabels[explorerRoot.access_level]}
+                </span>
+              )}
+            </div>
+            <div className="mt-3 space-y-1">
+              {!explorerRoot ? (
+                <p className="px-3 py-10 text-center text-[10px] leading-5 text-muted-foreground">
+                  从左侧选择公司共享空间
+                </p>
+              ) : explorerFolders.length === 0 ? (
+                <p className="px-3 py-10 text-center text-[10px] leading-5 text-muted-foreground">
+                  当前空间暂无下级文件夹
+                </p>
+              ) : (
+                explorerFolders.map((folder) => {
+                  const active = selectedFolder?.id === folder.id;
+                  return (
+                    <Link
+                      className={`flex items-center gap-2 rounded-xl px-3 py-2.5 text-[11px] transition ${active ? "bg-[#e6ebee] font-medium" : "hover:bg-[#f7f9fa]"}`}
+                      href={folderHref(folder.id)}
+                      key={folder.id}
+                    >
+                      <span
+                        className={`grid size-7 place-items-center rounded-lg ${folder.is_locked ? "bg-[#f6f1e9] text-[#8f7557]" : "bg-[#e9f5fb] text-[#3288bd]"}`}
+                      >
+                        {folder.is_locked ? (
+                          <Lock className="size-3.5" />
+                        ) : (
+                          <Folder className="size-3.5" />
+                        )}
+                      </span>
+                      <span className="min-w-0 flex-1 truncate">
+                        {folder.name}
+                      </span>
+                      <ChevronRight className="size-3 text-muted-foreground" />
+                    </Link>
+                  );
+                })
+              )}
+            </div>
+          </div>
+
+          <div className="py-4">
+            <div className="flex items-center justify-between px-4">
+              <div>
+                <h2 className="text-xs font-semibold">
+                  {selectedFolder?.name || "文件列表"}
+                </h2>
+                <p className="mt-1 text-[9px] text-muted-foreground">
+                  {selectedFolder
+                    ? `${documents.length} 个文件`
+                    : "选择目录后查看文件"}
                 </p>
               </div>
-            ) : (
-              <div className="divide-y divide-border/70 px-5 sm:px-6">
-                {documents.map((document) => {
-                  const uploader = relatedOne(document.employees);
-                  const department = relatedOne(document.departments);
-                  const customer = relatedOne(document.customers);
+            </div>
+            <div className="mt-3">
+              {documentError ? (
+                <p className="px-5 py-12 text-center text-[10px] text-[#985846]">
+                  文件读取失败，请稍后重试
+                </p>
+              ) : selectedFolder?.is_locked ? (
+                <p className="px-5 py-12 text-center text-[10px] leading-5 text-[#8f7557]">
+                  当前目录需要申请权限后查看
+                </p>
+              ) : !selectedFolder ? (
+                <p className="px-5 py-12 text-center text-[10px] text-muted-foreground">
+                  请先选择左侧共享空间
+                </p>
+              ) : documents.length === 0 ? (
+                <p className="px-5 py-12 text-center text-[10px] text-muted-foreground">
+                  这个文件夹还没有文件
+                </p>
+              ) : (
+                documents.map((document) => {
+                  const active = selectedDocument?.id === document.id;
                   return (
-                    <article
-                      className="grid gap-3 py-4 lg:grid-cols-[44px_minmax(0,1fr)_190px_auto] lg:items-center"
+                    <Link
+                      className={`flex items-center gap-3 border-y border-transparent px-4 py-3 transition ${active ? "border-border/60 bg-[#f1f3f4]" : "hover:bg-[#f8fafb]"}`}
+                      href={folderHref(selectedFolder.id, {
+                        document: document.id,
+                      })}
                       key={document.id}
                     >
-                      <span className="grid size-11 place-items-center rounded-[14px] border border-border/70 bg-[#f6f9f7] text-primary">
-                        <FileText className="size-5" />
+                      <span className="grid size-9 shrink-0 place-items-center rounded-xl border border-border/70 bg-white text-primary">
+                        <FileText className="size-4" />
                       </span>
-                      <div className="min-w-0">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="truncate text-[12px] font-semibold">
-                            {document.title}
-                          </h3>
-                          <span
-                            className={`rounded-full px-2 py-0.5 text-[9px] ${categoryTones[document.category]}`}
-                          >
-                            {categoryLabels[document.category]}
-                          </span>
-                          {document.status === "archived" && (
-                            <span className="rounded-full bg-[#f2f2f2] px-2 py-0.5 text-[9px] text-muted-foreground">
-                              已归档
-                            </span>
-                          )}
-                        </div>
-                        <p className="mt-1.5 truncate text-[10px] text-muted-foreground">
-                          {document.document_no} · {document.original_file_name} ·{" "}
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-[11px] font-medium">
+                          {document.title}
+                        </span>
+                        <span className="mt-1 block truncate text-[9px] text-muted-foreground">
+                          {document.original_file_name} ·{" "}
                           {displaySize(document.file_size)}
-                        </p>
-                        <p className="mt-1 truncate text-[10px] text-muted-foreground">
-                          {customer?.name ||
-                            document.related_party_name ||
-                            document.reference_no ||
-                            "未关联往来单位"}
-                        </p>
-                      </div>
-                      <div className="text-[10px] leading-5 text-muted-foreground">
-                        <div>
-                          {visibilityLabels[document.visibility]}
-                          {document.visibility === "restricted" &&
-                            document.viewer_role_codes.length > 0 &&
-                            ` · ${document.viewer_role_codes
-                              .map((code) => roleLabels[code])
-                              .filter(Boolean)
-                              .join("/")}`}
+                        </span>
+                      </span>
+                      <ChevronRight className="size-3 text-muted-foreground" />
+                    </Link>
+                  );
+                })
+              )}
+            </div>
+          </div>
+
+          <aside className="p-5">
+            {selectedDocument ? (
+              <div>
+                <span className="mx-auto grid size-16 place-items-center rounded-2xl border border-border/70 bg-[#f6f9f7] text-primary">
+                  <FileText className="size-7" />
+                </span>
+                <h2 className="mt-4 break-words text-center text-sm font-semibold">
+                  {selectedDocument.title}
+                </h2>
+                <p className="mt-1 break-all text-center text-[9px] text-muted-foreground">
+                  {selectedDocument.original_file_name}
+                </p>
+                <dl className="mt-6 space-y-3 border-t border-border/70 pt-5 text-[10px]">
+                  <DriveDetail
+                    label="文件编号"
+                    value={selectedDocument.document_no}
+                  />
+                  <DriveDetail
+                    label="文件大小"
+                    value={displaySize(selectedDocument.file_size)}
+                  />
+                  <DriveDetail
+                    label="上传人"
+                    value={selectedUploader?.name || "未知上传人"}
+                  />
+                  <DriveDetail
+                    label="上传时间"
+                    value={displayDate(selectedDocument.created_at)}
+                  />
+                  <DriveDetail
+                    label="文件类型"
+                    value={categoryLabels[selectedDocument.category]}
+                  />
+                  <DriveDetail
+                    label="关联对象"
+                    value={
+                      selectedCustomer?.name ||
+                      selectedDocument.related_party_name ||
+                      "未关联"
+                    }
+                  />
+                </dl>
+                <div className="mt-6 grid gap-2">
+                  {canDownload(selectedDocument) && (
+                    <Link
+                      className="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-primary text-[10px] text-white"
+                      href={`/documents/${selectedDocument.id}/download`}
+                    >
+                      <Download className="size-3.5" />
+                      下载文件
+                    </Link>
+                  )}
+                  {canArchive(selectedDocument) &&
+                    selectedDocument.status === "active" && (
+                      <details className="rounded-xl border border-border bg-white">
+                        <summary className="flex h-9 cursor-pointer list-none items-center justify-center gap-2 text-[10px] text-muted-foreground [&::-webkit-details-marker]:hidden">
+                          <MoreHorizontal className="size-3.5" />
+                          更多操作
+                        </summary>
+                        <div className="space-y-3 border-t border-border/70 p-3">
+                          <form
+                            action={renameBusinessDocument}
+                            className="flex gap-2"
+                          >
+                            <input
+                              name="documentId"
+                              type="hidden"
+                              value={selectedDocument.id}
+                            />
+                            <input
+                              className="h-9 min-w-0 flex-1 rounded-xl border border-border px-3 text-[10px]"
+                              defaultValue={selectedDocument.title}
+                              maxLength={160}
+                              minLength={2}
+                              name="title"
+                              required
+                            />
+                            <button
+                              className="grid size-9 place-items-center rounded-xl border border-primary/25 text-primary"
+                              title="保存名称"
+                              type="submit"
+                            >
+                              <Pencil className="size-3.5" />
+                            </button>
+                          </form>
+                          <form
+                            action={moveBusinessDocument}
+                            className="flex gap-2"
+                          >
+                            <input
+                              name="documentId"
+                              type="hidden"
+                              value={selectedDocument.id}
+                            />
+                            <select
+                              className="h-9 min-w-0 flex-1 rounded-xl border border-border bg-white px-2 text-[10px]"
+                              defaultValue={selectedDocument.folder_id}
+                              name="targetFolderId"
+                            >
+                              {uploadFolders.map((folder) => (
+                                <option key={folder.id} value={folder.id}>
+                                  {folder.name}
+                                </option>
+                              ))}
+                            </select>
+                            <button
+                              className="grid size-9 place-items-center rounded-xl border border-primary/25 text-primary"
+                              title="移动文件"
+                              type="submit"
+                            >
+                              <FolderInput className="size-3.5" />
+                            </button>
+                          </form>
+                          <form action={archiveBusinessDocument}>
+                            <input
+                              name="documentId"
+                              type="hidden"
+                              value={selectedDocument.id}
+                            />
+                            <button
+                              className="flex h-9 w-full items-center justify-center gap-2 rounded-xl border border-[#e8cbc5] text-[10px] text-[#a34e42]"
+                              type="submit"
+                            >
+                              <Trash2 className="size-3.5" />
+                              移入回收站
+                            </button>
+                          </form>
                         </div>
-                        <div>
-                          {department?.name || "未分部门"} ·{" "}
-                          {uploader?.name || "未知上传人"}
-                        </div>
-                        <div>
-                          到期：{displayDate(document.expires_on)}
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-end gap-2">
-                        <Link
-                          className="inline-flex h-8 items-center gap-1.5 rounded-xl bg-primary px-3 text-[10px] font-medium text-white"
-                          href={`/documents/${document.id}/download`}
-                        >
-                          <Download className="size-3.5" />
-                          下载
-                        </Link>
-                        {document.status === "active" &&
-                          canArchive(document) && (
+                      </details>
+                    )}
+                </div>
+              </div>
+            ) : (
+              <div className="flex min-h-[460px] flex-col items-center justify-center text-center">
+                <span className="grid size-12 place-items-center rounded-2xl bg-[#f2f5f6] text-muted-foreground">
+                  <Info className="size-5" />
+                </span>
+                <h2 className="mt-4 text-xs font-medium">文件详情</h2>
+                <p className="mt-2 max-w-52 text-[10px] leading-5 text-muted-foreground">
+                  在左侧文件列表中选择一个文件，即可查看详细信息和可用操作。
+                </p>
+              </div>
+            )}
+          </aside>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function DriveDetail({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="grid grid-cols-[64px_minmax(0,1fr)] gap-3">
+      <dt className="text-muted-foreground">{label}</dt>
+      <dd className="break-words text-right text-foreground">{value}</dd>
+    </div>
+  );
+}
+
+function LockedFolder({ folder }: { folder: DocumentFolder }) {
+  return (
+    <section className="mx-auto mt-6 max-w-2xl rounded-[22px] border border-[#e8dfd1] bg-white p-6 sm:p-8">
+      <div className="flex items-start gap-4">
+        <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-[#f6f1e9] text-[#8f7557]">
+          <FolderKey className="size-6" />
+        </span>
+        <div>
+          <h2 className="text-lg font-semibold">{folder.name}需要授权</h2>
+          <p className="mt-2 text-xs leading-6 text-muted-foreground">
+            当前账号没有此目录的查看权限。提交申请后会按目录等级进入审批，审批通过后默认开放
+            24 小时。
+          </p>
+        </div>
+      </div>
+      {folder.pending_request_id ? (
+        <div className="mt-6 rounded-2xl bg-[#fff7e7] px-5 py-4 text-xs text-[#8b692d]">
+          <Clock3 className="mr-2 inline size-4" />
+          该目录已有审批中的申请，无需重复提交。
+        </div>
+      ) : folder.is_requestable ? (
+        <form action={requestDocumentFolderAccess} className="mt-6 space-y-4">
+          <input name="folderId" type="hidden" value={folder.id} />
+          <label className="block text-[11px] text-muted-foreground">
+            申请原因
+            <textarea
+              className="mt-1.5 min-h-24 w-full rounded-xl border border-border p-3 text-xs outline-none focus:border-primary/40"
+              maxLength={1000}
+              minLength={10}
+              name="reason"
+              placeholder="请说明需要查看的具体工作原因（至少 10 个字）"
+              required
+            />
+          </label>
+          <label className="block text-[11px] text-muted-foreground">
+            关联客户 / 项目 / 事项（可选）
+            <input
+              className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs outline-none focus:border-primary/40"
+              maxLength={500}
+              name="relatedContext"
+            />
+          </label>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="text-[11px] text-muted-foreground">
+              申请时长
+              <select
+                className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs"
+                defaultValue="24"
+                name="durationHours"
+              >
+                <option value="24">24 小时（默认）</option>
+                <option value="168">7 天</option>
+                <option value="720">30 天</option>
+                <option value="2160">90 天</option>
+                <option value="0">长期权限</option>
+              </select>
+            </label>
+            <label className="text-[11px] text-muted-foreground">
+              紧急程度
+              <select
+                className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs"
+                defaultValue="normal"
+                name="urgency"
+              >
+                <option value="normal">普通</option>
+                <option value="urgent">紧急</option>
+              </select>
+            </label>
+          </div>
+          <label className="flex items-center gap-2 text-[11px]">
+            <input
+              className="accent-primary"
+              defaultChecked
+              name="requestedCanDownload"
+              type="checkbox"
+            />
+            同时申请下载权限
+          </label>
+          <button
+            className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary text-xs font-medium text-white"
+            type="submit"
+          >
+            <ShieldCheck className="size-4" />
+            提交查看权限申请
+          </button>
+        </form>
+      ) : (
+        <div className="mt-6 rounded-2xl bg-muted px-5 py-4 text-xs text-muted-foreground">
+          此目录不开放自助申请，请联系系统管理员。
+        </div>
+      )}
+    </section>
+  );
+}
+
+function DocumentList({
+  canArchive,
+  canDownload,
+  category,
+  documentError,
+  documents,
+  fileView,
+  folders,
+  query,
+  selectedFolder,
+  status,
+  uploadFolders,
+}: {
+  canArchive: (document: BusinessDocument) => boolean;
+  canDownload: (document: BusinessDocument) => boolean;
+  category: DocumentCategory | "all";
+  documentError: { code?: string } | null;
+  documents: BusinessDocument[];
+  fileView: DocumentView;
+  folders: Map<string, DocumentFolder>;
+  query: string;
+  selectedFolder: DocumentFolder | null;
+  status: "active" | "archived";
+  uploadFolders: DocumentFolder[];
+}) {
+  return (
+    <section className="overflow-hidden rounded-[20px] border border-border/75 bg-white">
+      <div className="border-b border-border/70 px-5 py-5 sm:px-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <h2 className="text-base font-semibold">
+              {selectedFolder?.name ||
+                {
+                  all: "有权查看的全部文件",
+                  mine: "我的文件",
+                  recent: "最近 30 天的文件",
+                  archived: "回收站",
+                }[fileView]}
+            </h2>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              {documents.length} 个文件 · 目录权限实时生效
+            </p>
+          </div>
+          <form className="flex gap-2" method="get">
+            {fileView !== "all" && (
+              <input name="view" type="hidden" value={fileView} />
+            )}
+            {selectedFolder && (
+              <input name="folder" type="hidden" value={selectedFolder.id} />
+            )}
+            <label className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+              <input
+                className="h-9 w-52 rounded-xl border border-border bg-[#fafcfe] pl-9 pr-3 text-[10px] outline-none"
+                defaultValue={query}
+                name="q"
+                placeholder="搜索标题、编号或往来单位"
+              />
+            </label>
+            <button
+              className="h-9 rounded-xl bg-primary px-3 text-[10px] text-white"
+              type="submit"
+            >
+              搜索
+            </button>
+          </form>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2 text-[10px]">
+          {(
+            [
+              ["all", "全部"],
+              ["contract", "合同"],
+              ["customer", "客户"],
+              ["supplier", "供应商"],
+              ["internal", "内部资料"],
+            ] as const
+          ).map(([value, label]) => (
+            <Link
+              className={`rounded-full px-3 py-1.5 ${category === value ? "bg-primary text-white" : "bg-[#f2f5f4] text-muted-foreground"}`}
+              href={folderHref(selectedFolder?.id, {
+                ...(fileView === "all" ? {} : { view: fileView }),
+                ...(value === "all" ? {} : { category: value }),
+              })}
+              key={value}
+            >
+              {label}
+            </Link>
+          ))}
+          <Link
+            className={`ml-auto rounded-full px-3 py-1.5 ${status === "archived" ? "bg-[#eee9e2] text-[#756657]" : "bg-[#f2f5f4] text-muted-foreground"}`}
+            href={
+              status === "archived"
+                ? folderHref(selectedFolder?.id)
+                : folderHref(selectedFolder?.id, { view: "archived" })
+            }
+          >
+            {status === "archived" ? "返回全部文件" : "打开回收站"}
+          </Link>
+        </div>
+      </div>
+      {documentError ? (
+        <div className="px-6 py-16 text-center text-xs text-[#985846]">
+          无法读取文件数据，请稍后重试。
+        </div>
+      ) : documents.length === 0 ? (
+        <div className="px-6 py-16 text-center">
+          <FileArchive className="mx-auto size-9 text-primary/45" />
+          <h3 className="mt-4 text-sm font-medium">这里还没有文件</h3>
+          <p className="mt-2 text-xs text-muted-foreground">
+            具有上传权限的员工可以从右侧直接上传到 NAS。
+          </p>
+        </div>
+      ) : (
+        <div className="divide-y divide-border/70 px-5 sm:px-6">
+          {documents.map((document) => {
+            const uploader = one(document.employees);
+            const customer = one(document.customers);
+            const folder = folders.get(document.folder_id);
+            return (
+              <article
+                className="grid gap-3 py-4 lg:grid-cols-[44px_minmax(0,1fr)_180px_auto] lg:items-center"
+                key={document.id}
+              >
+                <span className="grid size-11 place-items-center rounded-[14px] border border-border/70 bg-[#f6f9f7] text-primary">
+                  <FileText className="size-5" />
+                </span>
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="truncate text-[12px] font-semibold">
+                      {document.title}
+                    </h3>
+                    <span className="rounded-full bg-[#eef4f7] px-2 py-0.5 text-[9px] text-[#426c7b]">
+                      {categoryLabels[document.category]}
+                    </span>
+                  </div>
+                  <p className="mt-1.5 truncate text-[10px] text-muted-foreground">
+                    {document.document_no} · {document.original_file_name} ·{" "}
+                    {displaySize(document.file_size)}
+                  </p>
+                  <p className="mt-1 truncate text-[10px] text-muted-foreground">
+                    {customer?.name ||
+                      document.related_party_name ||
+                      document.reference_no ||
+                      "未关联往来单位"}
+                  </p>
+                </div>
+                <div className="text-[10px] leading-5 text-muted-foreground">
+                  <div>{folder?.name || "文件目录"}</div>
+                  <div>
+                    {uploader?.name || "未知上传人"} ·{" "}
+                    {displayDate(document.created_at)}
+                  </div>
+                </div>
+                <div className="flex items-start justify-end gap-2 lg:min-w-72">
+                  {canDownload(document) && (
+                    <Link
+                      className="inline-flex h-8 items-center gap-1.5 rounded-xl bg-primary px-3 text-[10px] text-white"
+                      href={`/documents/${document.id}/download`}
+                    >
+                      <Download className="size-3.5" />
+                      下载
+                    </Link>
+                  )}
+                  {canArchive(document) && (
+                    <details className="group max-w-72 rounded-xl border border-border bg-white">
+                      <summary className="grid size-8 cursor-pointer list-none place-items-center text-muted-foreground [&::-webkit-details-marker]:hidden">
+                        <MoreHorizontal className="size-4" />
+                      </summary>
+                      <div className="w-72 space-y-3 border-t border-border/70 p-3 text-left">
+                        {document.status === "archived" ? (
+                          <form action={restoreBusinessDocument}>
+                            <input
+                              name="documentId"
+                              type="hidden"
+                              value={document.id}
+                            />
+                            <button
+                              className="flex h-9 w-full items-center justify-center gap-2 rounded-xl bg-primary text-[10px] text-white"
+                              type="submit"
+                            >
+                              <RotateCcw className="size-3.5" />
+                              恢复到原目录
+                            </button>
+                          </form>
+                        ) : (
+                          <>
+                            <form
+                              action={renameBusinessDocument}
+                              className="space-y-2"
+                            >
+                              <input
+                                name="documentId"
+                                type="hidden"
+                                value={document.id}
+                              />
+                              <label className="text-[9px] text-muted-foreground">
+                                重命名
+                                <span className="mt-1 flex gap-2">
+                                  <input
+                                    className="h-9 min-w-0 flex-1 rounded-xl border border-border px-3 text-[10px]"
+                                    defaultValue={document.title}
+                                    maxLength={160}
+                                    minLength={2}
+                                    name="title"
+                                    required
+                                  />
+                                  <button
+                                    className="grid size-9 place-items-center rounded-xl border border-primary/25 text-primary"
+                                    title="保存名称"
+                                    type="submit"
+                                  >
+                                    <Pencil className="size-3.5" />
+                                  </button>
+                                </span>
+                              </label>
+                            </form>
+                            <form
+                              action={moveBusinessDocument}
+                              className="space-y-2"
+                            >
+                              <input
+                                name="documentId"
+                                type="hidden"
+                                value={document.id}
+                              />
+                              <label className="text-[9px] text-muted-foreground">
+                                移动到
+                                <span className="mt-1 flex gap-2">
+                                  <select
+                                    className="h-9 min-w-0 flex-1 rounded-xl border border-border bg-white px-2 text-[10px]"
+                                    defaultValue={document.folder_id}
+                                    name="targetFolderId"
+                                  >
+                                    {uploadFolders.map((target) => (
+                                      <option key={target.id} value={target.id}>
+                                        {target.name}
+                                      </option>
+                                    ))}
+                                  </select>
+                                  <button
+                                    className="grid size-9 place-items-center rounded-xl border border-primary/25 text-primary"
+                                    title="移动文件"
+                                    type="submit"
+                                  >
+                                    <FolderInput className="size-3.5" />
+                                  </button>
+                                </span>
+                              </label>
+                            </form>
                             <form action={archiveBusinessDocument}>
                               <input
                                 name="documentId"
@@ -471,182 +1323,395 @@ export default async function DocumentsPage({
                                 value={document.id}
                               />
                               <button
-                                className="grid size-8 place-items-center rounded-xl border border-border text-muted-foreground hover:bg-muted"
-                                title="归档文件"
+                                className="flex h-9 w-full items-center justify-center gap-2 rounded-xl border border-[#e8cbc5] text-[10px] text-[#a34e42]"
                                 type="submit"
                               >
-                                <Archive className="size-3.5" />
+                                <Trash2 className="size-3.5" />
+                                移入回收站
                               </button>
                             </form>
-                          )}
+                          </>
+                        )}
                       </div>
-                    </article>
-                  );
-                })}
-              </div>
-            )}
-          </section>
-
-          <section className="rounded-[20px] border border-border/75 bg-white p-5 sm:p-6">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h2 className="text-base font-semibold">上传并归档</h2>
-                <p className="mt-1 text-[11px] text-muted-foreground">
-                  PDF、图片、Word、Excel，单文件最大 20MB
-                </p>
-              </div>
-              <span className="grid size-10 place-items-center rounded-xl bg-[#eaf3f8] text-primary">
-                <Upload className="size-5" />
-              </span>
-            </div>
-
-            <form action={uploadBusinessDocument} className="mt-5 space-y-4">
-              <label className="block text-[10px] text-muted-foreground">
-                文件分类
-                <select
-                  className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
-                  name="category"
-                  required
-                >
-                  {availableCategories.map((item) => (
-                    <option key={item} value={item}>
-                      {categoryLabels[item]}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="block text-[10px] text-muted-foreground">
-                文件标题
-                <input
-                  className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
-                  maxLength={160}
-                  name="title"
-                  placeholder="例如：2026年度粮油采购框架协议"
-                  required
-                />
-              </label>
-              <label className="block text-[10px] text-muted-foreground">
-                选择文件
-                <input
-                  accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx,.xls,.xlsx"
-                  className="mt-1.5 block w-full rounded-xl border border-dashed border-primary/25 bg-[#f5faf7] p-3 text-[10px] file:mr-3 file:rounded-lg file:border-0 file:bg-primary file:px-3 file:py-2 file:text-[10px] file:text-white"
-                  name="file"
-                  required
-                  type="file"
-                />
-              </label>
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
-                <label className="text-[10px] text-muted-foreground">
-                  可见范围
-                  <select
-                    className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
-                    defaultValue="department"
-                    name="visibility"
-                  >
-                    <option value="department">本部门可见</option>
-                    <option value="organization">全公司可见</option>
-                    <option value="restricted">指定角色可见</option>
-                  </select>
-                </label>
-                <label className="text-[10px] text-muted-foreground">
-                  文件编号 / 合同号
-                  <input
-                    className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
-                    maxLength={100}
-                    name="referenceNo"
-                  />
-                </label>
-              </div>
-              {customers.length > 0 && (
-                <label className="block text-[10px] text-muted-foreground">
-                  关联客户（可选）
-                  <select
-                    className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
-                    name="customerId"
-                  >
-                    <option value="">不关联客户</option>
-                    {customers.map((customer) => (
-                      <option key={customer.id} value={customer.id}>
-                        {customer.name} · {customer.customer_no}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              )}
-              <label className="block text-[10px] text-muted-foreground">
-                客户 / 供应商 / 往来单位
-                <input
-                  className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
-                  maxLength={160}
-                  name="relatedPartyName"
-                  placeholder="未关联客户档案时填写"
-                />
-              </label>
-              <div className="grid grid-cols-2 gap-4">
-                <label className="text-[10px] text-muted-foreground">
-                  生效日期
-                  <input
-                    className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
-                    name="effectiveOn"
-                    type="date"
-                  />
-                </label>
-                <label className="text-[10px] text-muted-foreground">
-                  到期日期
-                  <input
-                    className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
-                    name="expiresOn"
-                    type="date"
-                  />
-                </label>
-              </div>
-              <fieldset className="rounded-xl border border-border/75 bg-[#fafcfe] p-3">
-                <legend className="px-1 text-[10px] text-muted-foreground">
-                  指定角色（仅“指定角色可见”时生效）
-                </legend>
-                <div className="mt-1 grid grid-cols-2 gap-2">
-                  {["department_lead", "hr", "finance", "admin", "chairman"].map(
-                    (code) => (
-                      <label
-                        className="flex items-center gap-2 text-[10px]"
-                        key={code}
-                      >
-                        <input
-                          className="accent-primary"
-                          name="viewerRoleCodes"
-                          type="checkbox"
-                          value={code}
-                        />
-                        {roleLabels[code]}
-                      </label>
-                    ),
+                    </details>
                   )}
                 </div>
-              </fieldset>
-              <label className="block text-[10px] text-muted-foreground">
-                备注说明
-                <textarea
-                  className="mt-1.5 min-h-20 w-full rounded-xl border border-border bg-white p-3 text-xs outline-none focus:border-primary/40"
-                  maxLength={500}
-                  name="description"
-                  placeholder="补充文件用途、版本或注意事项"
-                />
-              </label>
-              <button
-                className="flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-primary text-xs font-medium text-white"
-                type="submit"
-              >
-                <ShieldCheck className="size-4" />
-                安全上传并归档
-              </button>
-              <p className="flex items-start gap-2 text-[9px] leading-4 text-muted-foreground">
-                <UsersRound className="mt-0.5 size-3 shrink-0" />
-                上传、下载和归档都会记录操作审计；已归档文件不会立即删除。
-              </p>
-            </form>
-          </section>
+              </article>
+            );
+          })}
         </div>
-      </main>
-    </WorkflowShell>
+      )}
+    </section>
+  );
+}
+
+function UploadPanel({
+  customers,
+  selectedFolder,
+  uploadFolders,
+}: {
+  customers: { id: string; name: string; customer_no: string }[];
+  selectedFolder: DocumentFolder | null;
+  uploadFolders: DocumentFolder[];
+}) {
+  if (uploadFolders.length === 0)
+    return (
+      <section
+        id="drive-upload"
+        className="scroll-mt-6 rounded-[20px] border border-border/75 bg-white p-6 text-xs text-muted-foreground"
+      >
+        当前账号暂无可上传目录。可以进入锁定目录提交权限申请。
+      </section>
+    );
+  const defaultFolder = selectedFolder?.can_upload
+    ? selectedFolder.id
+    : uploadFolders[0].id;
+  return (
+    <section
+      id="drive-upload"
+      className="scroll-mt-6 rounded-[20px] border border-border/75 bg-white p-5 sm:p-6"
+    >
+      <div className="flex items-start justify-between">
+        <div>
+          <h2 className="text-base font-semibold">上传到 NAS</h2>
+          <p className="mt-1 text-[11px] text-muted-foreground">
+            无需打开绿联软件，单文件最大 20MB
+          </p>
+        </div>
+        <span className="grid size-10 place-items-center rounded-xl bg-[#eaf3f8] text-primary">
+          <Upload className="size-5" />
+        </span>
+      </div>
+      <form action={uploadBusinessDocument} className="mt-5 space-y-4">
+        <label className="block text-[10px] text-muted-foreground">
+          目标文件夹
+          <select
+            className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs"
+            defaultValue={defaultFolder}
+            name="folderId"
+            required
+          >
+            {uploadFolders.map((folder) => (
+              <option key={folder.id} value={folder.id}>
+                {folder.name} · {levelLabels[folder.access_level]}
+              </option>
+            ))}
+          </select>
+        </label>
+        <div className="grid grid-cols-2 gap-3">
+          <label className="text-[10px] text-muted-foreground">
+            文件分类
+            <select
+              className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs"
+              defaultValue="internal"
+              name="category"
+            >
+              <option value="internal">内部资料</option>
+              <option value="contract">合同文件</option>
+              <option value="customer">客户文件</option>
+              <option value="supplier">供应商资料</option>
+            </select>
+          </label>
+          <label className="text-[10px] text-muted-foreground">
+            文件编号
+            <input
+              className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs"
+              maxLength={100}
+              name="referenceNo"
+            />
+          </label>
+        </div>
+        <label className="block text-[10px] text-muted-foreground">
+          文件标题
+          <input
+            className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs"
+            maxLength={160}
+            minLength={2}
+            name="title"
+            required
+          />
+        </label>
+        <label className="block text-[10px] text-muted-foreground">
+          选择文件
+          <input
+            accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx,.xls,.xlsx"
+            className="mt-1.5 block w-full rounded-xl border border-dashed border-primary/25 bg-[#f5faf7] p-3 text-[10px] file:mr-3 file:rounded-lg file:border-0 file:bg-primary file:px-3 file:py-2 file:text-[10px] file:text-white"
+            id="business-document-file"
+            name="file"
+            required
+            type="file"
+          />
+        </label>
+        {customers.length > 0 && (
+          <label className="block text-[10px] text-muted-foreground">
+            关联客户（可选）
+            <select
+              className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs"
+              name="customerId"
+            >
+              <option value="">不关联客户</option>
+              {customers.map((customer) => (
+                <option key={customer.id} value={customer.id}>
+                  {customer.name} · {customer.customer_no}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+        <label className="block text-[10px] text-muted-foreground">
+          往来单位（可选）
+          <input
+            className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs"
+            maxLength={160}
+            name="relatedPartyName"
+          />
+        </label>
+        <label className="block text-[10px] text-muted-foreground">
+          备注说明
+          <textarea
+            className="mt-1.5 min-h-20 w-full rounded-xl border border-border p-3 text-xs"
+            maxLength={500}
+            name="description"
+          />
+        </label>
+        <input name="visibility" type="hidden" value="department" />
+        <button
+          className="flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-primary text-xs font-medium text-white"
+          type="submit"
+        >
+          <ShieldCheck className="size-4" />
+          安全上传并归档
+        </button>
+      </form>
+    </section>
+  );
+}
+
+function CreateFolderPanel({ folder }: { folder: DocumentFolder }) {
+  return (
+    <section
+      id="drive-new"
+      className="scroll-mt-6 rounded-[20px] border border-border/75 bg-white p-5 sm:p-6"
+    >
+      <div className="flex items-center gap-2">
+        <Plus className="size-4 text-primary" />
+        <h2 className="text-sm font-semibold">新建子文件夹</h2>
+      </div>
+      <form action={createDocumentFolder} className="mt-4 space-y-3">
+        <input name="parentId" type="hidden" value={folder.id} />
+        <input
+          className="h-10 w-full rounded-xl border border-border px-3 text-xs"
+          maxLength={80}
+          minLength={2}
+          name="name"
+          placeholder="文件夹名称"
+          required
+        />
+        <textarea
+          className="min-h-16 w-full rounded-xl border border-border p-3 text-xs"
+          maxLength={500}
+          name="description"
+          placeholder="用途说明（可选）"
+        />
+        <select
+          className="h-10 w-full rounded-xl border border-border bg-white px-3 text-xs"
+          defaultValue={folder.access_level}
+          name="accessLevel"
+        >
+          {[1, 2, 3, 4]
+            .filter((level) => level >= folder.access_level)
+            .map((level) => (
+              <option key={level} value={level}>
+                {levelLabels[level]}
+              </option>
+            ))}
+        </select>
+        <button
+          className="h-10 w-full rounded-xl border border-primary/30 text-xs font-medium text-primary"
+          type="submit"
+        >
+          创建文件夹
+        </button>
+      </form>
+    </section>
+  );
+}
+
+function AccessRequestList({
+  currentEmployeeId,
+  mode,
+  requests,
+}: {
+  currentEmployeeId: string;
+  mode: "mine" | "approvals";
+  requests: FolderAccessRequest[];
+}) {
+  return (
+    <section className="mt-5 overflow-hidden rounded-[20px] border border-border/75 bg-white">
+      <div className="border-b border-border/70 px-6 py-5">
+        <h2 className="text-base font-semibold">
+          {mode === "approvals" ? "待我审批的文件权限" : "我的文件权限申请"}
+        </h2>
+        <p className="mt-1 text-[11px] text-muted-foreground">
+          审批通过后系统自动开放权限；到期后自动失效。
+        </p>
+      </div>
+      {requests.length === 0 ? (
+        <div className="px-6 py-16 text-center text-xs text-muted-foreground">
+          暂无相关申请
+        </div>
+      ) : (
+        <div className="divide-y divide-border/70 px-6">
+          {requests.map((request) => {
+            const access = one(request.folder_access);
+            const folder = access ? one(access.folder) : null;
+            const isApplicant =
+              request.applicant_employee_id === currentEmployeeId;
+            return (
+              <article className="py-5" key={request.id}>
+                <div className="flex flex-col justify-between gap-4 lg:flex-row">
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="text-sm font-semibold">
+                        {folder?.name || "文件夹权限"}
+                      </h3>
+                      {folder && (
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[9px] ${levelTones[folder.access_level]}`}
+                        >
+                          {levelLabels[folder.access_level]}
+                        </span>
+                      )}
+                      <span className="rounded-full bg-[#f1f3f4] px-2 py-0.5 text-[9px] text-muted-foreground">
+                        {statusLabels[request.status]}
+                      </span>
+                      {access?.urgency === "urgent" && (
+                        <span className="rounded-full bg-[#fff0ed] px-2 py-0.5 text-[9px] text-[#a34e42]">
+                          紧急
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-2 text-[11px] leading-5 text-muted-foreground">
+                      {request.request_no} · 申请人{" "}
+                      {one(request.applicant)?.name || "未知"} ·{" "}
+                      {displayDate(request.created_at)}
+                    </p>
+                    <p className="mt-2 text-xs">{access?.reason}</p>
+                    <p className="mt-1 text-[10px] text-muted-foreground">
+                      权限：查看
+                      {access?.requested_can_download ? " + 下载" : ""} · 时长：
+                      {durationLabel(access?.duration_hours ?? 24)} · 审批进度{" "}
+                      {request.current_step_order}/{request.total_steps}
+                    </p>
+                  </div>
+                  {mode === "approvals" && request.status === "pending" ? (
+                    <form
+                      action={processDocumentFolderAccess}
+                      className="flex min-w-72 flex-col gap-2"
+                    >
+                      <input
+                        name="requestId"
+                        type="hidden"
+                        value={request.id}
+                      />
+                      <input
+                        name="expectedVersion"
+                        type="hidden"
+                        value={request.version}
+                      />
+                      <div className="grid grid-cols-2 gap-2">
+                        <select
+                          className="h-9 rounded-xl border border-border bg-white px-3 text-[10px]"
+                          defaultValue={access?.duration_hours ?? 24}
+                          name="durationHours"
+                          title="批准时长（只能缩短）"
+                        >
+                          {[
+                            [24, "24 小时"],
+                            [168, "7 天"],
+                            [720, "30 天"],
+                            [2160, "90 天"],
+                            [0, "长期"],
+                          ]
+                            .filter(
+                              ([hours]) =>
+                                access?.duration_hours === 0 ||
+                                Number(hours) <= (access?.duration_hours ?? 24),
+                            )
+                            .map(([hours, label]) => (
+                              <option key={hours} value={hours}>
+                                {label}
+                              </option>
+                            ))}
+                        </select>
+                        <label className="flex h-9 items-center gap-2 rounded-xl border border-border px-3 text-[10px]">
+                          <input
+                            className="accent-primary"
+                            defaultChecked={access?.requested_can_download}
+                            disabled={!access?.requested_can_download}
+                            name="canDownload"
+                            type="checkbox"
+                          />
+                          允许下载
+                        </label>
+                      </div>
+                      <input
+                        className="h-9 rounded-xl border border-border px-3 text-[10px]"
+                        name="opinion"
+                        placeholder="审批意见（拒绝时必填）"
+                      />
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          className="flex h-9 items-center justify-center gap-1 rounded-xl bg-primary text-[10px] text-white"
+                          name="action"
+                          type="submit"
+                          value="approve"
+                        >
+                          <Check className="size-3.5" />
+                          同意
+                        </button>
+                        <button
+                          className="flex h-9 items-center justify-center gap-1 rounded-xl border border-[#e2bdb7] text-[10px] text-[#a34e42]"
+                          name="action"
+                          type="submit"
+                          value="reject"
+                        >
+                          <X className="size-3.5" />
+                          拒绝
+                        </button>
+                      </div>
+                    </form>
+                  ) : isApplicant &&
+                    request.status === "pending" &&
+                    request.current_step_order === 1 ? (
+                    <form action={processDocumentFolderAccess}>
+                      <input
+                        name="requestId"
+                        type="hidden"
+                        value={request.id}
+                      />
+                      <input
+                        name="expectedVersion"
+                        type="hidden"
+                        value={request.version}
+                      />
+                      <input name="opinion" type="hidden" value="申请人撤回" />
+                      <button
+                        className="h-9 rounded-xl border border-border px-4 text-[10px] text-muted-foreground"
+                        name="action"
+                        type="submit"
+                        value="withdraw"
+                      >
+                        撤回申请
+                      </button>
+                    </form>
+                  ) : null}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
+    </section>
   );
 }

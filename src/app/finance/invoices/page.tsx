@@ -22,7 +22,7 @@ export default async function InvoicePage({searchParams}:{searchParams:Promise<{
   const invoices=invoiceResult.data??[];const documents=documentResult.data??[];const missing=Boolean(invoiceResult.error);
   const issued=invoices.filter(x=>x.direction==="issued").reduce((s,x)=>s+Number(x.total_amount),0);
   const received=invoices.filter(x=>x.direction==="received").reduce((s,x)=>s+Number(x.total_amount),0);
-  return <WorkflowShell activeItem="财务管理" breadcrumb="财务管理 / 发票管理" currentUser={{name:employee.name,roleLabel:employee.roleCodes.join(" · ")}}>
+  return <WorkflowShell activeItem="税务管理" breadcrumb="财务管理 / 税务管理 / 发票" currentUser={{name:employee.name,roleLabel:employee.roleCodes.join(" · ")}}>
     <main className="mx-auto max-w-[1600px] p-4 sm:p-6 xl:p-8">
       <section className="relative overflow-hidden rounded-[26px] bg-[radial-gradient(circle_at_80%_18%,rgba(56,199,194,.25),transparent_27%),linear-gradient(135deg,#071d34,#0a385d_58%,#0b626d)] px-7 py-8 text-white shadow-[0_26px_70px_-40px_rgba(6,28,49,.9)]">
         <ReceiptText className="absolute right-12 top-1/2 hidden size-36 -translate-y-1/2 text-white/[.07] sm:block"/><div className="relative"><div className="text-xs tracking-[.16em] text-[#70dcda]">FMS · INVOICE MANAGEMENT</div><h1 className="mt-3 text-3xl font-semibold">发票管理</h1><p className="mt-3 text-sm text-white/65">销项关联销售应收，进项关联采购应付，保留号码、税额、核验与作废历史。</p></div>
