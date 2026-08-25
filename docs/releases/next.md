@@ -1,34 +1,24 @@
-# 2026-08-14 发布内容（待业务验收）
+# Deployed Scope Pending Business Acceptance
 
-本页记录已经合并并部署到阿里云生产环境、等待业务验收的内容。部署信息见 [2026-08-14 阿里云发布记录](./2026-08-14-aliyun.md)。
+This page tracks capabilities already present in the deployed internal alpha but still requiring role-based business acceptance. It is not a public availability or quality guarantee.
 
-## 2026-08-14 合并内容
+## Included Capabilities
 
-- 合并收付款单页面、导出、打印、状态流转和红冲流程。
-- 合并微信小程序登录、会话、员工绑定和服务端权限处理。
-- 为主要业务页面补充加载骨架和稳定布局。
-- 合并新的七大领域侧边栏结构和共享导航组件。
-- 将一级分区“客户与销售”调整为“业务管理”，移除二级“销售管理”。
-- 二级模块不再显示右侧英文，三级菜单统一使用中文名称。
-- 为页面加载骨架增加统一的圆形转圈动画和可访问加载提示。
-- 合并导航架构、密码恢复、收付款和小程序测试。
-- 合并收付款、小程序会话和财务权限数据库迁移。
-- 删除 8 个带“ 2”的 iCloud 冲突副本。
-- 在系统管理新增按员工分配长期角色权限，董事长自动获得全部权限。
-- 权限变更保留姓名二次确认、最后一位管理员/董事长保护和审计记录。
-- 文件中心正文改为由阿里云服务端通过 Tailscale 和 WebDAV 存入绿联 NAS；Supabase 继续负责账号、权限、元数据和下载审计。
+- Receipt/payment documents, print/export, state transitions, and reversal.
+- Small-program login/session foundations and employee identity binding.
+- Shared loading patterns and reorganized navigation.
+- Controlled employee role assignment with confirmation, protection of critical roles, and audit.
+- Private document storage through server-authorized access, with relational metadata and download audit.
+- Database-filtered global search with broader permission-aware result types and identifier-first ranking.
 
-## 当前验证
+## Engineering Validation
 
-- ESLint：通过，无警告。
-- TypeScript：通过。
-- 自动化测试：77 项全部通过。
-- Next.js 生产构建：通过。
+At the latest recorded release, lint, TypeScript, the workflow regression suite, and the production build passed. This evidence must be rerun for later code changes and does not replace business acceptance.
 
-## 业务验收待办
+## Acceptance Pending
 
-- 使用老板、财务、普通员工和管理员账号完成功能验收。
-- 在目标 Supabase 项目确认并执行尚未上线的迁移。
-- 验证小程序所需环境变量、微信后台配置和回调域名。
-- 验证收款、付款、审批、红冲、导出和权限隔离。
-- 完成部署前备份并确认回滚版本。
+- Complete representative flows using standard employee, approver, finance, warehouse, and administrator roles.
+- Confirm all required migrations in the intended non-production/production environments.
+- Validate environment-dependent authentication callbacks without publishing their private configuration.
+- Verify cash, approval, reversal, export, document, search, and permission isolation scenarios.
+- Confirm backup, recovery ownership, and the last verified rollback release.

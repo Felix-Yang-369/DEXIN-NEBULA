@@ -1,181 +1,50 @@
-# 统一审批、请假与费用报销流程
+# Approval, Leave, Expense, and Seal Workflows
 
-## 1. 文档目的
+**Status:** Implemented baseline / policy configuration In Progress
 
-本文定义德馨星云 V1 的统一审批能力，以及“请假申请”和“费用报销”的业务规则、状态转换、权限边界和当前实现范围。
+## Purpose
 
-规则来源：
+The shared approval foundation models requests, assigned steps, actions, events, notifications, and audit history so modules do not implement incompatible approval engines.
 
-- `../行政管理/德馨淼盛管理制度/考勤管理制度.docx`
-- 重点参考第九至十二条及请假审批权限表
+## Common State Model
 
-制度文件是当前业务规则基线。后续若公司发布新版本制度，应由行政人事确认生效日期，再同步修改流程配置和回归测试。
+~~~text
+draft → submitted / assigned steps → approved
+  └→ withdrawn
+assigned step → returned → resubmitted
+assigned step → rejected
+~~~
 
-## 2. 请假类型
+Concrete status names differ where a workflow needs named business stages. The server and transactional database function validate the current state, assigned actor, action, and version. A page cannot skip a node or directly set a final state.
 
-当前支持：
+## Roles and Scope
 
-- 福利假
-- 病假
-- 事假
-- 婚假
-- 丧假
-- 产假
-- 陪产假
-- 工伤假
-- 其他法定假期
+- The applicant creates, submits, views, and—only when rules allow—withdraws their request.
+- The current assigned approver acts only on an active step assigned to them.
+- Functional reviewers such as HR or Finance act only at their configured step and data scope.
+- Executives participate when an approved workflow definition assigns them.
+- Administrators configure or troubleshoot the platform but do not automatically replace business approvers.
 
-福利假规则在页面中作为制度提示展示：转正后为 4 天/年，连续工作每满一年增加 1 天，最高 10 天，当年有效且不跨年累计。
+## Leave
 
-## 3. 申请字段
+Implemented leave requests capture type, date range, reason, handover, and exceptional-case information and route through assigned supervisory and filing/approval stages. Exact leave entitlements, calendars, evidence, escalation rules, and approver thresholds are organizational policy and are intentionally not published here.
 
-| 字段 | 必填 | 说明 |
-| --- | --- | --- |
-| 请假类型 | 是 | 从制度规定类型中选择 |
-| 开始日期 | 是 | 当前演示按自然日计算 |
-| 结束日期 | 是 | 不得早于开始日期 |
-| 请假事由 | 是 | 最少 5 个字；正式环境需控制敏感信息展示 |
-| 工作交接 | 是 | 说明交接对象与事项 |
-| 紧急补办 | 否 | 仅用于突发情况 |
-| 紧急情况说明 | 条件必填 | 勾选紧急补办后必填，需说明通知直属主管的方式 |
+## Expense
 
-正式版本应增加附件策略、假期余额、工作日历和法定假期口径。病假材料等敏感附件不得在普通列表中直接公开。
+Implemented expense requests capture category, occurrence date, amount, counterparty/merchant summary, description, and invoice presence/count. Conditional routing supports role-based review. Numerical approval thresholds and payment policy must be configured from an approved private policy source; example values must not be treated as company policy.
 
-## 4. 审批规则
+## Seal Requests
 
-### 4.1 一天及以下
+Seal requests use the same governed request/step/event foundation with workflow-specific fields and assigned review. Document content and sensitive attachments require separate file authorization.
 
-```text
-员工提交 → 直属上级审批 → 行政人事备案 → 完成
-```
+## Audit and Notifications
 
-### 4.2 超过一天
+Each action preserves request identifier, actor, role, action, previous/next state, time, and necessary comment metadata. Notifications contain only the minimum summary needed to direct the recipient. Sensitive reasons, amounts, or attachment bodies should not be copied into broad notifications or audit logs.
 
-```text
-员工提交 → 直属上级审核 → 董事长审批 → 行政人事备案 → 完成
-```
+## Current Limitations
 
-### 4.3 特殊规则
+Visual workflow configuration, complete work calendars/leave balances, mature attachment lifecycle, expense payment state, notification preferences, and full end-to-end database integration coverage remain incomplete.
 
-- 请假原则上应提前发起。
-- 紧急情况先通过电话或企业微信通知直属主管，返岗后补办。
-- 续假应在原批准期限届满前重新申请并完成审批。
-- 未经批准擅自离岗、提供虚假材料等异常情况，不在当前演示自动判定，应由行政人事按制度处理。
+## Acceptance
 
-## 5. 状态机
-
-| 状态 | 中文含义 | 可执行动作 |
-| --- | --- | --- |
-| `draft` | 草稿 | 保存、修改、提交 |
-| `pending_department` | 直属上级审批中 | 同意、退回、驳回；申请人可撤回 |
-| `pending_chairman` | 董事长审批中 | 同意、退回、驳回 |
-| `pending_hr_filing` | 行政人事备案中 | 完成备案、退回、驳回 |
-| `approved` | 已通过 | 只读 |
-| `returned` | 已退回 | 申请人修改并重新提交 |
-| `rejected` | 已驳回 | 只读 |
-| `withdrawn` | 已撤回 | 只读 |
-
-状态转换由 `src/features/approvals/leave-workflow.ts` 统一管理。页面不能自行跳过节点或直接修改最终状态。
-
-## 6. 角色与数据范围
-
-| 角色 | 页面与操作 | 数据范围 |
-| --- | --- | --- |
-| 普通员工 | 创建草稿、提交、查看本人申请、在首节点处理前撤回 | 本人申请 |
-| 部门负责人 | 处理分配给自己的直属员工请假 | 本部门授权范围 |
-| 董事长 | 处理超过一天且已通过直属上级审核的请假 | 分配给本人的待办 |
-| 人事行政 | 完成考勤和假期台账备案 | 公司授权范围 |
-| 系统管理员 | 配置流程、排查异常，不默认代替业务审批人 | 按管理授权 |
-
-真实系统必须在服务端根据登录身份、审批任务归属和当前状态重复校验。仅隐藏按钮不构成权限控制。
-
-## 7. 审批历史
-
-每次动作至少记录：
-
-- 申请编号
-- 动作类型
-- 操作人和角色
-- 审批意见
-- 前一状态和后一状态
-- 操作时间
-
-正式版本中历史记录不可由普通用户修改或删除，并应纳入审计日志。
-
-## 8. 当前实现
-
-已完成：
-
-- `/requests/leave` 请假表单
-- `/approvals` 统一审批中心
-- 草稿、提交、条件分支、同意、退回、驳回、撤回、重新提交和备案
-- 浏览器本地演示数据和完整操作历史
-- 请假状态机自动化测试
-
-运行模式：
-
-- 未配置 Supabase 时，继续使用浏览器本机演示数据。
-- 配置 Supabase 并执行迁移后，自动启用真实员工账号、数据库申请和服务端审批。
-- 提交和审批均通过数据库函数完成，审批人归属、状态、版本号和下一节点在服务端校验。
-- PostgreSQL 行级策略限制本人、直属负责人、当前审批人、人事和管理员的数据范围。
-
-### 8.1 通用审批底座
-
-新增的通用审批模型不会修改现有请假表：
-
-| 表 | 职责 |
-| --- | --- |
-| `approval_requests` | 申请公共信息、当前处理人、状态和乐观锁版本 |
-| `approval_steps` | 按申请保存实际审批节点和节点负责人 |
-| `approval_events` | 保存提交、同意、退回、驳回、撤回和重新提交历史 |
-| `expense_claims` | 保存报销类别、日期、金额、商户、说明和发票张数 |
-
-节点在申请提交时固化，之后员工角色变化不会改写既有审批历史。处理动作通过
-`process_approval_request` 在数据库事务内锁定申请并校验当前处理人、状态和版本。
-
-## 9. 费用报销 V1
-
-### 9.1 字段
-
-| 字段 | 必填 | 说明 |
-| --- | --- | --- |
-| 费用类别 | 是 | 差旅、交通、招待、办公、零星采购或其他 |
-| 费用发生日期 | 是 | 不允许晚于提交当日 |
-| 报销金额 | 是 | CNY，单笔大于 0 且不超过 100 万元 |
-| 收款方/商户 | 否 | 不填写银行卡等敏感信息 |
-| 费用说明 | 是 | 至少 5 个字 |
-| 是否有发票 | 是 | 有发票时必须填写张数 |
-
-### 9.2 内部试行路线
-
-```text
-金额 ≤ 5,000 元：员工 → 直属负责人 → 财务复核 → 完成
-金额 > 5,000 元：员工 → 直属负责人 → 财务复核 → 董事长审批 → 完成
-```
-
-`5,000 元`是开发阶段为验证条件分支设置的试行阈值，并非已发布财务制度。正式
-试运行前必须由公司确认审批金额、财务复核位置、票据要求和付款边界。
-
-### 9.3 权限
-
-- 申请人可查看本人报销，并仅在第一个节点处理前撤回。
-- 当前节点负责人只能处理分配给自己的有效待办。
-- 财务和董事长可查看公司范围内的报销申请。
-- 管理员可排查流程，但不默认代替审批人处理。
-- 退回与驳回必须填写意见；重复或过期版本由数据库拒绝。
-
-当前限制：
-
-- 站内消息和审计迁移已启用；企业微信尚未接入
-- 未接入假期余额、工作日历、附件与续假关联
-- 报销附件、编辑和财务付款状态尚未接入
-- 通用审批暂未提供后台可视化流程配置
-
-## 10. 生产化下一步
-
-1. 为财务主管绑定安全登录账号，使用本人账号验收财务待办。
-2. 使用独立测试账号继续验收大额报销的董事长节点。
-3. 由公司确认报销阈值、票据和付款规则。
-4. 增加报销编辑、附件服务和财务付款状态。
-5. 验收站内通知和审计记录，再评估企业微信消息提醒。
-6. 增加数据库集成测试与完整端到端测试。
+Test every valid and invalid transition, stale/duplicate actions, applicant/assignee/functional/admin roles, notification recipients, audit immutability, sensitive-field scope, and transaction rollback using synthetic data.

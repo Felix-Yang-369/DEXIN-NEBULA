@@ -1,11 +1,7 @@
-# 部署配置目录
+# Legacy Reverse-Proxy Configuration
 
-该目录保存需要跟随代码版本管理的部署配置，不存放密码、证书、环境变量或服务器备份。
+This directory contains versioned configuration examples only. It must not contain passwords, certificates, environment files, private addresses, production paths, or server backups.
 
-## 当前内容
+The included proxy configuration is historical and may not match the current environment. Treat hostnames, upstreams, certificates, headers, limits, and timeouts as values requiring a private operational review before reuse.
 
-- `nginx/app.nebula.http.conf`：历史阿里云 Nginx 配置，用于 HTTP 跳转 HTTPS，并将业务请求转发到德馨星云服务。
-
-当前正式业务系统托管在 Vercel，因此这里的 Nginx 文件不是当前生产部署入口。只有维护历史阿里云环境时才使用，使用前必须核对上游服务、证书路径和域名配置。
-
-完整发布和回滚规则见 [部署与回滚规范](../docs/operations/deployment.md)。
+See the sanitized [Deployment Guide](../docs/engineering/DEPLOYMENT.md) for release and rollback principles. Exact production configuration belongs in an access-controlled operations system.

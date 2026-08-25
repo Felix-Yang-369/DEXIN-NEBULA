@@ -69,7 +69,7 @@ supabase/migrations/202607290015_inventory_export_audit.sql
 supabase/seed.example.sql
 ```
 
-该脚本建立德馨淼盛、首批部门和六个基础角色。示例脚本不包含真实员工姓名、邮箱或 Auth UUID。
+该脚本建立示例组织、首批部门和基础角色。示例脚本不包含真实员工姓名、邮箱或 Auth UUID。
 
 ## 5. 创建首批员工账号
 
@@ -186,7 +186,7 @@ supabase/seed.example.sql
 | `chairman.dev@dxmstech.cn` | 董事长 |
 | `hr.dev@dxmstech.cn` | 人事、管理员 |
 
-测试密码不写入项目文件，保存在当前开发电脑的 macOS 钥匙串服务 `DEXIN Nebula Dev` 中。重新生成或交接测试账号时，应同步更新钥匙串，不得把密码补充到本文件。
+测试密码不写入项目文件，应保存在开发者获准使用的本机密码管理器中。重新生成或交接测试账号时，应通过安全渠道更新，不得把密码补充到本文件。
 
 ## 10. 密码找回与修改
 
@@ -197,10 +197,10 @@ supabase/seed.example.sql
 
 在 Supabase Dashboard 的 **Authentication → URL Configuration** 中：
 
-1. 将 `Site URL` 设为 `https://app.nebula.dexinmiaosheng.cn`。
+1. 将 `Site URL` 设为私有运维系统中登记的正式应用 HTTPS 地址。
 2. 将本地与正式回调加入 Redirect URLs：
    - `http://localhost:3000/auth/confirm`
-   - `https://app.nebula.dexinmiaosheng.cn/auth/confirm`
+   - `https://<application-domain>/auth/confirm`
 3. 生产环境配置自定义 SMTP，不依赖 Supabase 默认邮件服务。
 
 如果希望重置链接可在不同浏览器或设备打开，将 **Authentication → Email Templates → Reset password** 中的链接配置为：

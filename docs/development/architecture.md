@@ -1,101 +1,10 @@
-# 架构与产品边界
+# Architecture (Legacy Path)
 
-本文记录德馨星云的产品定位、当前边界、模块结构和技术基线。当前运行状态与快速开始以根目录 [README.md](../../README.md) 为准。
+The former architecture and product-boundary notes have been merged into:
 
-## 产品定义
+- [Project Overview](../PROJECT.md)
+- [Software Architecture](../ARCHITECTURE.md)
+- [AI Architecture](../AI_ARCHITECTURE.md)
+- [Module Documentation](../modules/CRM.md)
 
-- 产品：德馨星云（DEXIN Nebula）
-- 定位：德馨淼盛企业数字化运营平台
-- 当前版本：`V0.9-alpha`
-- 当前阶段：内部验收、部署与真实业务闭环验证
-- 主要用户：内部员工、部门负责人、人事、财务、董事长、管理员
-- 当前边界：单一组织内部系统，不开放外部注册，不提前建设完整多租户 SaaS
-
-德馨星云不是单独的 OA。CRM、销售、订单、PIM、SRM、采购、WMS、FMS、HRM、OA、BI 和德小馨 AI 共享组织、账号、权限、文件、通知与审计基础能力。
-
-## 已进入代码或数据库的能力
-
-- Supabase Auth、员工账号绑定、角色权限和 PostgreSQL RLS
-- OA 审批、请假、报销、用印、公告、通知、周报、制度和文件
-- CRM 客户、联系人、跟进、分级、Logo 和多法律实体
-- 产品主档、图片、授权价格、库存状态和 Excel 导出
-- 报价、销售机会、销售订单、履约、配送和销售应收
-- 供应商、采购申请、采购订单、到货、入库和采购应付
-- 仓库、库存、批次效期、出入库、调拨、盘点和配送
-- 应收应付、账龄、对账单、银行流水、核销、凭证和发票
-- HRM 组织、员工、合同、假期、考勤、入离职、职级岗位和绩效
-- BI 权限内真实聚合和数据覆盖提示
-- 德小馨 DeepSeek 对话、权限内检索、来源引用和审计
-
-## 尚未完整实现的能力
-
-以下功能只是入口或部分实现，不得描述为已经完成：
-
-- 新媒体账号、内容、发布计划、平台数据和舆情监控
-- 企业宣传完整资料库与发布审核
-- 企业活动立项、执行和复盘
-- 完整薪资、招聘、培训体系
-- 销售退货、采购退货和复杂订单变更
-- 银行自动对账、正式总账、税务与金蝶双向集成
-- AI 直接执行申请、审批、付款、删除或数据修改
-
-## 当前优先级
-
-1. 生产部署、内测入口、备份和回滚
-2. 老板、财务、客服、仓储四类账号权限验收
-3. 销售订单 → 出库配送 → 应收 → 收款核销真实验收
-4. 采购订单 → 到货入库 → 应付 → 付款核销真实验收
-5. 数据口径、重复提交、异常状态与移动端修复
-6. V0.10 运营管理真实数据模型与流程
-7. 正式域名、HTTPS 和企业微信扫码登录验收
-
-页面入口存在不代表功能完成，仍需验证数据模型、权限和业务闭环。
-
-## 导航与模块架构
-
-```text
-经营总览
-业务管理：CRM、销售、订单、供应链、产品
-运营管理：新媒体、企业宣传、企业活动
-财务管理：应收、应付、利润、报表、流水、发票
-AI 助手：德小馨、BI
-组织协同：HRM、OA、系统管理
-```
-
-新增页面优先归入上述分区。不要为了调整导航而移动已有路由或重写业务页面。
-
-## 技术基线
-
-- Next.js 16 App Router、React 19、TypeScript
-- Tailwind CSS 4、shadcn/ui、Base UI、Lucide、Recharts
-- Supabase Auth、PostgreSQL、Storage、Supabase JS/SSR
-- 绿联 NAS WebDAV（文件中心正文，由 Next.js 服务端专用连接）
-- Zod、Day.js、Axios、ExcelJS
-- npm 与 `package-lock.json`
-- Vercel 生产部署；历史部署资料保留在部署专题文档中
-
-当前没有使用 Prisma、React Hook Form、Vitest 或 Playwright。不要把未安装的技术写成现状，也不要为了符合旧文档而无目的引入依赖。
-
-## 代码结构
-
-```text
-src/app/                 路由、页面和 Route Handlers
-src/components/ui/       基础 UI
-src/components/business/ 跨模块业务组件
-src/config/              导航和稳定配置
-src/features/            业务模块与服务端动作
-src/lib/                 基础设施与通用工具
-src/types/               共享类型
-supabase/migrations/     PostgreSQL 迁移与事务函数
-tests/                   业务规则自动化测试
-docs/                    产品、流程、开发和接入说明
-```
-
-复杂审批、权限、库存和金额逻辑不得只写在页面组件中。跨表写入优先由 PostgreSQL 事务函数或明确的服务层完成。
-
-## 产品开发原则
-
-- 完整闭环优先：页面、数据、权限和状态流转必须能够一起验收。
-- 真实数据优先：没有数据源时显示空状态，不用随机数据伪装经营结果。
-- 共享能力优先：审批、文件、通知、审计和主数据不得在各模块重复建设。
-- 单一数据来源：组织、员工、客户、产品、供应商和法律实体保持统一主档。
+This path is retained temporarily for existing links. Do not add new architecture decisions here.

@@ -1,51 +1,64 @@
-# 德馨星云文档中心
+# DEXIN NEBULA Documentation
 
-这里保存产品、业务流程、开发、系统接入、运维和版本记录。项目介绍与本地启动方式见根目录 [README.md](../README.md)。
+The English [README](../README.md) is the primary public entry; the synchronized Chinese version is [README.zh-CN.md](../README.zh-CN.md). Canonical documentation is organized by product, architecture, module, engineering, and public portfolio concerns.
 
-## 产品
+## Canonical Documents
 
-- [产品需求基线](./product/requirements.md)：目标、用户、范围和验收原则
-- [文件中心需求](./product/file-center-requirements.md)：文件分类、权限、NAS 存储、生命周期和验收标准
-- [版本路线图](./product/roadmap.md)：当前优先级和后续规划
-- [角色与权限](./product/user-roles.md)：角色、页面、操作和敏感字段范围
-- [色彩系统](./product/color-system.md)：品牌颜色和使用原则
+- [Project Overview](./PROJECT.md)
+- [Product Requirements](./PRD.md)
+- [Software Architecture](./ARCHITECTURE.md)
+- [AI Architecture](./AI_ARCHITECTURE.md)
+- [Milestone Roadmap](./ROADMAP.md)
+- [Architecture Decisions](./DECISIONS.md)
+- [Evaluation Framework](./EVALUATION.md)
 
-## 业务流程
+## Modules
 
-- [统一审批、请假与费用报销](./processes/approval.md)
+- Customer and revenue: [CRM](./modules/CRM.md), [Sales](./modules/SALES.md), [OMS](./modules/OMS.md)
+- Supply chain: [Procurement](./modules/PROCUREMENT.md), [WMS](./modules/WMS.md)
+- Enterprise operations: [Finance](./modules/FINANCE.md), [HRM](./modules/HRM.md), [OA](./modules/OA.md)
+- Intelligence: [BI](./modules/BI.md)
 
-## 开发
+All module documents use the same structure: purpose, users, entities, workflows, rules, permissions, dependencies, integrations, AI integration, limitations, and future work.
 
-- [架构与产品边界](./development/architecture.md)
-- [开发与安全规范](./development/coding-standards.md)
-- [测试与完成标准](./development/testing.md)
+## Engineering
 
-## 系统接入
+- [Development](./engineering/DEVELOPMENT.md)
+- [Database](./engineering/DATABASE.md)
+- [API](./engineering/API.md)
+- [Security](./engineering/SECURITY.md)
+- [Testing](./engineering/TESTING.md)
+- [Deployment](./engineering/DEPLOYMENT.md)
 
-- [Supabase](./integrations/supabase.md)
-- [企业微信扫码登录](./integrations/wecom.md)
-- [DeepSeek](./integrations/deepseek.md)
-- [微信小程序认证](./integrations/miniprogram-auth.md)
-- [绿联 NAS 文件中心](./integrations/nas-webdav.md)
+## Public Portfolio
 
-## 运维
+- [Case Study](./portfolio/CASE_STUDY.md)
+- [Public Architecture](./portfolio/PUBLIC_ARCHITECTURE.md)
+- [Demo Guide](./portfolio/DEMO_GUIDE.md)
 
-- [部署与回滚](./operations/deployment.md)
-- [域名与 HTTPS](./operations/domains.md)
-- [历史 Nginx 配置](../deploy/README.md)
+These documents contain only sanitized information suitable for public presentation. Demonstrations must use synthetic data.
 
-## 安全
+## Focused Specifications Retained
 
-- [通知与操作审计](./security/notifications-and-audit.md)
+The refactor preserves useful detailed material rather than duplicating it in canonical documents:
 
-## 发布记录
+- Product: [roles and permissions](./product/user-roles.md), [search](./product/search-system.md), [file center](./product/file-center-requirements.md), and [visual color system](./product/color-system.md)
+- Process: [approvals, leave, and expense workflows](./processes/approval.md)
+- Integrations: [Supabase](./integrations/supabase.md), [enterprise identity](./integrations/wecom.md), [AI provider](./integrations/deepseek.md), [small-program authentication](./integrations/miniprogram-auth.md), and [private file storage](./integrations/nas-webdav.md)
+- Governance: [notifications and audit](./security/notifications-and-audit.md)
 
-- [下一版本（尚未发布）](./releases/next.md)
-- [2026-08-12 生产版本](./releases/2026-08-12-production.md)
+The former product overview, architecture, roadmap, development, testing, and deployment documents remain as legacy references temporarily. New changes should target the canonical files above; legacy duplicates can be removed after maintainers confirm that no internal workflow depends on their paths.
 
-## 文档维护规则
+## Status Vocabulary
 
-- README 只保留项目入口和当前事实，详细内容放在对应专题目录。
-- 已上线版本写入 `releases/`，后续计划写入 `product/roadmap.md`。
-- 外部服务接入放入 `integrations/`，域名、部署和回滚放入 `operations/`。
-- 功能、权限、数据模型或运行方式变化时，同步更新对应文档。
+- **Implemented:** confirmed in source code, migrations, or reproducible tests.
+- **In Progress:** a usable baseline exists, but validation or important capability remains incomplete.
+- **Planned:** no complete current implementation is claimed.
+- **TODO:** repository evidence or an owner decision is insufficient.
+
+## Documentation Rules
+
+- Do not include real business/personnel data, secrets, credentials, private infrastructure, or confidential financial information.
+- Link to one authoritative definition instead of copying detailed rules.
+- Update code, tests, module status, architecture, and release notes together when behavior changes.
+- Keep public examples synthetic and label plans and unmeasured results explicitly.

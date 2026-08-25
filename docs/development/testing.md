@@ -1,45 +1,5 @@
-# 测试与完成标准
+# Testing Standard (Legacy Path)
 
-测试数量会随功能变化，因此文档不写死数量；以当前测试命令的实际结果为准。
+This content has been merged into the canonical [Testing Guide](../engineering/TESTING.md) and [Evaluation Framework](../EVALUATION.md).
 
-## 自动检查
-
-每次代码改动按风险执行：
-
-```bash
-npm run check
-npm run test:workflow
-npm run build
-```
-
-- `npm run check`：检查代码规范和 TypeScript 类型。
-- `npm run test:workflow`：验证权限、金额、日期和业务状态流转。
-- `npm run build`：确认生产版本能够完整构建。
-
-新增状态机、金额、日期、权限或库存逻辑时，应同时补充回归测试。测试文件必须与当前分支功能一致，不要把未来版本测试混入正式版本导致长期失败。
-
-## 人工验收
-
-- 受影响页面可以访问。
-- 无权限账号被正确拦截。
-- 加载、空数据、错误和无权限状态完整。
-- 浏览器控制台与服务端没有新增错误。
-- 手机端核心操作可用。
-- 涉及数据库时，迁移、RLS 和回滚路径明确。
-
-无法完成某项验证时必须说明原因，不能用“页面能打开”代替业务验收。
-
-## 功能完成标准
-
-功能只有同时满足以下条件才可描述为完成：
-
-- 用户流程闭环。
-- 服务端与数据库权限生效。
-- 加载、空、错误和无权限状态完整。
-- 相关测试和生产构建通过。
-- 数据库变化有迁移和回滚说明。
-- 关键动作有审计。
-- 桌面和手机核心操作可用。
-- 文档与实际实现一致。
-
-交付说明应先给结果，再说明影响模块、验证结果、未完成事项、风险和下一步。
+This path is retained temporarily for existing links. Do not add new test policy here.

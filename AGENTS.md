@@ -14,10 +14,11 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 再根据任务阅读对应专题文档：
 
-- [架构与产品边界](./docs/development/architecture.md)
-- [开发与安全规范](./docs/development/coding-standards.md)
-- [测试与完成标准](./docs/development/testing.md)
-- [部署与回滚规范](./docs/operations/deployment.md)
+- [软件架构](./docs/ARCHITECTURE.md)
+- [开发指南](./docs/engineering/DEVELOPMENT.md)
+- [安全规范](./docs/engineering/SECURITY.md)
+- [测试与完成标准](./docs/engineering/TESTING.md)
+- [部署与回滚规范](./docs/engineering/DEPLOYMENT.md)
 
 ## 必须遵守
 

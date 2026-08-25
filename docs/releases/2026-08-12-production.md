@@ -1,26 +1,17 @@
-# 2026-08-12 生产版本
+# 2026-08-12 Production Release
 
-## 发布信息
+## Scope
 
-- 正式域名：`app.nebula.dexinmiaosheng.cn`
-- 托管平台：Vercel
-- Vercel 部署：`dpl_8eqpjTPgNw7XVQDNwXRw2MfRVq4B`
-- Git 基础提交：`64195f4258751ae7c10e862155d81b08f0e12943`
-- 状态：生产环境可用
+This release established a production-available application baseline on a managed hosting platform.
 
-## 版本说明
+## Validation
 
-该部署由包含未提交修改的本地工作区创建，因此 Git 基础提交不能单独完整还原线上源码。2026-08-14 已从 Vercel 生产部署恢复上传源码到本地正式项目，并完成逐文件校验。
+- Recovered source files were compared with the deployed artifact.
+- Lint, TypeScript, and the production build passed at release time.
+- Authentication entry and protected-route behavior were smoke-tested.
 
-## 本地恢复验证
+## Known Issues
 
-- 235 个部署源码文件校验一致。
-- ESLint 与 TypeScript 检查通过。
-- Next.js 生产构建通过。
-- 本地首页能够跳转到登录页，登录页正常响应。
+The original deployment was produced from a working tree that contained local changes, so its base commit alone was not a complete reproducible source record. Later release practice moved toward isolated artifacts and explicit validation. Historical dependency advisories required a separately tested upgrade.
 
-## 已知事项
-
-- 本地保留的部分下一版本测试对应线上尚未包含的功能，不能作为本版本失败依据。
-- 当前依赖审计提示 2 个高风险项，应在独立升级版本中处理和回归验证。
-- 后续正式发布应先形成干净、可复现的版本提交，再由该提交部署。
+Exact deployment IDs, domains, commits, account details, and recovery procedures are intentionally retained outside repository documentation.
