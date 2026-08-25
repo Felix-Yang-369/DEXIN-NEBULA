@@ -1,12 +1,8 @@
 <p align="center">
-  <img src="./docs/assets/readme-hero.svg" width="100%" alt="DEXIN NEBULA — AI-native enterprise management platform" />
+  <a href="https://nebula.dexinmiaosheng.cn">
+    <img src="./docs/assets/readme-hero.svg" width="100%" alt="DEXIN NEBULA — AI-native enterprise management platform" />
+  </a>
 </p>
-
-<h1 align="center">DEXIN NEBULA</h1>
-
-<p align="center"><strong>AI-Native Enterprise Management Platform</strong></p>
-<p align="center">CRM · Sales · OMS · Procurement · WMS · Finance · HRM · OA · BI · AI</p>
-<p align="center">A modular enterprise platform connecting operational workflows, governed business data, and grounded AI assistance.</p>
 
 <p align="center">
   <a href="./docs/ROADMAP.md"><img alt="Status: Active Development" src="./docs/assets/badges/status.svg" /></a>
@@ -20,6 +16,7 @@
 </p>
 
 <p align="center">
+  <a href="https://nebula.dexinmiaosheng.cn"><strong>Website ↗</strong></a> ·
   <a href="./docs/ARCHITECTURE.md">Architecture</a> ·
   <a href="./docs/README.md">Documentation</a> ·
   <a href="./docs/portfolio/DEMO_GUIDE.md">Demo</a> ·
@@ -37,7 +34,7 @@ DEXIN NEBULA is designed for internal enterprise teams whose customer, order, in
     <td width="25%"><strong>Architecture</strong><br />Modular monolith with explicit domain boundaries</td>
     <td width="25%"><strong>Data & Security</strong><br />PostgreSQL, RLS, transactions, and audit</td>
     <td width="25%"><strong>AI Layer</strong><br />Permission-aware retrieval with cited evidence</td>
-    <td width="25%"><strong>Delivery</strong><br />Internal alpha under active validation</td>
+    <td width="25%"><strong>Delivery</strong><br />Internal alpha · <a href="https://nebula.dexinmiaosheng.cn">Project website ↗</a></td>
   </tr>
 </table>
 
@@ -109,7 +106,7 @@ Reusable agent interfaces, retrieval utilities, workflow primitives, evaluation 
 
 ## Product Preview
 
-Public screenshots are withheld until a fully synthetic dataset and privacy review are complete. The [Demo Guide](./docs/portfolio/DEMO_GUIDE.md) defines a safe demonstration sequence for Dashboard, CRM, orders, procurement, warehouse, approvals, search, AI, and audit behavior.
+The public [project website](https://nebula.dexinmiaosheng.cn) presents the product at a high level. Repository screenshots remain withheld until a fully synthetic dataset and privacy review are complete. The [Demo Guide](./docs/portfolio/DEMO_GUIDE.md) defines a safe demonstration sequence for Dashboard, CRM, orders, procurement, warehouse, approvals, search, AI, and audit behavior.
 
 ## Project Status
 

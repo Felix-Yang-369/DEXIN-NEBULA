@@ -1,12 +1,8 @@
 <p align="center">
-  <img src="./docs/assets/readme-hero.svg" width="100%" alt="DEXIN NEBULA 德馨星云——AI 原生企业管理平台" />
+  <a href="https://nebula.dexinmiaosheng.cn">
+    <img src="./docs/assets/readme-hero.svg" width="100%" alt="DEXIN NEBULA 德馨星云——AI 原生企业管理平台" />
+  </a>
 </p>
-
-<h1 align="center">德馨星云 DEXIN NEBULA</h1>
-
-<p align="center"><strong>AI 原生企业管理平台</strong></p>
-<p align="center">CRM · 销售 · OMS · 采购 · WMS · 财务 · HRM · OA · BI · AI</p>
-<p align="center">一个连接企业运营流程、受控业务数据和可信 AI 辅助能力的模块化平台。</p>
 
 <p align="center">
   <a href="./docs/ROADMAP.md"><img alt="状态：持续开发" src="./docs/assets/badges/status.svg" /></a>
@@ -20,6 +16,7 @@
 </p>
 
 <p align="center">
+  <a href="https://nebula.dexinmiaosheng.cn"><strong>项目官网 ↗</strong></a> ·
   <a href="./docs/ARCHITECTURE.md">系统架构</a> ·
   <a href="./docs/README.md">文档中心</a> ·
   <a href="./docs/portfolio/DEMO_GUIDE.md">演示指南</a> ·
@@ -37,7 +34,7 @@
     <td width="25%"><strong>系统架构</strong><br />具备明确领域边界的模块化单体</td>
     <td width="25%"><strong>数据与安全</strong><br />PostgreSQL、RLS、事务与审计</td>
     <td width="25%"><strong>AI 层</strong><br />权限感知检索与来源引用</td>
-    <td width="25%"><strong>交付状态</strong><br />持续验证中的内部 Alpha</td>
+    <td width="25%"><strong>交付状态</strong><br />内部 Alpha · <a href="https://nebula.dexinmiaosheng.cn">项目官网 ↗</a></td>
   </tr>
 </table>
 
@@ -109,7 +106,7 @@ flowchart TD
 
 ## 产品预览
 
-在完成全合成数据集和隐私审查前，公开文档暂不放置业务截图。[演示指南](./docs/portfolio/DEMO_GUIDE.md)定义了 Dashboard、CRM、订单、采购、仓储、审批、搜索、AI 和审计能力的安全演示顺序。
+[项目官网](https://nebula.dexinmiaosheng.cn)提供产品层面的公开介绍。在完成全合成数据集和隐私审查前，仓库文档暂不放置业务截图。[演示指南](./docs/portfolio/DEMO_GUIDE.md)定义了 Dashboard、CRM、订单、采购、仓储、审批、搜索、AI 和审计能力的安全演示顺序。
 
 ## 项目状态
 
