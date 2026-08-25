@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="178" height="28" viewBox="0 0 178 28" role="img" aria-label="Quality: Checks passing">
+  <title>Quality: Checks passing</title>
+  <rect width="178" height="28" rx="4" fill="#0A2340"/>
+  <rect x="60" width="118" height="28" rx="4" fill="#16856D"/>
+  <path d="M60 0h4v28h-4z" fill="#16856D"/>
+  <g fill="#fff" font-family="ui-sans-serif,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif" font-size="12" font-weight="600" text-anchor="middle">
+    <text x="30" y="18">quality</text><text x="119" y="18">checks passing</text>
+  </g>
+</svg>

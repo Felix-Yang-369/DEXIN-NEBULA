@@ -1,18 +1,45 @@
-# DEXIN NEBULA
+<p align="center">
+  <img src="./docs/assets/readme-hero.svg" width="100%" alt="DEXIN NEBULA — AI-native enterprise management platform" />
+</p>
 
-> **AI-Native Enterprise Management Platform**
+<h1 align="center">DEXIN NEBULA</h1>
 
-CRM · Sales · OMS · Procurement · WMS · Finance · HRM · OA · BI · AI
+<p align="center"><strong>AI-Native Enterprise Management Platform</strong></p>
+<p align="center">CRM · Sales · OMS · Procurement · WMS · Finance · HRM · OA · BI · AI</p>
+<p align="center">A modular enterprise platform connecting operational workflows, governed business data, and grounded AI assistance.</p>
 
-A modular enterprise platform connecting operational workflows, structured business data, permission-aware search, and grounded AI assistance.
+<p align="center">
+  <a href="./docs/ROADMAP.md"><img alt="Status: Active Development" src="./docs/assets/badges/status.svg" /></a>
+  <a href="./LICENSE"><img alt="License: Proprietary" src="./docs/assets/badges/license.svg" /></a>
+  <a href="./docs/README.md"><img alt="Documentation: Complete Baseline" src="./docs/assets/badges/docs.svg" /></a>
+  <a href="./docs/engineering/TESTING.md"><img alt="Quality: Checks Passing" src="./docs/assets/badges/quality.svg" /></a>
+</p>
 
-[English](./README.md) | [简体中文](./README.zh-CN.md)
+<p align="center">
+  <a href="./README.md">English</a> · <a href="./README.zh-CN.md">简体中文</a>
+</p>
 
-[Architecture](./docs/ARCHITECTURE.md) · [Documentation](./docs/README.md) · [Demo](./docs/portfolio/DEMO_GUIDE.md) · [Case Study](./docs/portfolio/CASE_STUDY.md)
+<p align="center">
+  <a href="./docs/ARCHITECTURE.md">Architecture</a> ·
+  <a href="./docs/README.md">Documentation</a> ·
+  <a href="./docs/portfolio/DEMO_GUIDE.md">Demo</a> ·
+  <a href="./docs/portfolio/CASE_STUDY.md">Case Study</a>
+</p>
 
 ## Overview
 
 DEXIN NEBULA is designed for internal enterprise teams whose customer, order, inventory, finance, people, and document workflows are fragmented across spreadsheets and disconnected tools. It combines shared master data, auditable state transitions, database-enforced authorization, and cross-module workflows in a modular full-stack application. Its AI layer is grounded in authorized enterprise records: the implemented assistant retrieves bounded context, cites sources, and remains read-only, while controlled agent actions are a planned research direction.
+
+## At a Glance
+
+<table>
+  <tr>
+    <td width="25%"><strong>Architecture</strong><br />Modular monolith with explicit domain boundaries</td>
+    <td width="25%"><strong>Data & Security</strong><br />PostgreSQL, RLS, transactions, and audit</td>
+    <td width="25%"><strong>AI Layer</strong><br />Permission-aware retrieval with cited evidence</td>
+    <td width="25%"><strong>Delivery</strong><br />Internal alpha under active validation</td>
+  </tr>
+</table>
 
 ## Core Modules
 
@@ -111,11 +138,15 @@ The design combines authenticated server operations, scoped data access, Postgre
 
 ## License & Source Availability
 
-DEXIN NEBULA is a proprietary software project.
+<table>
+  <tr>
+    <td width="33%"><strong>Proprietary product</strong><br />DEXIN NEBULA is distributed under an All Rights Reserved proprietary license.</td>
+    <td width="33%"><strong>Controlled source availability</strong><br />The repository supports documentation, portfolio review, demonstration, and evaluation. Access does not grant reuse rights.</td>
+    <td width="34%"><strong>Independent components</strong><br />Selected generic components may be extracted and licensed separately after ownership and security review.</td>
+  </tr>
+</table>
 
-This repository is intended primarily for technical documentation, architectural demonstration, portfolio presentation, and evaluation. Selected components may be made publicly available, while production source code, business logic, enterprise data, credentials, and security-sensitive implementation details remain private.
-
-Unless otherwise stated, the contents of this repository are **All Rights Reserved**. Some independent components derived from the project may be released separately under open-source licenses such as Apache-2.0. See [LICENSE](./LICENSE) and [Third-Party Notices](./THIRD_PARTY_NOTICES.md).
+Production source, business logic, enterprise data, credentials, and security-sensitive implementation details remain private. See the full [Proprietary License](./LICENSE) and [Third-Party Notices](./THIRD_PARTY_NOTICES.md).
 
 ## Attribution
 

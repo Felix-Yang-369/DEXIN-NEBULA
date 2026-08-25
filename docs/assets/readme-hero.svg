@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="360" viewBox="0 0 1280 360" role="img" aria-labelledby="title desc">
+  <title id="title">DEXIN NEBULA</title>
+  <desc id="desc">AI-native enterprise management platform connecting business modules, governed data, and grounded AI.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#06182C"/>
+      <stop offset="0.56" stop-color="#0A2340"/>
+      <stop offset="1" stop-color="#123A5C"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#18AFB3" stop-opacity="0.42"/>
+      <stop offset="1" stop-color="#18AFB3" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6BD7D4" stop-opacity="0.12"/>
+      <stop offset="0.5" stop-color="#6BD7D4" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#E1A72D" stop-opacity="0.55"/>
+    </linearGradient>
+    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8"/>
+    </filter>
+  </defs>
+
+  <rect width="1280" height="360" rx="24" fill="url(#background)"/>
+  <circle cx="1050" cy="160" r="250" fill="url(#glow)"/>
+  <circle cx="1138" cy="74" r="52" fill="#18AFB3" opacity="0.10" filter="url(#softGlow)"/>
+  <path d="M0 290 C180 235 310 335 500 275 S850 220 1280 292" fill="none" stroke="#6BD7D4" stroke-opacity="0.08" stroke-width="2"/>
+  <path d="M0 312 C180 260 340 350 550 305 S920 258 1280 318" fill="none" stroke="#6BD7D4" stroke-opacity="0.05" stroke-width="2"/>
+
+  <g font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif">
+    <text x="72" y="88" fill="#6BD7D4" font-size="15" font-weight="700" letter-spacing="4">AI-NATIVE ENTERPRISE PLATFORM</text>
+    <text x="68" y="160" fill="#FFFFFF" font-size="56" font-weight="760" letter-spacing="1">DEXIN NEBULA</text>
+    <text x="72" y="205" fill="#C7DCE8" font-size="20" font-weight="400">Operational workflows · Governed data · Grounded AI</text>
+
+    <g transform="translate(72 246)" font-size="13" font-weight="650" fill="#DDF7F6">
+      <g><rect width="58" height="34" rx="17" fill="#18AFB3" opacity="0.18" stroke="#6BD7D4" stroke-opacity="0.42"/><text x="29" y="22" text-anchor="middle">CRM</text></g>
+      <g transform="translate(70)"><rect width="58" height="34" rx="17" fill="#18AFB3" opacity="0.18" stroke="#6BD7D4" stroke-opacity="0.42"/><text x="29" y="22" text-anchor="middle">OMS</text></g>
+      <g transform="translate(140)"><rect width="58" height="34" rx="17" fill="#18AFB3" opacity="0.18" stroke="#6BD7D4" stroke-opacity="0.42"/><text x="29" y="22" text-anchor="middle">WMS</text></g>
+      <g transform="translate(210)"><rect width="78" height="34" rx="17" fill="#18AFB3" opacity="0.18" stroke="#6BD7D4" stroke-opacity="0.42"/><text x="39" y="22" text-anchor="middle">FINANCE</text></g>
+      <g transform="translate(300)"><rect width="58" height="34" rx="17" fill="#18AFB3" opacity="0.18" stroke="#6BD7D4" stroke-opacity="0.42"/><text x="29" y="22" text-anchor="middle">HRM</text></g>
+      <g transform="translate(370)"><rect width="48" height="34" rx="17" fill="#E1A72D" opacity="0.18" stroke="#E1A72D" stroke-opacity="0.52"/><text x="24" y="22" text-anchor="middle" fill="#F8D98A">AI</text></g>
+    </g>
+  </g>
+
+  <g transform="translate(805 46)">
+    <g fill="none" stroke="url(#line)" stroke-width="2">
+      <path d="M202 129 L88 68 M202 129 L105 205 M202 129 L318 64 M202 129 L342 196 M202 129 L211 269"/>
+      <path d="M88 68 L318 64 M105 205 L211 269 M342 196 L211 269" opacity="0.35"/>
+    </g>
+    <g fill="#0A2340" stroke="#6BD7D4" stroke-width="2">
+      <circle cx="88" cy="68" r="28"/><circle cx="105" cy="205" r="28"/><circle cx="318" cy="64" r="28"/><circle cx="342" cy="196" r="28"/><circle cx="211" cy="269" r="28"/>
+    </g>
+    <circle cx="202" cy="129" r="49" fill="#0D7580" stroke="#6BD7D4" stroke-width="2.5"/>
+    <circle cx="202" cy="129" r="70" fill="none" stroke="#18AFB3" stroke-opacity="0.24" stroke-width="1.5"/>
+    <g font-family="Inter, ui-sans-serif, sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#DDF7F6">
+      <text x="202" y="126">GOVERNED</text><text x="202" y="143">AI</text>
+      <text x="88" y="72">CRM</text><text x="105" y="209">WMS</text><text x="318" y="68">OMS</text><text x="342" y="200">BI</text><text x="211" y="273">DATA</text>
+    </g>
+    <circle cx="386" cy="90" r="4" fill="#E1A72D"/><circle cx="54" cy="145" r="3" fill="#6BD7D4"/><circle cx="292" cy="252" r="3" fill="#E1A72D" opacity="0.8"/>
+  </g>
+</svg>

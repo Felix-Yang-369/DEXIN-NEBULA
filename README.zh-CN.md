@@ -1,18 +1,45 @@
-# 德馨星云 DEXIN NEBULA
+<p align="center">
+  <img src="./docs/assets/readme-hero.svg" width="100%" alt="DEXIN NEBULA 德馨星云——AI 原生企业管理平台" />
+</p>
 
-> **AI 原生企业管理平台**
+<h1 align="center">德馨星云 DEXIN NEBULA</h1>
 
-CRM · 销售 · OMS · 采购 · WMS · 财务 · HRM · OA · BI · AI
+<p align="center"><strong>AI 原生企业管理平台</strong></p>
+<p align="center">CRM · 销售 · OMS · 采购 · WMS · 财务 · HRM · OA · BI · AI</p>
+<p align="center">一个连接企业运营流程、受控业务数据和可信 AI 辅助能力的模块化平台。</p>
 
-一个连接企业运营流程、结构化业务数据、权限感知搜索和可信 AI 辅助能力的模块化平台。
+<p align="center">
+  <a href="./docs/ROADMAP.md"><img alt="状态：持续开发" src="./docs/assets/badges/status.svg" /></a>
+  <a href="./LICENSE"><img alt="许可证：专有" src="./docs/assets/badges/license.svg" /></a>
+  <a href="./docs/README.md"><img alt="文档：基础体系完整" src="./docs/assets/badges/docs.svg" /></a>
+  <a href="./docs/engineering/TESTING.md"><img alt="质量检查：通过" src="./docs/assets/badges/quality.svg" /></a>
+</p>
 
-[English](./README.md) | [简体中文](./README.zh-CN.md)
+<p align="center">
+  <a href="./README.md">English</a> · <a href="./README.zh-CN.md">简体中文</a>
+</p>
 
-[系统架构](./docs/ARCHITECTURE.md) · [文档中心](./docs/README.md) · [演示指南](./docs/portfolio/DEMO_GUIDE.md) · [案例研究](./docs/portfolio/CASE_STUDY.md)
+<p align="center">
+  <a href="./docs/ARCHITECTURE.md">系统架构</a> ·
+  <a href="./docs/README.md">文档中心</a> ·
+  <a href="./docs/portfolio/DEMO_GUIDE.md">演示指南</a> ·
+  <a href="./docs/portfolio/CASE_STUDY.md">案例研究</a>
+</p>
 
 ## 项目概述
 
 德馨星云面向客户、订单、库存、财务、人事和文件流程分散在表格与独立工具中的内部企业团队。系统通过共享主数据、可审计状态流转、数据库强制权限和跨模块流程构成模块化全栈应用。AI 层基于用户有权访问的企业记录提供证据：当前已实现的助手能够检索有限上下文、引用来源并保持只读；受控智能体操作属于规划中的研究方向。
+
+## 项目概览
+
+<table>
+  <tr>
+    <td width="25%"><strong>系统架构</strong><br />具备明确领域边界的模块化单体</td>
+    <td width="25%"><strong>数据与安全</strong><br />PostgreSQL、RLS、事务与审计</td>
+    <td width="25%"><strong>AI 层</strong><br />权限感知检索与来源引用</td>
+    <td width="25%"><strong>交付状态</strong><br />持续验证中的内部 Alpha</td>
+  </tr>
+</table>
 
 ## 核心模块
 
@@ -111,11 +138,15 @@ flowchart TD
 
 ## 许可证与源码开放说明
 
-DEXIN NEBULA 是一个专有软件项目。
+<table>
+  <tr>
+    <td width="33%"><strong>专有产品</strong><br />DEXIN NEBULA 采用保留所有权利的专有许可证。</td>
+    <td width="33%"><strong>受控源码开放</strong><br />仓库用于文档、作品集审阅、演示和评估；获得访问权限不代表获得复用权。</td>
+    <td width="34%"><strong>独立通用组件</strong><br />部分通用组件可在完成权属和安全审查后拆分并使用独立许可证。</td>
+  </tr>
+</table>
 
-本仓库主要用于技术文档、系统架构展示、项目作品集以及技术评估。部分通用组件可能公开，但生产环境源码、核心业务逻辑、企业数据、凭证以及涉及安全的实现细节保持私有。
-
-除非另有说明，本仓库内容**保留所有权利**。项目中抽象出的部分独立通用组件未来可能以 Apache-2.0 等开源许可证单独发布。详见 [LICENSE](./LICENSE)和[第三方声明](./THIRD_PARTY_NOTICES.md)。
+生产源码、核心业务逻辑、企业数据、凭证和涉及安全的实现细节保持私有。详见完整[专有许可证](./LICENSE)与[第三方声明](./THIRD_PARTY_NOTICES.md)。
 
 ## 项目归属
 
