@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" role="img" aria-label="Architecture">
+  <rect x="1" y="1" width="30" height="30" rx="8" fill="#18AFB3" fill-opacity=".14"/>
+  <path d="M16 10v5M9 21v-3h14v3" fill="none" stroke="#18AFB3" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="12" y="6" width="8" height="5" rx="1.5" fill="none" stroke="#18AFB3" stroke-width="1.6"/>
+  <rect x="6" y="21" width="7" height="5" rx="1.5" fill="none" stroke="#18AFB3" stroke-width="1.6"/>
+  <rect x="19" y="21" width="7" height="5" rx="1.5" fill="none" stroke="#18AFB3" stroke-width="1.6"/>
+</svg>

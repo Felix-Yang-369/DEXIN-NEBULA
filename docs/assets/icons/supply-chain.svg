@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" role="img" aria-label="Supply chain modules">
+  <rect x="1" y="1" width="38" height="38" rx="10" fill="#397FC0" fill-opacity=".14"/>
+  <path d="m8 13 9-5 9 5-9 5zM8 13v10l9 5 9-5V13M17 18v10" fill="none" stroke="#397FC0" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M27 22h4l3 4v5h-7z" fill="none" stroke="#397FC0" stroke-width="2" stroke-linejoin="round"/>
+  <circle cx="29" cy="31" r="2" fill="#397FC0"/><circle cx="11" cy="29" r="2" fill="#397FC0"/>
+</svg>

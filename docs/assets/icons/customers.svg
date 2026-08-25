@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" role="img" aria-label="Customer and revenue modules">
+  <rect x="1" y="1" width="38" height="38" rx="10" fill="#18AFB3" fill-opacity=".14"/>
+  <circle cx="17" cy="15" r="5" fill="none" stroke="#18AFB3" stroke-width="2"/>
+  <path d="M8 30c.8-6.1 3.8-9 9-9s8.2 2.9 9 9M26 14c3.3.3 5 2.4 5 5.2M27 22c3.2.7 4.8 3.4 5 7.8" fill="none" stroke="#18AFB3" stroke-width="2" stroke-linecap="round"/>
+</svg>

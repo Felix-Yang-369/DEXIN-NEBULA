@@ -16,11 +16,11 @@
 </p>
 
 <p align="center">
-  <a href="https://nebula.dexinmiaosheng.cn"><strong>项目官网 ↗</strong></a> ·
-  <a href="./docs/ARCHITECTURE.md">系统架构</a> ·
-  <a href="./docs/README.md">文档中心</a> ·
-  <a href="./docs/portfolio/DEMO_GUIDE.md">演示指南</a> ·
-  <a href="./docs/portfolio/CASE_STUDY.md">案例研究</a>
+  <a href="https://nebula.dexinmiaosheng.cn"><img src="./docs/assets/icons/website.svg" width="18" alt="" /> 项目官网</a> ·
+  <a href="./docs/ARCHITECTURE.md"><img src="./docs/assets/icons/architecture.svg" width="18" alt="" /> 系统架构</a> ·
+  <a href="./docs/README.md"><img src="./docs/assets/icons/documentation.svg" width="18" alt="" /> 文档中心</a> ·
+  <a href="./docs/portfolio/DEMO_GUIDE.md"><img src="./docs/assets/icons/demo.svg" width="18" alt="" /> 演示指南</a> ·
+  <a href="./docs/portfolio/CASE_STUDY.md"><img src="./docs/assets/icons/case-study.svg" width="18" alt="" /> 案例研究</a>
 </p>
 
 ## 项目概述
@@ -31,26 +31,39 @@
 
 <table>
   <tr>
-    <td width="25%"><strong>系统架构</strong><br />具备明确领域边界的模块化单体</td>
-    <td width="25%"><strong>数据与安全</strong><br />PostgreSQL、RLS、事务与审计</td>
-    <td width="25%"><strong>AI 层</strong><br />权限感知检索与来源引用</td>
-    <td width="25%"><strong>交付状态</strong><br />内部 Alpha · <a href="https://nebula.dexinmiaosheng.cn">项目官网 ↗</a></td>
+    <td width="25%"><img src="./docs/assets/icons/architecture.svg" width="28" alt="" /><br /><strong>系统架构</strong><br />具备明确领域边界的模块化单体</td>
+    <td width="25%"><img src="./docs/assets/icons/security.svg" width="28" alt="" /><br /><strong>数据与安全</strong><br />PostgreSQL、RLS、事务与审计</td>
+    <td width="25%"><img src="./docs/assets/icons/ai.svg" width="28" alt="" /><br /><strong>AI 层</strong><br />权限感知检索与来源引用</td>
+    <td width="25%"><img src="./docs/assets/icons/website.svg" width="28" alt="" /><br /><strong>交付状态</strong><br />内部 Alpha · <a href="https://nebula.dexinmiaosheng.cn">项目官网</a></td>
   </tr>
 </table>
 
 ## 核心模块
 
+<table>
+  <tr>
+    <td width="33%" align="center"><img src="./docs/assets/icons/customers.svg" width="40" alt="" /><br /><strong>客户与收入</strong><br /><a href="./docs/modules/CRM.md">CRM</a> · <a href="./docs/modules/SALES.md">销售</a> · <a href="./docs/modules/OMS.md">OMS</a><br /><sub>从客户关系到订单履约</sub></td>
+    <td width="33%" align="center"><img src="./docs/assets/icons/supply-chain.svg" width="40" alt="" /><br /><strong>供应链</strong><br /><a href="./docs/modules/PROCUREMENT.md">采购</a> · <a href="./docs/modules/WMS.md">WMS</a><br /><sub>供应商、到货、库存与仓储执行</sub></td>
+    <td width="34%" align="center"><img src="./docs/assets/icons/operations.svg" width="40" alt="" /><br /><strong>运营与智能</strong><br /><a href="./docs/modules/FINANCE.md">财务</a> · <a href="./docs/modules/HRM.md">HRM</a> · <a href="./docs/modules/OA.md">OA</a> · <a href="./docs/modules/BI.md">BI</a><br /><sub>财务、人事、协同与经营分析</sub></td>
+  </tr>
+</table>
+
+<details>
+<summary><strong>查看模块状态与范围</strong></summary>
+
 | 模块 | 用途 | 状态 |
 | --- | --- | --- |
-| [CRM](./docs/modules/CRM.md) | 客户、联系人、法律实体与关系管理 | 基础能力已实现 |
-| [销售](./docs/modules/SALES.md) | 商机、报价、产品与销售流程 | 基础能力已实现 |
-| [OMS](./docs/modules/OMS.md) | 订单生命周期、履约、配送和应收衔接 | 基础能力已实现 |
-| [采购](./docs/modules/PROCUREMENT.md) | 供应商、申请、订单、到货和应付流程 | 基础能力已实现 |
-| [WMS](./docs/modules/WMS.md) | 批次库存、出入库、调拨、盘点和出库执行 | 基础能力已实现 |
-| [财务](./docs/modules/FINANCE.md) | 应收应付、核销、资金、发票和分析 | 进行中 |
-| [HRM](./docs/modules/HRM.md) | 组织、员工生命周期、考勤、请假和绩效 | 进行中 |
-| [OA](./docs/modules/OA.md) | 审批、公告、周报、文件、通知和审计 | 基础能力已实现 |
-| [BI](./docs/modules/BI.md) | 权限感知的运营与管理分析 | 进行中 |
+| CRM | 客户、联系人、法律实体与关系管理 | 基础能力已实现 |
+| 销售 | 商机、报价、产品与销售流程 | 基础能力已实现 |
+| OMS | 订单生命周期、履约、配送和应收衔接 | 基础能力已实现 |
+| 采购 | 供应商、申请、订单、到货和应付流程 | 基础能力已实现 |
+| WMS | 批次库存、出入库、调拨、盘点和出库执行 | 基础能力已实现 |
+| 财务 | 应收应付、核销、资金、发票和分析 | 进行中 |
+| HRM | 组织、员工生命周期、考勤、请假和绩效 | 进行中 |
+| OA | 审批、公告、周报、文件、通知和审计 | 基础能力已实现 |
+| BI | 权限感知的运营与管理分析 | 进行中 |
+
+</details>
 
 ## 为什么是 AI 原生
 
@@ -97,6 +110,18 @@ flowchart TD
 | 文件与导出 | 服务端代理的私有文件存储、ExcelJS |
 | 测试 | ESLint、TypeScript、Node 测试运行器、生产构建 |
 | 部署 | TLS 反向代理后的 Node.js 服务和按环境隔离的托管服务 |
+
+## 开发者快速开始
+
+<p><img src="./docs/assets/icons/terminal.svg" width="28" alt="" /> <strong>本地开发需要 Node.js 20.9 或更高版本与 npm。</strong></p>
+
+~~~bash
+npm ci
+cp .env.example .env.local
+npm run dev
+~~~
+
+仅使用开发环境凭证与合成数据。发布前运行 `npm run check`、`npm run test:workflow` 和 `npm run build`。环境、数据库和工作流约定详见[开发指南](./docs/engineering/DEVELOPMENT.md)。
 
 ## 工程与研究重点
 

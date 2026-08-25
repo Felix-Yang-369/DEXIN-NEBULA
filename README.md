@@ -16,11 +16,11 @@
 </p>
 
 <p align="center">
-  <a href="https://nebula.dexinmiaosheng.cn"><strong>Website ↗</strong></a> ·
-  <a href="./docs/ARCHITECTURE.md">Architecture</a> ·
-  <a href="./docs/README.md">Documentation</a> ·
-  <a href="./docs/portfolio/DEMO_GUIDE.md">Demo</a> ·
-  <a href="./docs/portfolio/CASE_STUDY.md">Case Study</a>
+  <a href="https://nebula.dexinmiaosheng.cn"><img src="./docs/assets/icons/website.svg" width="18" alt="" /> Website</a> ·
+  <a href="./docs/ARCHITECTURE.md"><img src="./docs/assets/icons/architecture.svg" width="18" alt="" /> Architecture</a> ·
+  <a href="./docs/README.md"><img src="./docs/assets/icons/documentation.svg" width="18" alt="" /> Documentation</a> ·
+  <a href="./docs/portfolio/DEMO_GUIDE.md"><img src="./docs/assets/icons/demo.svg" width="18" alt="" /> Demo</a> ·
+  <a href="./docs/portfolio/CASE_STUDY.md"><img src="./docs/assets/icons/case-study.svg" width="18" alt="" /> Case Study</a>
 </p>
 
 ## Overview
@@ -31,26 +31,39 @@ DEXIN NEBULA is designed for internal enterprise teams whose customer, order, in
 
 <table>
   <tr>
-    <td width="25%"><strong>Architecture</strong><br />Modular monolith with explicit domain boundaries</td>
-    <td width="25%"><strong>Data & Security</strong><br />PostgreSQL, RLS, transactions, and audit</td>
-    <td width="25%"><strong>AI Layer</strong><br />Permission-aware retrieval with cited evidence</td>
-    <td width="25%"><strong>Delivery</strong><br />Internal alpha · <a href="https://nebula.dexinmiaosheng.cn">Project website ↗</a></td>
+    <td width="25%"><img src="./docs/assets/icons/architecture.svg" width="28" alt="" /><br /><strong>Architecture</strong><br />Modular monolith with explicit domain boundaries</td>
+    <td width="25%"><img src="./docs/assets/icons/security.svg" width="28" alt="" /><br /><strong>Data & Security</strong><br />PostgreSQL, RLS, transactions, and audit</td>
+    <td width="25%"><img src="./docs/assets/icons/ai.svg" width="28" alt="" /><br /><strong>AI Layer</strong><br />Permission-aware retrieval with cited evidence</td>
+    <td width="25%"><img src="./docs/assets/icons/website.svg" width="28" alt="" /><br /><strong>Delivery</strong><br />Internal alpha · <a href="https://nebula.dexinmiaosheng.cn">Project website</a></td>
   </tr>
 </table>
 
 ## Core Modules
 
+<table>
+  <tr>
+    <td width="33%" align="center"><img src="./docs/assets/icons/customers.svg" width="40" alt="" /><br /><strong>Customer & Revenue</strong><br /><a href="./docs/modules/CRM.md">CRM</a> · <a href="./docs/modules/SALES.md">Sales</a> · <a href="./docs/modules/OMS.md">OMS</a><br /><sub>Customer context through order fulfilment</sub></td>
+    <td width="33%" align="center"><img src="./docs/assets/icons/supply-chain.svg" width="40" alt="" /><br /><strong>Supply Chain</strong><br /><a href="./docs/modules/PROCUREMENT.md">Procurement</a> · <a href="./docs/modules/WMS.md">WMS</a><br /><sub>Supplier, receiving, inventory, and execution</sub></td>
+    <td width="34%" align="center"><img src="./docs/assets/icons/operations.svg" width="40" alt="" /><br /><strong>Operations & Intelligence</strong><br /><a href="./docs/modules/FINANCE.md">Finance</a> · <a href="./docs/modules/HRM.md">HRM</a> · <a href="./docs/modules/OA.md">OA</a> · <a href="./docs/modules/BI.md">BI</a><br /><sub>Finance, people, collaboration, and analytics</sub></td>
+  </tr>
+</table>
+
+<details>
+<summary><strong>View module status and scope</strong></summary>
+
 | Module | Purpose | Status |
 | --- | --- | --- |
-| [CRM](./docs/modules/CRM.md) | Customer, contact, legal-entity, and relationship management | Implemented baseline |
-| [Sales](./docs/modules/SALES.md) | Opportunities, quotations, products, and commercial workflows | Implemented baseline |
-| [OMS](./docs/modules/OMS.md) | Order lifecycle, fulfilment, delivery, and receivable hand-off | Implemented baseline |
-| [Procurement](./docs/modules/PROCUREMENT.md) | Supplier, request, order, receiving, and payable workflows | Implemented baseline |
-| [WMS](./docs/modules/WMS.md) | Batch inventory, movements, transfers, stocktakes, and outbound execution | Implemented baseline |
-| [Finance](./docs/modules/FINANCE.md) | Receivables, payables, settlement, cash, invoices, and analysis | In progress |
-| [HRM](./docs/modules/HRM.md) | Organization, employee lifecycle, attendance, leave, and performance | In progress |
-| [OA](./docs/modules/OA.md) | Approvals, announcements, reports, documents, notifications, and audit | Implemented baseline |
-| [BI](./docs/modules/BI.md) | Permission-aware operational and management analytics | In progress |
+| CRM | Customer, contact, legal-entity, and relationship management | Implemented baseline |
+| Sales | Opportunities, quotations, products, and commercial workflows | Implemented baseline |
+| OMS | Order lifecycle, fulfilment, delivery, and receivable hand-off | Implemented baseline |
+| Procurement | Supplier, request, order, receiving, and payable workflows | Implemented baseline |
+| WMS | Batch inventory, movements, transfers, stocktakes, and outbound execution | Implemented baseline |
+| Finance | Receivables, payables, settlement, cash, invoices, and analysis | In progress |
+| HRM | Organization, employee lifecycle, attendance, leave, and performance | In progress |
+| OA | Approvals, announcements, reports, documents, notifications, and audit | Implemented baseline |
+| BI | Permission-aware operational and management analytics | In progress |
+
+</details>
 
 ## Why AI-Native
 
@@ -97,6 +110,18 @@ The current system is a modular monolith. Critical order, stock, finance, and ap
 | Files and exports | Private server-mediated file storage, ExcelJS |
 | Testing | ESLint, TypeScript, Node test runner, production builds |
 | Deployment | Node.js service behind a TLS reverse proxy; environment-specific managed services |
+
+## Developer Quick Start
+
+<p><img src="./docs/assets/icons/terminal.svg" width="28" alt="" /> <strong>Local development requires Node.js 20.9 or later and npm.</strong></p>
+
+~~~bash
+npm ci
+cp .env.example .env.local
+npm run dev
+~~~
+
+Use development-only credentials and synthetic data. Run `npm run check`, `npm run test:workflow`, and `npm run build` before a release. See the [Development Guide](./docs/engineering/DEVELOPMENT.md) for environment, database, and workflow conventions.
 
 ## Engineering and Research Focus
 
