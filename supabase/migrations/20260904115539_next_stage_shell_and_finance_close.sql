@@ -471,6 +471,7 @@ revoke all on function public.accounting_close_checklist(uuid) from public, anon
 revoke all on function public.acknowledge_accounting_close_warnings(uuid, text) from public, anon;
 revoke all on function public.request_period_reopening(uuid, text, text) from public, anon;
 revoke all on function public.transition_period_reopening_entry(uuid, text, integer) from public, anon;
+revoke all on function public.finalize_period_reopening() from public, anon, authenticated;
 grant execute on function public.accounting_close_checklist(uuid) to authenticated;
 grant execute on function public.acknowledge_accounting_close_warnings(uuid, text) to authenticated;
 grant execute on function public.request_period_reopening(uuid, text, text) to authenticated;
