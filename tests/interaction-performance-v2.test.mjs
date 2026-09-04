@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 import { readFileSync, statSync } from "node:fs";
 import test from "node:test";
+import {
+  createNavigationGroupMemory,
+  ensureNavigationGroupOpen,
+  setNavigationGroupOpen,
+} from "../src/components/navigation/navigation-group-state.ts";
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 
@@ -48,6 +53,31 @@ test("侧边栏压缩为 232 与 64 像素并关闭批量预取", () => {
   assert.match(navigation, /prefetch=\{false\}/);
   assert.match(navigation, /router\.prefetch\(href\)/);
   assert.doesNotMatch(navigation, /group\.english/);
+});
+
+test("侧边栏分组可以独立展开并在路由变化时保留已有分组", () => {
+  let openGroups = ensureNavigationGroupOpen(new Set(), "业务管理");
+  openGroups = setNavigationGroupOpen(openGroups, "供应链管理", true);
+
+  assert.deepEqual([...openGroups], ["业务管理", "供应链管理"]);
+
+  openGroups = setNavigationGroupOpen(openGroups, "业务管理", false);
+  assert.deepEqual([...openGroups], ["供应链管理"]);
+
+  const routeChanged = ensureNavigationGroupOpen(openGroups, "财务管理");
+  assert.deepEqual([...routeChanged], ["供应链管理", "财务管理"]);
+});
+
+test("侧边栏组件重新挂载后保留当前导航过程中的展开分组", () => {
+  const memory = createNavigationGroupMemory();
+  const labels = ["业务管理", "供应链管理", "财务管理"];
+  let firstMount = memory.restore(labels, "业务管理");
+
+  firstMount = setNavigationGroupOpen(firstMount, "供应链管理", true);
+  memory.remember(labels, firstMount);
+
+  const nextMount = memory.restore(labels, "财务管理");
+  assert.deepEqual([...nextMount], ["业务管理", "供应链管理", "财务管理"]);
 });
 
 test("启动接口与热点 RLS 采用受控函数和单动作策略", () => {

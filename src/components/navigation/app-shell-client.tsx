@@ -216,7 +216,7 @@ export function AppShellClient({
             title={`${displayName} · ${roleLabel}`}
           >
             <EmployeeAvatar name={displayName} size="sm" src={avatarUrl} />
-            {mode === "expanded" ? <span className="min-w-0 truncate text-xs text-white/65">{displayName}</span> : null}
+            {mode === "expanded" ? <span className="min-w-0 truncate text-[13px] text-white/65">{displayName}</span> : null}
           </Link>
         </div>
       </aside>

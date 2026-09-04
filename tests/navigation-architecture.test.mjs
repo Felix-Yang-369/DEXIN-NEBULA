@@ -10,7 +10,7 @@ test("sidebar follows the seven-domain product architecture", async () => {
   const domains = [
     "经营决策",
     "业务管理",
-    "供应链",
+    "供应链管理",
     "财务管理",
     "组织运营",
     "协同办公",

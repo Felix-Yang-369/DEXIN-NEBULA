@@ -6,6 +6,11 @@ import { useEffect, useMemo, useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { SidebarIcon } from "@/components/icons/sidebar-icons";
 import {
+  ensureNavigationGroupOpen,
+  getNavigationGroupMemory,
+  setNavigationGroupOpen,
+} from "@/components/navigation/navigation-group-state";
+import {
   isPlatformItemActive,
   type PlatformNavigationGroup,
   type PlatformNavigationItem,
@@ -29,6 +34,7 @@ export function PlatformNavigationList({
   onNavigate?: () => void;
 }) {
   const router = useRouter();
+  const [navigationGroupMemory] = useState(getNavigationGroupMemory);
   const activeGroup = useMemo(
     () =>
       groups.find((group) =>
@@ -36,8 +42,30 @@ export function PlatformNavigationList({
       )?.label ?? groups[0]?.label,
     [activeItem, groups],
   );
-  const [openGroup, setOpenGroup] = useState(activeGroup);
+  const groupLabels = useMemo(() => groups.map((group) => group.label), [groups]);
+  const [navigationState, setNavigationState] = useState<{
+    activeGroup: string | undefined;
+    openGroups: ReadonlySet<string>;
+  }>(() => ({
+    activeGroup,
+    openGroups: navigationGroupMemory.restore(groupLabels, activeGroup),
+  }));
   const [compactOpenGroup, setCompactOpenGroup] = useState<string | null>(null);
+
+  if (navigationState.activeGroup !== activeGroup) {
+    setNavigationState({
+      activeGroup,
+      openGroups: ensureNavigationGroupOpen(navigationState.openGroups, activeGroup),
+    });
+  }
+
+  const openGroups = navigationState.openGroups;
+
+  useEffect(() => {
+    if (!compact) {
+      navigationGroupMemory.remember(groupLabels, openGroups);
+    }
+  }, [compact, groupLabels, navigationGroupMemory, openGroups]);
 
   useEffect(() => {
     const closeOnEscape = (event: KeyboardEvent) => {
@@ -97,7 +125,7 @@ export function PlatformNavigationList({
                 }`}
                 role="menu"
               >
-                <div className="flex items-center justify-between px-2 pb-2 pt-1 text-xs font-semibold text-white/80">
+                <div className="flex items-center justify-between px-2 pb-2 pt-1 text-[13px] font-semibold text-white/80">
                   <span>{group.label}</span>
                   <ChevronRight className="size-3.5 text-white/30" />
                 </div>
@@ -108,7 +136,7 @@ export function PlatformNavigationList({
                       <div key={`${group.label}-${item.label}`}>
                         <Link
                           aria-current={active ? "page" : undefined}
-                          className={`flex min-h-9 items-center gap-2.5 rounded-md px-2 text-xs transition ${
+                          className={`flex min-h-9 items-center gap-2.5 rounded-md px-2 text-[13px] transition ${
                             active
                               ? "bg-white/10 text-white"
                               : "text-white/62 hover:bg-white/[0.07] hover:text-white"
@@ -137,7 +165,7 @@ export function PlatformNavigationList({
                           <div className="ml-8 border-l border-white/10 pl-2">
                             {item.children.map((child) => (
                               <Link
-                                className="block truncate rounded px-2 py-1.5 text-xs text-white/42 hover:bg-white/[0.06] hover:text-white/80"
+                                className="block truncate rounded px-2 py-1.5 text-[13px] text-white/42 hover:bg-white/[0.06] hover:text-white/80"
                                 href={child.href}
                                 key={`${item.label}-${child.label}`}
                                 onClick={() => {
@@ -172,28 +200,43 @@ export function PlatformNavigationList({
         const groupActive = group.items.some((item) =>
           itemIsActive(item, activeItem),
         );
-        const expanded = openGroup === group.label;
+        const expanded = openGroups.has(group.label);
 
         return (
-          <section key={group.label}>
-            <button
-              aria-expanded={expanded}
-              className={`flex h-8 w-full items-center gap-2 rounded-md px-2.5 text-left text-xs font-semibold transition ${
+          <details
+            className="group/sidebar-section"
+            key={group.label}
+            onToggle={(event) => {
+              const open = event.currentTarget.open;
+              setNavigationState((current) => {
+                const nextOpenGroups = setNavigationGroupOpen(
+                  current.openGroups,
+                  group.label,
+                  open,
+                );
+
+                if (nextOpenGroups === current.openGroups) return current;
+
+                // Persist synchronously so a child-link navigation cannot remount
+                // the shell before the effect has remembered the latest groups.
+                navigationGroupMemory.remember(groupLabels, nextOpenGroups);
+                return { ...current, openGroups: nextOpenGroups };
+              });
+            }}
+            open={expanded}
+          >
+            <summary
+              className={`flex h-8 w-full items-center gap-2 rounded-md px-2.5 text-left text-[13px] font-semibold transition ${
                 groupActive
                   ? "text-white"
                   : "text-white/45 hover:bg-white/[0.05] hover:text-white/75"
-              }`}
-              onClick={() => setOpenGroup(group.label)}
-              type="button"
+              } cursor-pointer list-none [&::-webkit-details-marker]:hidden`}
             >
               <span className="min-w-0 flex-1 truncate">{group.label}</span>
-              <ChevronDown
-                className={`size-3.5 transition-transform ${expanded ? "rotate-180" : ""}`}
-              />
-            </button>
+              <ChevronDown className="size-3.5 transition-transform group-open/sidebar-section:rotate-180" />
+            </summary>
 
-            {expanded ? (
-              <div className="mt-1 space-y-0.5 pb-1">
+            <div className="mt-1 space-y-0.5 pb-1">
                 {group.items.map((item) => {
                   const active = itemIsActive(item, activeItem);
                   const hasChildren = Boolean(item.children?.length);
@@ -202,7 +245,7 @@ export function PlatformNavigationList({
                     <div className="relative" key={`${group.label}-${item.label}`}>
                       <Link
                         aria-current={active ? "page" : undefined}
-                        className={`group/item relative flex h-9 items-center overflow-hidden rounded-md text-[13px] transition-colors gap-2.5 pl-2.5 ${
+                        className={`group/item relative flex h-9 items-center overflow-hidden rounded-md text-sm transition-colors gap-2.5 pl-2.5 ${
                           hasChildren ? "pr-9" : "pr-2.5"
                         } ${
                           active
@@ -252,7 +295,7 @@ export function PlatformNavigationList({
                               return (
                                 <Link
                                   aria-current={current ? "page" : undefined}
-                                  className={`block min-h-8 rounded-md px-2.5 py-1.5 text-xs leading-5 transition ${
+                                  className={`block min-h-8 rounded-md px-2.5 py-1.5 text-[13px] leading-5 transition ${
                                     current
                                       ? "bg-white/[0.09] font-medium text-white"
                                       : "text-white/42 hover:bg-white/[0.055] hover:text-white/78"
@@ -274,9 +317,8 @@ export function PlatformNavigationList({
                     </div>
                   );
                 })}
-              </div>
-            ) : null}
-          </section>
+            </div>
+          </details>
         );
       })}
     </div>

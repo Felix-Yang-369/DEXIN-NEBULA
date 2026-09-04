@@ -112,7 +112,7 @@ export const platformNavigationGroups: PlatformNavigationGroup[] = [
     ],
   },
   {
-    label: "供应链",
+    label: "供应链管理",
     english: "SUPPLY CHAIN",
     items: [
       {
