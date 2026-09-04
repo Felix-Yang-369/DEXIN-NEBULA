@@ -20,7 +20,7 @@ create table public.access_permissions (
 create table public.access_roles (
   id uuid primary key default gen_random_uuid(),
   organization_id uuid not null references public.organizations(id) on delete cascade,
-  code text not null check (code ~ '^[a-z][a-z0-9_]{2,39}$'),
+  code text not null check (code ~ '^[a-z][a-z0-9_]{1,39}$'),
   name text not null check (char_length(btrim(name)) between 2 and 40),
   description text,
   source_role_code text check (

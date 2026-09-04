@@ -547,7 +547,7 @@ as $function$
     select entry_cash.id, entry_cash.cash_amount,
       case when count(distinct rule.cash_flow_item_id) filter (where item.activity_type <> 'unclassified') = 1
         and count(*) filter (where rule.cash_flow_item_id is null or item.activity_type = 'unclassified') = 0
-      then min(rule.cash_flow_item_id) else null end as item_id
+      then min(rule.cash_flow_item_id::text)::uuid else null end as item_id
     from entry_cash
     left join public.journal_lines line on line.entry_id = entry_cash.id
       and exists (
