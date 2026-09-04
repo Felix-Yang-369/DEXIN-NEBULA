@@ -6,6 +6,7 @@ export type PlatformNavigationChild = {
   href: string;
   activeMatch?: string;
   allowedRoles?: string[];
+  allowedPermissions?: string[];
 };
 
 export type PlatformNavigationItem = {
@@ -17,6 +18,7 @@ export type PlatformNavigationItem = {
   countBadge?: number;
   future?: boolean;
   allowedRoles?: string[];
+  allowedPermissions?: string[];
   financeScoped?: boolean;
   children?: PlatformNavigationChild[];
 };
@@ -74,6 +76,20 @@ export const platformNavigationGroups: PlatformNavigationGroup[] = [
             href: "/sales#orders",
             activeMatch: "销售订单",
           },
+        ],
+      },
+      {
+        label: "客服中心",
+        icon: "ai",
+        href: "/customer-service",
+        activeItems: ["客服中心"],
+        allowedRoles: adminRoles,
+        allowedPermissions: ["customer_service.dashboard.view"],
+        children: [
+          { label: "客服工作台", href: "/customer-service", activeMatch: "客服中心" },
+          { label: "会话中心", href: "/customer-service?tab=conversations", activeMatch: "客服中心" },
+          { label: "客服线索池", href: "/customer-service?tab=leads", activeMatch: "客服中心" },
+          { label: "客服知识库", href: "/customer-service?tab=knowledge", activeMatch: "客服中心" },
         ],
       },
     ],
@@ -286,6 +302,7 @@ export const platformNavigationGroups: PlatformNavigationGroup[] = [
         children: [
           { label: "公告", href: "/announcements", activeMatch: "公告" },
           { label: "周报", href: "/reports/weekly", activeMatch: "周报" },
+          { label: "内部表单", href: "/forms", activeMatch: "内部表单" },
           { label: "制度与知识", href: "/knowledge", activeMatch: "制度与知识" },
         ],
       },
@@ -329,17 +346,10 @@ export const platformNavigation = platformNavigationGroups.flatMap(
   (group) => group.items,
 );
 
-function hasAllowedRole(
-  allowedRoles: string[] | undefined,
+export function navigationGroupsForRoles(
   roleCodes: string[],
+  permissionCodes: string[] = [],
 ) {
-  return (
-    !allowedRoles?.length ||
-    allowedRoles.some((role) => roleCodes.includes(role))
-  );
-}
-
-export function navigationGroupsForRoles(roleCodes: string[]) {
   const financeScoped = isScopedFinanceUser(roleCodes);
 
   return platformNavigationGroups
@@ -347,12 +357,18 @@ export function navigationGroupsForRoles(roleCodes: string[]) {
       ...group,
       items: group.items
         .filter((item) => !financeScoped || item.financeScoped)
-        .filter((item) => hasAllowedRole(item.allowedRoles, roleCodes))
+        .filter((item) => {
+          const roleAllowed = item.allowedRoles?.some((role) => roleCodes.includes(role)) ?? false;
+          const permissionAllowed = item.allowedPermissions?.some((permission) => permissionCodes.includes(permission)) ?? false;
+          return (!item.allowedRoles?.length && !item.allowedPermissions?.length) || roleAllowed || permissionAllowed;
+        })
         .map((item) => ({
           ...item,
-          children: item.children?.filter((child) =>
-            hasAllowedRole(child.allowedRoles, roleCodes),
-          ),
+          children: item.children?.filter((child) => {
+            const roleAllowed = child.allowedRoles?.some((role) => roleCodes.includes(role)) ?? false;
+            const permissionAllowed = child.allowedPermissions?.some((permission) => permissionCodes.includes(permission)) ?? false;
+            return (!child.allowedRoles?.length && !child.allowedPermissions?.length) || roleAllowed || permissionAllowed;
+          }),
         })),
     }))
     .filter((group) => group.items.length > 0);

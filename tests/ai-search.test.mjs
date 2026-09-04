@@ -5,7 +5,14 @@ import {
   extractSearchTerms,
   relevanceScore,
   searchableText,
+  selectRetrievalTerm,
 } from "../src/features/ai/search.ts";
+import { planReadOnlyBusinessTools } from "../src/features/ai/business-tool-planner.ts";
+
+test("候选查询优先使用业务对象词而不是领域词", () => {
+  assert.equal(selectRetrievalTerm("五常大米库存"), "五常大米");
+  assert.equal(selectRetrievalTerm("查看霸碗客户应收"), "霸碗");
+});
 
 test("德小馨检索能识别产品编号和中文关键词", () => {
   const terms = extractSearchTerms("请问 DX-R001 的团购价和库存是多少？");
@@ -81,4 +88,14 @@ test("匹配内容的相关性高于无关内容", () => {
   );
   const unrelated = relevanceScore(searchableText(["产品配送说明"]), terms);
   assert.ok(related > unrelated);
+});
+
+test("内嵌助手仅为明确业务意图规划只读工具", () => {
+  assert.deepEqual(planReadOnlyBusinessTools("本月应收账龄和逾期金额"), [
+    { tool: "finance.receivables.summary", input: {} },
+  ]);
+  assert.deepEqual(planReadOnlyBusinessTools("DX-R001 还有多少可用库存"), [
+    { tool: "inventory.availability", input: { keyword: "dx-r001" } },
+  ]);
+  assert.deepEqual(planReadOnlyBusinessTools("帮我写一段欢迎语"), []);
 });

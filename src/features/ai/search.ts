@@ -11,7 +11,40 @@ const STOP_TERMS = new Set([
   "多少",
   "告诉",
   "查询",
+  "查看",
+  "查找",
+  "帮我",
+  "公司",
+  "内部",
+  "关于",
+  "最新",
+  "资料",
 ]);
+
+const DOMAIN_TERMS = [
+  "制度",
+  "规定",
+  "流程",
+  "产品",
+  "商品",
+  "价格",
+  "库存",
+  "仓库",
+  "客户",
+  "供应商",
+  "员工",
+  "部门",
+  "公告",
+  "通知",
+  "文件",
+  "文档",
+  "审批",
+  "申请",
+  "报价",
+  "财务",
+  "应收",
+  "应付",
+];
 
 export function extractSearchTerms(input: string) {
   const normalized = input
@@ -36,6 +69,34 @@ export function extractSearchTerms(input: string) {
   }
 
   return [...terms].slice(0, 36);
+}
+
+export function selectRetrievalTerm(input: string, terms = extractSearchTerms(input)) {
+  let cleaned = input.normalize("NFKC").toLocaleLowerCase("zh-CN");
+  for (const term of [...DOMAIN_TERMS, ...STOP_TERMS].sort(
+    (left, right) => right.length - left.length,
+  )) {
+    cleaned = cleaned.replaceAll(term, " ");
+  }
+  cleaned = cleaned
+    .replace(/[的了吗呢啊与和及以]/g, " ")
+    .replace(/[^\p{L}\p{N}_\-/.@]+/gu, " ")
+    .trim();
+  const candidates =
+    cleaned.match(/[a-z0-9][a-z0-9_\-/.@]{1,}|[\u3400-\u9fff]{2,}/g) ?? [];
+  const direct = [...new Set(candidates)].sort(
+    (left, right) => right.length - left.length || left.localeCompare(right),
+  );
+  if (direct[0]) return direct[0].slice(0, 24);
+
+  const fallback = [...terms].sort(
+    (left, right) => right.length - left.length || left.localeCompare(right),
+  );
+  return (
+    fallback.find(
+      (term) => !DOMAIN_TERMS.some((domainTerm) => term.includes(domainTerm)),
+    ) ?? fallback[0] ?? ""
+  );
 }
 
 export function searchableText(values: unknown[]) {

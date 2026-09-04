@@ -1,16 +1,11 @@
 import "server-only";
 
+import { after } from "next/server";
 import type { CurrentEmployee } from "@/features/auth/current-employee";
+import { recordPerformance } from "@/lib/observability/performance";
+import { createServerTimer } from "@/lib/observability/server-log";
 import { createClient } from "@/lib/supabase/server";
-import type {
-  BusinessSourceItem,
-  DashboardData,
-  DashboardKpi,
-  DashboardTodo,
-  InventoryWarningItem,
-  ProductRankingItem,
-  SalesTrendPoint,
-} from "@/types/dashboard";
+import type { DashboardData, DashboardKpi, DashboardTodo, InventoryWarningItem, ProductRankingItem, SalesTrendPoint } from "@/types/dashboard";
 
 type InventoryRow = {
   id: string;
@@ -35,7 +30,7 @@ type LeaveTodoRow = {
 type GenericTodoRow = {
   id: string;
   title: string;
-  request_type: "expense" | "seal";
+  request_type: "expense" | "seal" | "sales_order";
   created_at: string;
   applicant:
     | { name: string }
@@ -43,59 +38,39 @@ type GenericTodoRow = {
     | null;
 };
 
-const DEMO_SALES_TREND: SalesTrendPoint[] = [
-  { date: "07/23", sales: 40, orders: 80 },
-  { date: "07/24", sales: 65, orders: 120 },
-  { date: "07/25", sales: 58, orders: 110 },
-  { date: "07/26", sales: 72, orders: 150 },
-  { date: "07/27", sales: 90, orders: 180 },
-  { date: "07/28", sales: 68, orders: 130 },
-];
+type SalesOrderRow = { id: string; order_date: string; total_cny: number; price_type: "retail" | "group" | "dropship"; status: string };
+type SalesOrderItemRow = { product_name: string; line_total_cny: number };
 
-const DEMO_BUSINESS_SOURCE: BusinessSourceItem[] = [
-  { name: "客户下单", value: 45.2, color: "#087D67" },
-  { name: "销售下单", value: 28.7, color: "#4FA58C" },
-  { name: "线上商城", value: 15.6, color: "#96C8B7" },
-  { name: "其他渠道", value: 10.5, color: "#C9DDD5" },
-];
+function shanghaiDate(date: Date) {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Shanghai" }).format(date);
+}
 
-const DEMO_PRODUCT_RANKING: ProductRankingItem[] = [
-  {
-    rank: 1,
-    name: "德馨礼盒",
-    salesAmount: 1126840,
-    share: 26.3,
-    source: "demo",
-  },
-  {
-    rank: 2,
-    name: "金龙鱼香米",
-    salesAmount: 805690,
-    share: 18.8,
-    source: "demo",
-  },
-  {
-    rank: 3,
-    name: "福临门大豆油",
-    salesAmount: 655700,
-    share: 15.3,
-    source: "demo",
-  },
-  {
-    rank: 4,
-    name: "德馨经典礼盒",
-    salesAmount: 557130,
-    share: 13,
-    source: "demo",
-  },
-  {
-    rank: 5,
-    name: "胡姬花花生油",
-    salesAmount: 411420,
-    share: 9.6,
-    source: "demo",
-  },
-];
+function salesReadModel(orders: SalesOrderRow[], items: SalesOrderItemRow[]) {
+  const validOrders = orders.filter((order) => order.status !== "cancelled");
+  const today = shanghaiDate(new Date());
+  const yesterdayDate = new Date(); yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+  const yesterday = shanghaiDate(yesterdayDate);
+  const dates = Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(); date.setDate(date.getDate() - (6 - index)); return shanghaiDate(date);
+  });
+  const trend: SalesTrendPoint[] = dates.map((date) => {
+    const rows = validOrders.filter((order) => order.order_date === date);
+    return { date: date.slice(5).replace("-", "/"), sales: Number((rows.reduce((sum, row) => sum + Number(row.total_cny), 0) / 10000).toFixed(2)), orders: rows.length };
+  });
+  const todayRows = validOrders.filter((order) => order.order_date === today);
+  const yesterdayRows = validOrders.filter((order) => order.order_date === yesterday);
+  const todaySales = todayRows.reduce((sum, row) => sum + Number(row.total_cny), 0);
+  const yesterdaySales = yesterdayRows.reduce((sum, row) => sum + Number(row.total_cny), 0);
+  const channels = [{ key: "retail", name: "零售价订单", color: "#087D67" }, { key: "group", name: "团购价订单", color: "#4FA58C" }, { key: "dropship", name: "代发价订单", color: "#96C8B7" }];
+  const totalOrders = Math.max(1, validOrders.length);
+  const businessSource = channels.map((channel) => ({ name: channel.name, value: Number((validOrders.filter((order) => order.price_type === channel.key).length / totalOrders * 100).toFixed(1)), color: channel.color })).filter((item) => item.value > 0);
+  const productTotals = new Map<string, number>();
+  for (const item of items) productTotals.set(item.product_name, (productTotals.get(item.product_name) ?? 0) + Number(item.line_total_cny));
+  const productTotal = [...productTotals.values()].reduce((sum, value) => sum + value, 0);
+  const products: ProductRankingItem[] = [...productTotals.entries()].sort((left, right) => right[1] - left[1]).slice(0, 5).map(([name, salesAmount], index) => ({ rank: index + 1, name, salesAmount, share: productTotal ? Number((salesAmount / productTotal * 100).toFixed(1)) : 0, source: "live" }));
+  const completed = validOrders.filter((order) => order.status === "completed").length;
+  return { trend, businessSource, products, todayRows, todaySales, yesterdaySales, yesterdayOrderCount: yesterdayRows.length, validOrders, fulfillmentRate: validOrders.length ? completed / validOrders.length * 100 : 0 };
+}
 
 const LEAVE_TYPE_LABELS: Record<string, string> = {
   welfare: "福利假",
@@ -191,7 +166,10 @@ function buildTodos(
 export async function getDashboardData(
   employee: CurrentEmployee,
 ): Promise<DashboardData> {
+  const elapsed = createServerTimer();
   const supabase = await createClient();
+  const salesFromDate = new Date();
+  salesFromDate.setDate(salesFromDate.getDate() - 30);
   const [
     leaveCountResult,
     genericCountResult,
@@ -201,6 +179,7 @@ export async function getDashboardData(
     inventoryResult,
     leaveTodosResult,
     genericTodosResult,
+    salesOrdersResult,
   ] = await Promise.all([
     supabase
       .from("leave_requests")
@@ -256,7 +235,20 @@ export async function getDashboardData(
       .eq("status", "pending")
       .order("created_at", { ascending: false })
       .limit(4),
+    supabase
+      .from("sales_orders")
+      .select("id, order_date, total_cny, price_type, status")
+      .gte("order_date", shanghaiDate(salesFromDate))
+      .order("order_date", { ascending: false })
+      .limit(1000),
   ]);
+
+  const salesOrders = (salesOrdersResult.data ?? []) as SalesOrderRow[];
+  const salesOrderIds = salesOrders.filter((order) => order.status !== "cancelled").map((order) => order.id);
+  const salesItemsResult = salesOrderIds.length
+    ? await supabase.from("sales_order_items").select("product_name, line_total_cny").in("order_id", salesOrderIds).limit(5000)
+    : { data: [], error: null };
+  const salesModel = salesReadModel(salesOrders, (salesItemsResult.data ?? []) as SalesOrderItemRow[]);
 
   const pendingCount =
     (leaveCountResult.count ?? 0) + (genericCountResult.count ?? 0);
@@ -271,24 +263,24 @@ export async function getDashboardData(
     {
       key: "sales",
       title: "今日销售额",
-      value: 286560,
+      value: salesModel.todaySales,
       format: "currency",
-      trend: 14.8,
+      trend: salesModel.yesterdaySales > 0 ? Number(((salesModel.todaySales - salesModel.yesterdaySales) / salesModel.yesterdaySales * 100).toFixed(1)) : null,
       trendLabel: "较昨日",
-      note: "销售订单模块演示口径",
-      source: "demo",
-      sparkline: [42, 55, 48, 66, 52, 71, 64, 82],
+      note: salesOrdersResult.error ? "销售数据暂不可用" : "非取消销售订单口径",
+      source: salesOrdersResult.error ? "pending" : "live",
+      sparkline: salesModel.trend.map((point) => point.sales),
     },
     {
       key: "orders",
       title: "今日订单",
-      value: 128,
+      value: salesModel.todayRows.length,
       format: "number",
-      trend: 9.6,
+      trend: salesModel.yesterdayOrderCount > 0 ? Number(((salesModel.todayRows.length - salesModel.yesterdayOrderCount) / salesModel.yesterdayOrderCount * 100).toFixed(1)) : null,
       trendLabel: "较昨日",
-      note: "销售订单模块演示口径",
-      source: "demo",
-      sparkline: [32, 36, 41, 39, 48, 52, 58, 63],
+      note: salesOrdersResult.error ? "销售数据暂不可用" : "今日非取消订单",
+      source: salesOrdersResult.error ? "pending" : "live",
+      sparkline: salesModel.trend.map((point) => point.orders),
     },
     {
       key: "approvals",
@@ -327,20 +319,20 @@ export async function getDashboardData(
     },
   ];
 
-  return {
+  const dashboardData: DashboardData = {
     generatedAt: new Date().toISOString(),
-    salesDataSource: "demo",
+    salesDataSource: salesOrdersResult.error ? "pending" : "live",
     unreadNotificationCount: unreadResult.count ?? 0,
     kpis,
-    salesTrend: DEMO_SALES_TREND,
-    businessSource: DEMO_BUSINESS_SOURCE,
+    salesTrend: salesModel.trend,
+    businessSource: salesModel.businessSource,
     businessSummary: [
       {
         label: "总订单数",
-        value: 1248,
+        value: salesModel.validOrders.length,
         format: "number",
-        trend: 18.3,
-        source: "demo",
+        trend: null,
+        source: salesOrdersResult.error ? "pending" : "live",
       },
       {
         label: "客户数",
@@ -351,24 +343,35 @@ export async function getDashboardData(
       },
       {
         label: "履约率",
-        value: 92.8,
+        value: Number(salesModel.fulfillmentRate.toFixed(1)),
         format: "percent",
-        trend: 5.6,
-        source: "demo",
+        trend: null,
+        source: salesOrdersResult.error ? "pending" : "live",
       },
       {
         label: "客单价",
-        value: 1256,
+        value: salesModel.validOrders.length ? salesModel.validOrders.reduce((sum, order) => sum + Number(order.total_cny), 0) / salesModel.validOrders.length : 0,
         format: "currency",
-        trend: 6.4,
-        source: "demo",
+        trend: null,
+        source: salesOrdersResult.error ? "pending" : "live",
       },
     ],
-    products: DEMO_PRODUCT_RANKING,
+    products: salesModel.products,
     inventory: inventoryItems.slice(0, 4),
     todos: buildTodos(
       (leaveTodosResult.data ?? []) as LeaveTodoRow[],
       (genericTodosResult.data ?? []) as GenericTodoRow[],
     ),
   };
+
+  after(async () => {
+    await recordPerformance(supabase, {
+      route: "/dashboard",
+      operation: "load_dashboard",
+      durationMs: elapsed(),
+      status: "ok",
+      metadata: { queryCount: 10 },
+    });
+  });
+  return dashboardData;
 }

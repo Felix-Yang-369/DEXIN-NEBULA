@@ -37,6 +37,25 @@ export async function GET(request: Request) {
   }
 
   const supabase = await createClient();
+  const { data: canExport, error: permissionError } = await supabase.rpc(
+    "can_export_products",
+  );
+
+  if (permissionError) {
+    console.error("product export permission check failed", permissionError.code);
+    return Response.json(
+      { error: "导出权限校验失败，请稍后重试" },
+      { status: 500 },
+    );
+  }
+
+  if (!canExport) {
+    return Response.json(
+      { error: "当前账号无权导出产品与价格数据" },
+      { status: 403 },
+    );
+  }
+
   const [productResult, priceResult] = await Promise.all([
     supabase
       .from("products")
@@ -70,6 +89,20 @@ export async function GET(request: Request) {
     employeeName: employee.name,
     exportedAt,
   });
+  const { error: auditError } = await supabase.rpc(
+    "record_product_export_audit",
+    {
+      p_product_rows: productResult.data?.length ?? 0,
+      p_price_rows: priceResult.data?.length ?? 0,
+    },
+  );
+  if (auditError) {
+    console.error("product export audit failed", auditError.code);
+    return Response.json(
+      { error: "导出审计记录失败，未生成下载" },
+      { status: 500 },
+    );
+  }
   const parts = timestamp(exportedAt);
   const stamp = `${parts.year}${parts.month}${parts.day}-${parts.hour}${parts.minute}`;
 

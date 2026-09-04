@@ -49,6 +49,29 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+@media (min-width: 1024px) {
+  [data-workspace-density="compact"] main {
+    --workspace-section-gap: 1rem;
+  }
+
+  [data-workspace-density="compact"] main table td,
+  [data-workspace-density="compact"] main table th {
+    padding-top: 0.55rem;
+    padding-bottom: 0.55rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
 :root {
   --font-geist-sans:
     -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei",

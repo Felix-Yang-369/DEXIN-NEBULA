@@ -12,11 +12,11 @@ export function ProductRanking({ items }: { items: ProductRankingItem[] }) {
               产品销售 TOP5
             </h2>
             <span className="rounded-full bg-[#fff4e3] px-2 py-0.5 text-[8px] font-medium text-[#a8752c]">
-              演示
+              实时
             </span>
           </div>
           <p className="mt-1 text-[10px] text-[#8293a1]">
-            销售明细接入后按真实商品统计
+            近 30 天销售订单商品金额汇总
           </p>
         </div>
         <span className="text-[10px] text-[#7d8b86]">本月</span>

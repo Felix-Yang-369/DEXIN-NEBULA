@@ -2,8 +2,8 @@
 
 ## Prerequisites
 
-- Node.js 20.9 or later
-- npm and the committed lockfile
+- Node.js 22 LTS
+- npm 10 or later and the committed lockfile
 - A non-production Supabase project for database-backed workflows
 - Environment-specific credentials supplied through local/runtime environment variables
 
@@ -17,7 +17,15 @@ cp .env.example .env.local
 npm run dev
 ~~~
 
+Use the version declared in `.nvmrc` and `package.json`. CI enforces the same
+Node.js major version so local, build, and production runtimes stay aligned.
+
 Review every value in the local environment file and replace examples with development-only configuration. Do not commit environment files.
+
+Additional development origins are configured through
+`NEXT_ALLOWED_DEV_ORIGINS` as comma-separated hostnames. Supabase avatar image
+access is derived from `NEXT_PUBLIC_SUPABASE_URL`; do not commit project-specific
+hostnames or developer LAN addresses in `next.config.ts`.
 
 ## Repository Map
 
@@ -63,3 +71,6 @@ Run checks proportionate to the change, but release candidates require the compl
 ## Documentation
 
 Canonical product and architecture documents live at the top of **docs/**. Module contracts live in **docs/modules/**. Focused legacy specifications remain linked from [the documentation index](../README.md) where they contain useful operational detail.
+# 平台治理
+
+主数据质量、个人工作台和性能治理的模型、权限与上线顺序见 [平台治理 V2](../modules/PLATFORM_GOVERNANCE.md)。新建后台列表优先复用 `src/components/business/business-data-table.tsx`，避免继续复制表格空状态、分页和密度逻辑。

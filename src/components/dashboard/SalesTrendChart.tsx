@@ -25,11 +25,11 @@ export function SalesTrendChart({ data }: { data: SalesTrendPoint[] }) {
               销售趋势分析
             </h2>
             <span className="rounded-full bg-[#fff4e3] px-2 py-0.5 text-[8px] font-medium text-[#a8752c]">
-              演示口径
+              实时数据
             </span>
           </div>
           <p className="mt-1 text-[10px] text-[#8293a1]">
-            销售订单模块接入后替换为实时数据
+            基于权限范围内的非取消销售订单
           </p>
         </div>
         <span className="rounded-full border border-[#e4ebe8] bg-[#f8fafc] px-3 py-1.5 text-[10px] text-[#596862]">
@@ -48,9 +48,7 @@ export function SalesTrendChart({ data }: { data: SalesTrendPoint[] }) {
               }).format(total)}
             </div>
           </div>
-          <div className="pb-0.5 text-[10px] font-medium text-[#0b8c6e]">
-            较上周期 ↑ 22.6%
-          </div>
+          <div className="pb-0.5 text-[10px] font-medium text-[#0b8c6e]">权限内实时汇总</div>
         </div>
         <div className="h-[250px] w-full">
           {data.length > 0 ? (

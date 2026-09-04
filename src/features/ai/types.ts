@@ -9,7 +9,8 @@ export type AiSourceType =
   | "document"
   | "approval"
   | "quote"
-  | "finance";
+  | "finance"
+  | "sales";
 
 export type AiSource = {
   id: string;

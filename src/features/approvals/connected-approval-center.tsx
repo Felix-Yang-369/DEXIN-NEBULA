@@ -11,6 +11,9 @@ import { createClient } from "@/lib/supabase/server";
 import { processExpenseApprovalAction } from "./expense-server-actions";
 import { processSealApprovalAction } from "./seal-server-actions";
 import { processLeaveRequestAction } from "./server-actions";
+import { processUnifiedApprovalAction } from "./unified-server-actions";
+
+type ConnectedUnifiedRequest = { id:string;request_no:string;request_type:string;title:string;summary:string|null;applicant_employee_id:string;current_approver_employee_id:string|null;status:string;current_step_order:number|null;total_steps:number;version:number;amount_cny:number|null;due_at:string|null;applicant:{name:string;employee_no:string}|Array<{name:string;employee_no:string}>|null };
 
 type ConnectedLeaveRequest = {
   id: string;
@@ -256,6 +259,7 @@ export async function ConnectedApprovalCenter({
     { data: leaveData, error: leaveError },
     { data: expenseData, error: expenseError },
     { data: sealData, error: sealError },
+    { data: unifiedData, error: unifiedError },
   ] = await Promise.all([
     supabase
       .from("leave_requests")
@@ -280,11 +284,13 @@ export async function ConnectedApprovalCenter({
       .eq("request_type", "seal")
       .order("created_at", { ascending: false })
       .limit(50),
+    supabase.from("approval_requests").select("id,request_no,request_type,title,summary,applicant_employee_id,current_approver_employee_id,status,current_step_order,total_steps,version,amount_cny,due_at,applicant:employees!approval_requests_applicant_employee_id_fkey(name,employee_no)").eq("request_type","sales_order").order("created_at",{ascending:false}).limit(50),
   ]);
 
   const requests = (leaveData ?? []) as ConnectedLeaveRequest[];
   const expenseRequests = (expenseData ?? []) as ConnectedExpenseRequest[];
   const sealRequests = (sealData ?? []) as ConnectedSealRequest[];
+  const unifiedRequests=(unifiedData??[]) as ConnectedUnifiedRequest[];const unifiedPending=unifiedRequests.filter((request)=>request.current_approver_employee_id===employee.id);const unifiedMine=unifiedRequests.filter((request)=>request.applicant_employee_id===employee.id);const unifiedCompleted=unifiedRequests.filter((request)=>["approved","rejected","withdrawn"].includes(request.status));
   const pending = requests.filter(
     (request) => request.current_approver_employee_id === employee.id,
   );
@@ -312,7 +318,7 @@ export async function ConnectedApprovalCenter({
   const sealCompleted = sealRequests.filter((request) =>
     ["approved", "rejected", "withdrawn"].includes(request.status),
   );
-  const error = leaveError ?? expenseError ?? sealError;
+  const error = leaveError ?? expenseError ?? sealError ?? unifiedError;
   const message = feedbackMessage(feedback);
 
   return (
@@ -321,14 +327,14 @@ export async function ConnectedApprovalCenter({
         {[
           {
             label: "我的待审批",
-            value: pending.length + expensePending.length + sealPending.length,
+            value: pending.length + expensePending.length + sealPending.length + unifiedPending.length,
             note: "只显示分配给当前账号的有效节点",
             icon: Clock3,
             tone: "bg-[#fff4e7] text-[#9a6321]",
           },
           {
             label: "我的申请",
-            value: mine.length + expenseMine.length + sealMine.length,
+            value: mine.length + expenseMine.length + sealMine.length + unifiedMine.length,
             note: "本人申请由数据库行级策略隔离",
             icon: FileText,
             tone: "bg-[#edf2f7] text-[#42647a]",
@@ -336,7 +342,7 @@ export async function ConnectedApprovalCenter({
           {
             label: "可见已完成",
             value:
-              completed.length + expenseCompleted.length + sealCompleted.length,
+              completed.length + expenseCompleted.length + sealCompleted.length + unifiedCompleted.length,
             note: "按本人、负责人和角色范围统计",
             icon: CircleCheck,
             tone: "bg-[#eaf3f8] text-[#0d6c78]",
@@ -396,13 +402,14 @@ export async function ConnectedApprovalCenter({
 
         {pending.length === 0 &&
         expensePending.length === 0 &&
-        sealPending.length === 0 ? (
+        sealPending.length === 0 && unifiedPending.length === 0 ? (
           <div className="mt-5 rounded-2xl border border-dashed border-border bg-[#fafcfe] py-10 text-center">
             <CircleCheck className="mx-auto size-7 text-primary" />
             <div className="mt-3 text-xs font-medium">当前没有待审批</div>
           </div>
         ) : (
           <div className="mt-5 space-y-4">
+            {unifiedPending.map((request)=><article className="rounded-[18px] border border-cyan-100 bg-cyan-50/40 p-4 sm:p-5" key={request.id}><div className="flex flex-wrap items-start justify-between gap-3"><div><div className="font-mono text-[10px] text-primary">{request.request_no}</div><h3 className="mt-2 text-sm font-semibold">{request.title}</h3><p className="mt-1 text-[10px] text-muted-foreground">申请人 {Array.isArray(request.applicant)?request.applicant[0]?.name:request.applicant?.name} · 金额 {request.amount_cny===null?"—":formatCurrency(request.amount_cny)}</p></div><span className="rounded-full bg-[#fff4e7] px-3 py-1 text-[9px] text-[#9a6321]">节点 {request.current_step_order}/{request.total_steps}</span></div><form action={processUnifiedApprovalAction} className="mt-4"><input name="requestId" type="hidden" value={request.id}/><input name="version" type="hidden" value={request.version}/><textarea className="min-h-20 w-full rounded-xl border border-border bg-white px-3 py-2 text-xs" name="opinion" placeholder="同意可选，退回或驳回时必填"/><div className="mt-3 flex justify-end gap-2"><button className="h-9 rounded-xl border border-[#f0dfc7] px-3 text-[10px] text-[#8b612c]" name="workflowAction" value="return">退回</button><button className="h-9 rounded-xl border border-[#ead8d8] px-3 text-[10px] text-[#965151]" name="workflowAction" value="reject">驳回</button><button className="h-9 rounded-xl bg-primary px-4 text-[10px] text-primary-foreground" name="workflowAction" value="approve">同意</button></div></form></article>)}
             {sealPending.map((request) => {
               const detail = sealDetail(request);
               if (!detail) return null;

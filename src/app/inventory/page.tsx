@@ -340,6 +340,9 @@ export default async function InventoryPage({
   const canManage =
     !employee ||
     departmentCode === "DX-WH";
+  const canExport = employee
+    ? departmentCode === "DX-WH" || employee.roleCodes.includes("chairman")
+    : false;
   const activeInventory = inventory.filter((item) => item.status === "active");
   const totalPhysicalQuantity = activeInventory.reduce(
     (total, item) => total + Number(item.quantity),
@@ -405,6 +408,7 @@ export default async function InventoryPage({
       }
     >
       <main className="relative isolate mx-auto max-w-[1600px] overflow-hidden p-4 sm:p-6 xl:p-8">
+        <div className="mb-4 flex justify-end"><Link className="rounded-xl bg-[#0a385d] px-4 py-2 text-[10px] text-white" href="/inventory/control">进入精细库存控制</Link></div>
         <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_12%_4%,rgba(24,175,179,.12),transparent_28%),radial-gradient(circle_at_88%_16%,rgba(57,127,192,.11),transparent_30%),linear-gradient(180deg,#f4f9fc_0%,#f7f9fb_48%,#f5f8fb_100%)]" />
         <section className="relative overflow-hidden rounded-[26px] border border-white/12 bg-[radial-gradient(circle_at_78%_18%,rgba(24,175,179,.28),transparent_26%),linear-gradient(135deg,#071d34_0%,#0a2d4e_52%,#0c5263_100%)] px-6 py-7 text-white shadow-[0_24px_70px_-38px_rgba(6,24,44,.9)] sm:px-8 lg:px-10">
           <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.035)_1px,transparent_1px)] bg-[size:42px_42px] [mask-image:linear-gradient(to_right,transparent,black_55%,black)]" />
@@ -429,7 +433,7 @@ export default async function InventoryPage({
                 <ShieldCheck className="size-4" />
                 {canManage ? "仓储操作权限已启用" : "库存查询视图"}
               </div>
-              {employee && (
+              {canExport && (
                 <Link
                   className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#6bd7d4] to-[#8be4df] px-4 py-3 text-[11px] font-semibold text-[#08253d] shadow-[0_10px_28px_-16px_rgba(107,215,212,.9)] transition hover:-translate-y-0.5 hover:from-[#80e0dc] hover:to-[#a0ebe6]"
                   href="/inventory/export"

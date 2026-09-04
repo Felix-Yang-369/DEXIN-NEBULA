@@ -19,10 +19,15 @@ import { navigationGroupsForRoles } from "@/config/platform-navigation";
 import { WorkflowShell } from "@/features/approvals/workflow-shell";
 import { requireCurrentEmployee } from "@/features/auth/current-employee";
 import {
+  classifySearchDomains,
   normalizeSearchQuery,
   postgrestContainsFilter,
   rankSearchResults,
 } from "@/lib/search/global-search";
+import {
+  createServerTimer,
+  logServerEvent,
+} from "@/lib/observability/server-log";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
@@ -118,6 +123,8 @@ export default async function SearchPage({
   const params = await searchParams;
   const query = normalizeSearchQuery(params.q ?? "");
   const supabase = await createClient();
+  const searchDurationMs = createServerTimer();
+  let searchedDomainCount = 0;
 
   let functionResults: SearchResult[] = [];
   let employeeResults: SearchResult[] = [];
@@ -134,7 +141,15 @@ export default async function SearchPage({
   let unavailableCount = 0;
 
   if (query) {
-    const navigationCandidates = navigationGroupsForRoles(employee.roleCodes)
+    const domains = classifySearchDomains(query);
+    searchedDomainCount = Object.entries(domains).filter(
+      ([key, enabled]) => key !== "hasExplicitDomain" && enabled,
+    ).length;
+    const skipped = Promise.resolve({ data: [], error: null });
+    const navigationCandidates = navigationGroupsForRoles(
+      employee.roleCodes,
+      employee.accessPermissionCodes,
+    )
       .flatMap((group) =>
         group.items.flatMap((item) => [
           {
@@ -240,21 +255,26 @@ export default async function SearchPage({
       announcements,
       documents,
     ] = await Promise.all([
-        supabase
+        domains.employee
+          ? supabase
           .from("employees")
           .select("id, employee_no, name, english_name, title, email")
           .eq("status", "active")
           .or(employeesFilter ?? noMatch)
           .order("employee_no")
-          .limit(12),
-        supabase
+          .limit(12)
+          : skipped,
+        domains.knowledge
+          ? supabase
           .from("knowledge_documents")
           .select("id, slug, title, title_en, summary, content, keywords")
           .eq("status", "published")
           .or(knowledgeFilter ?? noMatch)
           .order("published_at", { ascending: false })
-          .limit(12),
-        supabase
+          .limit(12)
+          : skipped,
+        domains.product
+          ? supabase
           .from("products")
           .select(
             "id, code, short_name, name, brand, specification, keywords, category",
@@ -262,15 +282,19 @@ export default async function SearchPage({
           .eq("status", "active")
           .or(productsFilter ?? noMatch)
           .order("code")
-          .limit(12),
-        supabase
+          .limit(12)
+          : skipped,
+        domains.customer
+          ? supabase
           .from("customers")
           .select("id, customer_no, name, customer_type, region, tags, note")
           .neq("status", "inactive")
           .or(customersFilter ?? noMatch)
           .order("updated_at", { ascending: false })
-          .limit(12),
-        supabase
+          .limit(12)
+          : skipped,
+        domains.supplier
+          ? supabase
           .from("suppliers")
           .select(
             "id, supplier_no, name, short_name, category, cooperation_status, unified_credit_code",
@@ -278,30 +302,38 @@ export default async function SearchPage({
           .neq("cooperation_status", "inactive")
           .or(suppliersFilter ?? noMatch)
           .order("updated_at", { ascending: false })
-          .limit(12),
-        supabase
+          .limit(12)
+          : skipped,
+        domains.salesOrder
+          ? supabase
           .from("sales_orders")
           .select(
             "id, order_no, status, order_date, total_cny, note, customers(name), sales_order_items(product_name)",
           )
           .or(salesOrdersFilter ?? noMatch)
           .order("created_at", { ascending: false })
-          .limit(12),
-        supabase
+          .limit(12)
+          : skipped,
+        domains.purchaseOrder
+          ? supabase
           .from("purchase_orders")
           .select(
             "id, order_no, status, order_date, total_amount, note, suppliers(name), purchase_order_items(product_name)",
           )
           .or(purchaseOrdersFilter ?? noMatch)
           .order("created_at", { ascending: false })
-          .limit(12),
-        supabase
+          .limit(12)
+          : skipped,
+        domains.approval
+          ? supabase
           .from("approval_requests")
           .select("id, request_no, request_type, title, summary, status")
           .or(approvalsFilter ?? noMatch)
           .order("updated_at", { ascending: false })
-          .limit(12),
-        supabase
+          .limit(12)
+          : skipped,
+        domains.finance
+          ? supabase
           .from("finance_documents")
           .select(
             "id, document_no, document_type, counterparty_name, source_no, invoice_no, summary, status",
@@ -309,16 +341,20 @@ export default async function SearchPage({
           .neq("status", "void")
           .or(financeFilter ?? noMatch)
           .order("updated_at", { ascending: false })
-          .limit(12),
-        supabase
+          .limit(12)
+          : skipped,
+        domains.announcement
+          ? supabase
           .from("announcements")
           .select("id, title, summary, content, category_code")
           .eq("status", "published")
           .or(announcementsFilter ?? noMatch)
           .order("is_pinned", { ascending: false })
           .order("published_at", { ascending: false })
-          .limit(12),
-        supabase
+          .limit(12)
+          : skipped,
+        domains.document
+          ? supabase
           .from("business_documents")
           .select(
             "id, document_no, title, description, original_file_name, category, related_party_name, reference_no",
@@ -326,7 +362,8 @@ export default async function SearchPage({
           .eq("status", "active")
           .or(documentsFilter ?? noMatch)
           .order("created_at", { ascending: false })
-          .limit(12),
+          .limit(12)
+          : skipped,
       ]);
 
     unavailableCount = [
@@ -630,6 +667,16 @@ export default async function SearchPage({
     },
   ];
   const total = groups.reduce((sum, group) => sum + group.results.length, 0);
+
+  if (query) {
+    logServerEvent("global_search_completed", {
+      durationMs: Math.round(searchDurationMs()),
+      queryLength: query.length,
+      searchedDomainCount,
+      unavailableDomainCount: unavailableCount,
+      resultCount: total,
+    });
+  }
 
   return (
     <WorkflowShell

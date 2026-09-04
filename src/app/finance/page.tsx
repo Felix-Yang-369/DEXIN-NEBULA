@@ -479,6 +479,7 @@ export default async function FinancePage({
       }
     >
       <main className="mx-auto max-w-[1600px] p-4 sm:p-6 xl:p-8">
+        <div className="mb-4 flex justify-end"><Link className="rounded-xl bg-[#0a385d] px-4 py-2 text-[10px] text-white" href="/finance/automation">进入业财自动化</Link></div>
         <section className="relative overflow-hidden rounded-[24px] bg-[#0a385d] px-6 py-7 text-white shadow-[0_18px_50px_-32px_rgba(12,47,41,.75)] sm:px-8 lg:px-10">
           <div className="absolute -right-16 -top-28 size-80 rounded-full border border-white/8" />
           <div className="absolute right-24 top-14 size-28 rounded-full border border-white/8" />
@@ -496,6 +497,15 @@ export default async function FinancePage({
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2 self-start lg:self-auto">
+              {canView ? (
+                <Link
+                  className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/18 bg-white/8 px-4 text-xs font-medium text-white transition-colors hover:bg-white/14"
+                  href="/finance/accounting"
+                >
+                  <Scale className="size-4" />
+                  会计核算
+                </Link>
+              ) : null}
               {canView ? (
                 <Link
                   className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/18 bg-white/8 px-4 text-xs font-medium text-white transition-colors hover:bg-white/14"

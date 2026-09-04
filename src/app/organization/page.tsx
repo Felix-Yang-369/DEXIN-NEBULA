@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { NebulaLogo } from "@/components/brand/nebula-logo";
 import { EmployeeAvatar } from "@/components/business/employee-avatar";
-import { PlatformSidebarMenu } from "@/components/navigation/platform-sidebar-menu";
+import { WorkflowShell } from "@/features/approvals/workflow-shell";
 import { requireCurrentEmployee } from "@/features/auth/current-employee";
 import { createClient } from "@/lib/supabase/server";
 
@@ -210,78 +209,12 @@ export default async function OrganizationPage() {
   );
 
   return (
-    <div className="min-h-svh bg-[#f5f8fb] text-foreground">
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[252px] flex-col border-r border-white/8 bg-[#102f2c] px-4 py-5 text-white lg:flex">
-        <div className="px-2">
-          <NebulaLogo inverse />
-        </div>
-        <PlatformSidebarMenu
-          activeItem="人力资源"
-          breadcrumb="组织运营 / 人力资源 / 组织架构"
-        />
-        <div className="rounded-2xl border border-white/10 bg-white/[0.055] p-3">
-          <div className="flex items-center gap-3">
-            <div className="grid size-9 place-items-center rounded-xl bg-[#6bd7d4] text-xs font-semibold text-[#0b3152]">
-              {currentEmployee.name.slice(0, 1)}
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="truncate text-xs font-medium">
-                {currentEmployee.name}
-              </div>
-              <div className="mt-0.5 truncate text-[10px] text-white/38">
-                德馨淼盛
-              </div>
-            </div>
-            <span className="text-white/28">•••</span>
-          </div>
-        </div>
-      </aside>
-
-      <div className="lg:pl-[252px]">
-        <header className="sticky top-0 z-20 flex h-[72px] items-center border-b border-border/80 bg-white/88 px-4 backdrop-blur-xl sm:px-6 xl:px-8">
-          <div className="lg:hidden">
-            <NebulaLogo compact />
-          </div>
-          <div className="ml-3 hidden min-w-0 flex-1 md:block lg:ml-0">
-            <div className="text-xs text-muted-foreground">
-              德馨星云 / 组织协同 / 组织架构
-            </div>
-          </div>
-          <div className="ml-auto flex items-center gap-2">
-            <label className="relative hidden md:block">
-              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
-                搜
-              </span>
-              <input
-                className="h-10 w-64 rounded-xl border border-border bg-[#f3f7fa] pl-10 pr-3 text-xs outline-none placeholder:text-muted-foreground/60 focus:border-primary/35 focus:bg-white focus:ring-4 focus:ring-primary/7"
-                placeholder="搜索部门、职位或员工"
-                type="search"
-              />
-            </label>
-            <button
-              className="grid size-10 place-items-center rounded-xl border border-border bg-card text-xs text-muted-foreground"
-              type="button"
-              aria-label="帮助"
-            >
-              ?
-            </button>
-            <div className="ml-1 hidden items-center gap-2 rounded-xl border border-border bg-card py-1.5 pl-1.5 pr-3 sm:flex">
-              <div className="grid size-7 place-items-center rounded-lg bg-primary text-[10px] font-semibold text-primary-foreground">
-                {currentEmployee.name.slice(0, 1)}
-              </div>
-              <div>
-                <div className="text-[11px] font-medium leading-4">
-                  {currentEmployee.name}
-                </div>
-                <div className="text-[9px] text-muted-foreground">
-                  {currentEmployee.title ?? "员工"}
-                </div>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        <main className="mx-auto max-w-[1600px] p-4 sm:p-6 xl:p-8">
+    <WorkflowShell
+      activeItem="人力资源"
+      breadcrumb="组织运营 / 人力资源 / 组织架构"
+      currentUser={{ name: currentEmployee.name, roleLabel: currentEmployee.title ?? "员工" }}
+    >
+      <main className="mx-auto max-w-[1600px] p-4 sm:p-6 xl:p-8">
           <section className="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
             <div>
               <div className="text-xs font-medium text-primary">ORGANIZATION</div>
@@ -679,8 +612,7 @@ export default async function OrganizationPage() {
               </section>
             </div>
           </div>
-        </main>
-      </div>
-    </div>
+      </main>
+    </WorkflowShell>
   );
 }

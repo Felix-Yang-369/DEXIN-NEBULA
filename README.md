@@ -113,7 +113,7 @@ The current system is a modular monolith. Critical order, stock, finance, and ap
 
 ## Developer Quick Start
 
-<p><img src="./docs/assets/icons/terminal.svg" width="28" alt="" /> <strong>Local development requires Node.js 20.9 or later and npm.</strong></p>
+<p><img src="./docs/assets/icons/terminal.svg" width="28" alt="" /> <strong>Local development requires Node.js 22 LTS and npm 10 or later.</strong></p>
 
 ~~~bash
 npm ci

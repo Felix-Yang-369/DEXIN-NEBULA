@@ -209,6 +209,7 @@ const fulfillmentSchema = z.object({
   recipientPhone: z.string().trim().max(40),
   deliveryAddress: z.string().trim().min(2).max(300),
   note: z.string().trim().max(500),
+  items: z.array(z.object({ orderItemId: z.uuid(), quantity: z.coerce.number().positive().max(999999) })).min(1).max(100),
 });
 
 export async function fulfillSalesOrderAction(formData: FormData) {
@@ -220,18 +221,20 @@ export async function fulfillSalesOrderAction(formData: FormData) {
     recipientPhone: formData.get("recipientPhone") ?? "",
     deliveryAddress: formData.get("deliveryAddress") ?? "",
     note: formData.get("note") ?? "",
+    items: parseItems(formData.get("items")),
   });
   if (!parsed.success) {
     salesRedirect({ error: "请完整填写履约仓库和配送地址" });
   }
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("fulfill_sales_order", {
+  const { data, error } = await supabase.rpc("fulfill_sales_order_v2", {
     p_order_id: parsed.data.orderId,
     p_warehouse_id: parsed.data.warehouseId,
     p_recipient_name: parsed.data.recipientName || null,
     p_recipient_phone: parsed.data.recipientPhone || null,
     p_delivery_address: parsed.data.deliveryAddress,
     p_note: parsed.data.note || null,
+    p_items: parsed.data.items,
   });
   if (error || !data) {
     console.error("fulfillSalesOrderAction failed", error?.code);
@@ -247,7 +250,7 @@ export async function fulfillSalesOrderAction(formData: FormData) {
   revalidatePath("/sales");
   revalidatePath("/inventory");
   revalidatePath("/inventory/operations");
-  revalidatePath("/finance");
+  revalidatePath("/finance"); revalidatePath("/finance/receivables"); revalidatePath(`/sales/orders/${parsed.data.orderId}`);
   salesRedirect({
     updated: `履约完成：出库单 ${result.outboundNo ?? "-"}，配送单 ${result.deliveryNo ?? "-"}，应收单 ${result.receivableNo ?? "-"}`,
   });

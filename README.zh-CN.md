@@ -113,7 +113,7 @@ flowchart TD
 
 ## 开发者快速开始
 
-<p><img src="./docs/assets/icons/terminal.svg" width="28" alt="" /> <strong>本地开发需要 Node.js 20.9 或更高版本与 npm。</strong></p>
+<p><img src="./docs/assets/icons/terminal.svg" width="28" alt="" /> <strong>本地开发需要 Node.js 22 LTS 与 npm 10 或更高版本。</strong></p>
 
 ~~~bash
 npm ci

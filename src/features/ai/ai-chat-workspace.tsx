@@ -69,6 +69,7 @@ const sourceMeta: Record<
   approval: { label: "审批", className: "bg-[#e9f7ee] text-[#34724a]" },
   quote: { label: "报价", className: "bg-[#eef2ff] text-[#5266a9]" },
   finance: { label: "财务", className: "bg-[#fff0ed] text-[#a05248]" },
+  sales: { label: "销售", className: "bg-[#eef4ff] text-[#3d64a1]" },
 };
 
 function SourceCards({ sources }: { sources: AiSource[] }) {

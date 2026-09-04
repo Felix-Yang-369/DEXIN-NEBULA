@@ -46,6 +46,14 @@ function isProtectedPath(pathname: string) {
   );
 }
 
+const defaultWorkspacePaths: Record<string, string> = {
+  dashboard: "/dashboard",
+  sales: "/sales",
+  inventory: "/inventory",
+  finance: "/finance",
+  oa: "/oa",
+};
+
 export async function updateSession(request: NextRequest) {
   if (!isSupabaseConfigured()) {
     return NextResponse.next({ request });
@@ -83,8 +91,22 @@ export async function updateSession(request: NextRequest) {
 
   if (isAuthenticated && pathname === "/login") {
     const dashboardUrl = request.nextUrl.clone();
-    dashboardUrl.pathname = "/dashboard";
+    const requestedPath = request.nextUrl.searchParams.get("next");
+    let destination = requestedPath?.startsWith("/") && !requestedPath.startsWith("//")
+      ? requestedPath
+      : null;
+    if (!destination) {
+      const authUserId = verifiedToken?.claims.sub;
+      const { data: employee } = await supabase.from("employees").select("id").eq("auth_user_id", authUserId).eq("status", "active").maybeSingle();
+      const { data: preference } = employee
+        ? await supabase.from("workspace_preferences").select("default_workspace").eq("employee_id", employee.id).maybeSingle()
+        : { data: null };
+      destination = defaultWorkspacePaths[preference?.default_workspace ?? "dashboard"] ?? "/dashboard";
+    }
+    const destinationUrl = new URL(destination, request.url);
+    dashboardUrl.pathname = destinationUrl.pathname;
     dashboardUrl.search = "";
+    dashboardUrl.search = destinationUrl.search;
     return NextResponse.redirect(dashboardUrl);
   }
 

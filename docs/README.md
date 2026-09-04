@@ -14,7 +14,7 @@ The English [README](../README.md) is the primary public entry; the synchronized
 
 ## Modules
 
-- Customer and revenue: [CRM](./modules/CRM.md), [Sales](./modules/SALES.md), [OMS](./modules/OMS.md)
+- Customer and revenue: [CRM](./modules/CRM.md), [Sales](./modules/SALES.md), [OMS](./modules/OMS.md), [Customer Service](./modules/CUSTOMER_SERVICE.md)
 - Supply chain: [Procurement](./modules/PROCUREMENT.md), [WMS](./modules/WMS.md)
 - Enterprise operations: [Finance](./modules/FINANCE.md), [HRM](./modules/HRM.md), [OA](./modules/OA.md)
 - Intelligence: [BI](./modules/BI.md)

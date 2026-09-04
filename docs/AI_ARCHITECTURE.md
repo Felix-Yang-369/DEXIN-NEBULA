@@ -31,7 +31,7 @@ A server-side chat endpoint calls a configured language-model service with a con
 
 ### Intent and Routing — Implemented Baseline
 
-Deterministic query classification identifies likely domains such as knowledge, product, inventory, customer, supplier, employee, announcement, document, approval, quotation, and finance. This narrows retrieval but is not a learned semantic router.
+Deterministic query classification identifies likely domains such as knowledge, product, inventory, customer, supplier, employee, announcement, document, approval, quotation, and finance. Explicit intent runs only the relevant domain queries; broad questions retain cross-domain fallback. Each query is constrained by a sanitized business-object term and an 80-row maximum candidate set before deterministic ranking. This is not a learned semantic router.
 
 ### Planning — Limited
 
@@ -77,3 +77,10 @@ Request → policy gate → router → explicit plan → governed tool registry
 ~~~
 
 Planned work includes structured tool schemas, risk classification, plan inspection, read/write separation, approval checkpoints, replayable traces, and adversarial evaluation. These capabilities must not be described as implemented until code, tests, and operational acceptance exist.
+# 内部业务工具 API V1
+
+德小馨的对话检索之外，系统提供仅限已登录员工调用的内部 Tool API：`POST /api/ai/tools`。首批工具为应收汇总、库存可用量和销售订单链路，均为只读查询。接口使用当前 Supabase 会话、数据库 RLS 与既有受控 RPC，不接受模型或浏览器提供的身份、SQL、任意表名或写入指令。
+
+工具名称必须来自服务端白名单，输入使用 Zod 校验，结果被限制在业务所需字段与数量范围内。工具执行日志仅记录工具名、员工标识和耗时，不记录查询文本、业务正文或凭据。后续“创建草稿”类工具必须复用现有事务函数，显示执行计划并要求人工确认；提交、审批、过账和付款不属于 Agent 可执行范围。
+
+当前已提供两类零副作用草稿计划：销售订单草稿计划与会计凭证草稿计划。它们仅验证字段、计算总额或借贷平衡，并返回人工确认入口；尚不创建订单、凭证或任何数据库记录。

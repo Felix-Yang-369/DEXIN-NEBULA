@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { DashboardClient } from "@/components/dashboard/DashboardClient";
+import { WorkflowShell } from "@/features/approvals/workflow-shell";
 import {
-  getCurrentEmployeeAvatarUrl,
   requireCurrentEmployee,
 } from "@/features/auth/current-employee";
+import { getDashboardData } from "@/lib/api/dashboard";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "企业经营驾驶舱",
@@ -30,16 +32,36 @@ function roleLabel(roleCodes: string[], title: string | null) {
 
 export default async function DashboardPage() {
   const employee = await requireCurrentEmployee();
-  const avatarUrl = await getCurrentEmployeeAvatarUrl();
+  const supabase = await createClient();
+  const [initialData, preferenceResult] = await Promise.all([
+    getDashboardData(employee),
+    supabase
+      .from("workspace_preferences")
+      .select("pinned_modules,hidden_widgets,density,default_workspace")
+      .eq("employee_id", employee.id)
+      .maybeSingle(),
+  ]);
+  const preference = preferenceResult.data;
 
   return (
-    <DashboardClient
-      identity={{
+    <WorkflowShell
+      activeItem="驾驶舱"
+      breadcrumb="经营决策 / 经营概览"
+      currentUser={{
         name: employee.name,
-        role: roleLabel(employee.roleCodes, employee.title),
-        roleCodes: employee.roleCodes,
-        avatarUrl,
+        roleLabel: roleLabel(employee.roleCodes, employee.title),
       }}
-    />
+    >
+      <DashboardClient
+      initialData={initialData}
+      identity={{ name: employee.name }}
+      preferences={{
+        pinnedModules: preference?.pinned_modules ?? ["sales", "inventory", "approvals"],
+        hiddenWidgets: preference?.hidden_widgets ?? [],
+        density: preference?.density === "compact" ? "compact" : "comfortable",
+        defaultWorkspace: preference?.default_workspace ?? "dashboard",
+      }}
+      />
+    </WorkflowShell>
   );
 }

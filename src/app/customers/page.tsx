@@ -305,6 +305,7 @@ export default async function CustomersPage({
       }
     >
       <main className="mx-auto max-w-[1600px] p-4 sm:p-6 xl:p-8">
+        <div className="mb-4 flex justify-end"><Link className="rounded-xl bg-[#0a385d] px-4 py-2 text-[10px] text-white" href="/customers/operations">进入客户经营中心</Link></div>
         <section className="relative overflow-hidden rounded-[24px] bg-[#0a385d] px-6 py-7 text-white shadow-[0_18px_50px_-32px_rgba(12,47,41,.75)] sm:px-8 lg:px-10">
           <div className="absolute -right-16 -top-28 size-80 rounded-full border border-white/8" />
           <div className="absolute right-24 top-14 size-28 rounded-full border border-white/8" />

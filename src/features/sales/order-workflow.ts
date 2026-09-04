@@ -1,5 +1,6 @@
 export type SalesOrderStatus =
   | "draft"
+  | "pending_approval"
   | "confirmed"
   | "fulfilling"
   | "completed"
@@ -7,6 +8,7 @@ export type SalesOrderStatus =
 
 const transitions: Record<SalesOrderStatus, SalesOrderStatus[]> = {
   draft: ["confirmed", "cancelled"],
+  pending_approval: [],
   confirmed: ["cancelled"],
   fulfilling: [],
   completed: [],

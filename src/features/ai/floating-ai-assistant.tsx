@@ -79,7 +79,7 @@ export function FloatingAiAssistant({ configured }: { configured: boolean }) {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [open, minimized, messages, loading]);
 
-  if (pathname === "/login" || pathname.startsWith("/ai")) return null;
+  if (pathname === "/login" || pathname.startsWith("/ai") || pathname.startsWith("/customer-service/widget")) return null;
 
   const ask = async (question: string) => {
     const value = question.trim();

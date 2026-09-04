@@ -15,7 +15,7 @@ export function PlatformRouteStateShell({
   return (
     <div className="min-h-svh bg-background text-foreground">
       {loadingLabel ? (
-        <div className="pointer-events-none fixed inset-x-0 top-24 z-50 flex justify-center lg:left-[252px]">
+        <div className="pointer-events-none fixed inset-x-0 top-24 z-50 flex justify-center lg:left-[var(--sidebar-width,252px)]">
           <div
             aria-label={`正在加载${loadingLabel}`}
             aria-live="polite"
@@ -51,7 +51,7 @@ export function PlatformRouteStateShell({
         <div className="mt-auto h-[62px] rounded-[18px] border border-white/10 bg-white/[0.055]" />
       </aside>
 
-      <div className="lg:pl-[252px]">
+      <div className="lg:pl-[var(--sidebar-width,252px)]">
         <header className="flex h-[72px] items-center border-b border-border/80 bg-white/88 px-4 sm:px-6 xl:px-8">
           <div className="lg:hidden">
             <NebulaLogo compact />

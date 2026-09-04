@@ -7,6 +7,7 @@ DEXIN NEBULA is deployed as a production-built Node.js/Next.js service behind a 
 ## Release Inputs
 
 - Reviewed source and lockfile
+- Node.js 22 LTS and npm 10 or later
 - Environment-specific secrets in an approved secret store
 - Ordered database migrations and compatibility notes
 - Successful relevant checks and acceptance evidence

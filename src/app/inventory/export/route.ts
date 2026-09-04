@@ -41,6 +41,22 @@ export async function GET(request: Request) {
   }
 
   const supabase = await createClient();
+  const { data: canExport, error: permissionError } = await supabase.rpc(
+    "can_export_inventory",
+  );
+
+  if (permissionError) {
+    console.error("inventory export permission check failed", permissionError.code);
+    return Response.json(
+      { error: "导出权限校验失败，请稍后重试" },
+      { status: 500 },
+    );
+  }
+
+  if (!canExport) {
+    return Response.json({ error: "当前账号无权导出仓储数据" }, { status: 403 });
+  }
+
   const [inventoryResult, batchResult] = await Promise.all([
     supabase
       .from("inventory_items")
@@ -89,6 +105,10 @@ export async function GET(request: Request) {
   );
   if (auditError) {
     console.error("inventory export audit failed", auditError.code);
+    return Response.json(
+      { error: "导出审计记录失败，未生成下载" },
+      { status: 500 },
+    );
   }
 
   const timestamp = shanghaiTimestamp(exportedAt);

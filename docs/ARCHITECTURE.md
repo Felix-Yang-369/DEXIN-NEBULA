@@ -21,7 +21,7 @@ The browser does not connect directly to privileged credentials or private stora
 
 ### Frontend
 
-Next.js App Router and React implement authenticated pages, server-rendered views, interactive client components, responsive navigation, forms, tables, charts, loading states, and error states. Tailwind CSS and shared components provide the visual system.
+Next.js App Router and React implement authenticated pages, server-rendered views, interactive client components, responsive navigation, forms, tables, charts, loading states, and error states. A server-owned application shell supplies authorized navigation data to narrow client islands for the three-state sidebar, mobile drawer, and command center. Tailwind CSS and shared components provide the visual system.
 
 ### Backend
 

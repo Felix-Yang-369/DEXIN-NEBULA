@@ -19,6 +19,7 @@ export type CurrentEmployee = {
   avatarPath: string | null;
   status: "active" | "inactive";
   roleCodes: string[];
+  accessPermissionCodes: string[];
 };
 
 export const getCurrentEmployee = cache(async (): Promise<CurrentEmployee | null> => {
@@ -70,6 +71,14 @@ export const getCurrentEmployee = cache(async (): Promise<CurrentEmployee | null
   const effectiveRoleCodes = roleCodes.includes("chairman")
     ? [...assignableRoleCodes]
     : [...new Set(roleCodes)];
+  const { data: permissionRows } = await supabase.rpc(
+    "effective_employee_permissions",
+    { p_employee_id: employee.id },
+  );
+  const accessPermissionCodes = (permissionRows ?? [])
+    .filter((row: { effect?: string }) => row.effect === "allow")
+    .map((row: { permission_code?: string }) => row.permission_code)
+    .filter((code: string | undefined): code is string => Boolean(code));
 
   return {
     id: employee.id,
@@ -84,6 +93,7 @@ export const getCurrentEmployee = cache(async (): Promise<CurrentEmployee | null
     avatarPath: employee.avatar_path,
     status: employee.status,
     roleCodes: effectiveRoleCodes,
+    accessPermissionCodes,
   };
 });
 

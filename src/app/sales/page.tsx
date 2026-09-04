@@ -20,10 +20,10 @@ import {
 } from "@/features/sales/sales-order-builder";
 import {
   createSalesOpportunityAction,
-  fulfillSalesOrderAction,
   transitionSalesOrderAction,
 } from "@/features/sales/server-actions";
 import { availableSalesOrderTransitions } from "@/features/sales/order-workflow";
+import { SalesFulfillmentForm } from "@/features/sales/sales-fulfillment-form";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
@@ -50,7 +50,7 @@ type OpportunityRow = {
 type OrderRow = {
   id: string;
   order_no: string;
-  status: "draft" | "confirmed" | "fulfilling" | "completed" | "cancelled";
+  status: "draft" | "pending_approval" | "confirmed" | "fulfilling" | "completed" | "cancelled";
   price_type: "retail" | "group" | "dropship";
   order_date: string;
   requested_delivery_on: string | null;
@@ -66,6 +66,7 @@ type OrderRow = {
     id: string;
     product_name: string;
     quantity: number | string;
+    delivered_quantity: number | string;
   }> | null;
 };
 
@@ -112,6 +113,7 @@ const stageLabels: Record<OpportunityRow["stage"], string> = {
 
 const orderStatusLabels: Record<OrderRow["status"], string> = {
   draft: "草稿",
+  pending_approval: "审批中",
   confirmed: "已确认",
   fulfilling: "履约中",
   completed: "已完成",
@@ -120,6 +122,7 @@ const orderStatusLabels: Record<OrderRow["status"], string> = {
 
 const orderStatusTones: Record<OrderRow["status"], string> = {
   draft: "bg-slate-100 text-slate-600",
+  pending_approval: "bg-amber-50 text-amber-700",
   confirmed: "bg-cyan-50 text-cyan-700",
   fulfilling: "bg-blue-50 text-blue-700",
   completed: "bg-emerald-50 text-emerald-700",
@@ -177,7 +180,7 @@ export default async function SalesPage({
       supabase
         .from("sales_orders")
         .select(
-          "id, order_no, status, price_type, order_date, requested_delivery_on, total_cny, legal_entity_id, customers(name), customer_legal_entities(legal_name), employees!sales_orders_owner_employee_id_fkey(name), sales_order_items(id, product_name, quantity)",
+          "id, order_no, status, price_type, order_date, requested_delivery_on, total_cny, legal_entity_id, customers(name), customer_legal_entities(legal_name), employees!sales_orders_owner_employee_id_fkey(name), sales_order_items(id, product_name, quantity, delivered_quantity)",
         )
         .order("created_at", { ascending: false })
         .limit(80),
@@ -356,7 +359,7 @@ export default async function SalesPage({
                                   <form action={transitionSalesOrderAction}>
                                     <input name="orderId" type="hidden" value={order.id} />
                                     <input name="targetStatus" type="hidden" value="confirmed" />
-                                    <button className="rounded-lg bg-[#0d6475] px-3 py-2 text-[9px] font-medium text-white" type="submit">确认订单</button>
+                                    <button className="rounded-lg bg-[#0d6475] px-3 py-2 text-[9px] font-medium text-white" type="submit">提交确认审批</button>
                                   </form>
                                 )}
                                 {availableSalesOrderTransitions(order.status).includes("cancelled") && <form action={transitionSalesOrderAction} className="flex gap-1.5">
@@ -367,19 +370,7 @@ export default async function SalesPage({
                                 </form>}
                               </div>
                             )}
-                            {canFulfill && order.status === "confirmed" && warehouses.length > 0 && (
-                              <form action={fulfillSalesOrderAction} className="grid w-full gap-2 rounded-xl border border-cyan-100 bg-cyan-50/60 p-3 sm:w-[360px] sm:grid-cols-2">
-                                <input name="orderId" type="hidden" value={order.id} />
-                                <select className="h-8 rounded-lg border border-cyan-200 bg-white px-2 text-[9px]" name="warehouseId" required>
-                                  {warehouses.map((warehouse) => <option key={warehouse.id} value={warehouse.id}>{warehouse.code} · {warehouse.name}</option>)}
-                                </select>
-                                <input className="h-8 rounded-lg border border-cyan-200 bg-white px-2 text-[9px]" name="recipientName" placeholder="收货人" />
-                                <input className="h-8 rounded-lg border border-cyan-200 bg-white px-2 text-[9px]" name="recipientPhone" placeholder="联系电话" />
-                                <input className="h-8 rounded-lg border border-cyan-200 bg-white px-2 text-[9px]" name="deliveryAddress" placeholder="配送地址" required />
-                                <input className="h-8 rounded-lg border border-cyan-200 bg-white px-2 text-[9px]" name="note" placeholder="履约说明" />
-                                <button className="h-8 rounded-lg bg-[#0d6475] text-[9px] font-medium text-white" type="submit">出库并生成应收</button>
-                              </form>
-                            )}
+                            {canFulfill && ["confirmed","fulfilling"].includes(order.status) && warehouses.length > 0 && <SalesFulfillmentForm lines={order.sales_order_items??[]} orderId={order.id} warehouses={warehouses}/>}<Link className="text-[9px] text-primary hover:underline" href={`/sales/orders/${order.id}`}>查看业务链路</Link>
                           </div>
                         </div>
                       </article>

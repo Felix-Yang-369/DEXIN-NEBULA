@@ -28,15 +28,26 @@ test("sidebar follows the seven-domain product architecture", async () => {
 });
 
 test("all application shells use the shared sidebar renderer", async () => {
-  const paths = [
-    "src/components/navigation/platform-sidebar-menu.tsx",
-    "src/components/dashboard/Sidebar.tsx",
-    "src/features/approvals/workflow-shell.tsx",
-  ];
+  const clientShell = await read("src/components/navigation/app-shell-client.tsx");
+  const serverShell = await read("src/features/approvals/workflow-shell.tsx");
+  const dashboard = await read("src/app/dashboard/page.tsx");
+  const organization = await read("src/app/organization/page.tsx");
 
-  for (const path of paths) {
-    assert.match(await read(path), /PlatformNavigationList/);
-  }
+  assert.match(clientShell, /PlatformNavigationList/);
+  assert.match(serverShell, /AppShellClient/);
+  assert.match(dashboard, /WorkflowShell/);
+  assert.match(organization, /WorkflowShell/);
+});
+
+test("sidebar supports persisted compact mode, temporary hiding and mobile drawer", async () => {
+  const shell = await read("src/components/navigation/app-shell-client.tsx");
+  const action = await read("src/features/workspace/actions.ts");
+
+  assert.match(shell, /"expanded" \| "compact"/);
+  assert.match(shell, /nebula_sidebar_hidden/);
+  assert.match(shell, /aria-modal="true"/);
+  assert.match(shell, /saveSidebarModeAction/);
+  assert.match(action, /save_sidebar_mode/);
 });
 
 test("module title and submenu toggle remain separate controls", async () => {

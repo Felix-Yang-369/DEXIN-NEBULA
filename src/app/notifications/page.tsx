@@ -23,7 +23,7 @@ export const dynamic = "force-dynamic";
 
 type NotificationRow = {
   id: string;
-  notification_type: "approval_pending" | "request_updated" | "system";
+  notification_type: "approval_pending" | "request_updated" | "system" | "customer_service";
   title: string;
   body: string;
   href: string | null;
@@ -85,7 +85,7 @@ export default async function NotificationsPage({
                 消息中心
               </h1>
               <p className="mt-3 max-w-2xl text-sm leading-7 text-white/55">
-                接收审批待办和申请状态变化提醒。消息范围严格绑定当前员工账号。
+                接收审批、申请状态和官网客户转人工提醒。消息范围严格绑定当前员工账号。
               </p>
             </div>
             {unread.length > 0 && (

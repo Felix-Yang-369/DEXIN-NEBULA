@@ -208,6 +208,7 @@ export default async function PurchasingPage({
             <p className="mt-3 text-sm leading-7 text-white/60">从内部采购需求出发，连接合作供应商、采购订单、批次入库、采购应付和银行付款核销。应付按实际到货金额生成，不提前确认未履约采购。</p>
             <div className="mt-5 flex flex-wrap gap-2">
               <a className="rounded-xl bg-white px-4 py-2 text-xs font-semibold text-[#0a385d]" href="#requests">发起采购申请</a>
+              <Link className="rounded-xl border border-white/25 px-4 py-2 text-xs font-semibold" href="/purchasing/control">询价 · 质检 · 三单匹配</Link>
               <Link className="rounded-xl border border-white/25 px-4 py-2 text-xs font-semibold" href="/finance/bank-reconciliation">银行核销 <ArrowRight className="ml-1 inline size-3" /></Link>
             </div>
           </div>

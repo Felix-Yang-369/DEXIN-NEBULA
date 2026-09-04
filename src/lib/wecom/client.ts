@@ -68,6 +68,34 @@ async function getAccessToken() {
   return tokenCache.value;
 }
 
+export async function sendWeComTextMessage(userIds: string[], content: string) {
+  const recipients = [...new Set(userIds.map((value) => value.trim()).filter(Boolean))];
+  if (recipients.length === 0) return { sent: 0 };
+  const accessToken = await getAccessToken();
+  const { agentId } = getWeComConfig();
+  const url = new URL("https://qyapi.weixin.qq.com/cgi-bin/message/send");
+  url.searchParams.set("access_token", accessToken);
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      touser: recipients.join("|"),
+      msgtype: "text",
+      agentid: Number(agentId),
+      text: { content: content.slice(0, 2000) },
+      safe: 0,
+      enable_duplicate_check: 1,
+      duplicate_check_interval: 600,
+    }),
+    cache: "no-store",
+    signal: AbortSignal.timeout(10_000),
+  });
+  if (!response.ok) throw new Error(`企业微信消息发送失败（HTTP ${response.status}）`);
+  const payload = await response.json() as WeComErrorResponse;
+  assertWeComSuccess(payload);
+  return { sent: recipients.length };
+}
+
 export function buildWeComQrLoginUrl(state: string) {
   const { corpId, agentId, callbackUrl } = getWeComConfig();
   return createWeComQrConnectUrl({

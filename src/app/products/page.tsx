@@ -311,6 +311,9 @@ export default async function ProductsPage({
   const canManage =
     !employee ||
     departmentCode === "DX-PROC";
+  const canExport = employee
+    ? departmentCode === "DX-PROC" || employee.roleCodes.includes("chairman")
+    : false;
   const hasChannelPricing = prices.some((price) =>
     ["group", "dropship", "procurement"].includes(price.price_type),
   );
@@ -408,15 +411,17 @@ export default async function ProductsPage({
           </div>
         )}
 
-        <div className="mt-5 flex justify-end">
-          <a
-            className="inline-flex h-10 items-center gap-2 rounded-xl border border-[#cfe0d9] bg-white px-4 text-[11px] font-medium text-[#1a5a69] shadow-[0_8px_24px_-20px_rgba(23,57,50,.45)] transition hover:-translate-y-0.5 hover:border-[#82aa99]"
-            href="/products/export"
-          >
-            <Download className="size-4" />
-            导出德馨产品库总表
-          </a>
-        </div>
+        {canExport && (
+          <div className="mt-5 flex justify-end">
+            <a
+              className="inline-flex h-10 items-center gap-2 rounded-xl border border-[#cfe0d9] bg-white px-4 text-[11px] font-medium text-[#1a5a69] shadow-[0_8px_24px_-20px_rgba(23,57,50,.45)] transition hover:-translate-y-0.5 hover:border-[#82aa99]"
+              href="/products/export"
+            >
+              <Download className="size-4" />
+              导出德馨产品库总表
+            </a>
+          </div>
+        )}
 
         {canManage && (
           <details className="mt-5 rounded-[22px] border border-[#d7e6df] bg-white p-5 shadow-[0_10px_36px_-30px_rgba(23,57,50,.36)]">

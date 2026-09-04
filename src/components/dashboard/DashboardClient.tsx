@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import axios from "axios";
 import {
   Activity,
@@ -11,15 +11,14 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { BusinessSourceChart } from "@/components/dashboard/BusinessSourceChart";
-import { Header } from "@/components/dashboard/Header";
 import { InventoryWarning } from "@/components/dashboard/InventoryWarning";
 import { KPIOverview } from "@/components/dashboard/KPIOverview";
 import { ProductRanking } from "@/components/dashboard/ProductRanking";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 import { SalesTrendChart } from "@/components/dashboard/SalesTrendChart";
-import { Sidebar } from "@/components/dashboard/Sidebar";
 import { TodoList } from "@/components/dashboard/TodoList";
 import { WelcomeBanner } from "@/components/dashboard/WelcomeBanner";
+import { WorkspacePreferences, type WorkspacePreferencesValue } from "@/components/dashboard/WorkspacePreferences";
 import { Skeleton } from "@/components/ui/skeleton";
 import type {
   DashboardApiResponse,
@@ -28,9 +27,6 @@ import type {
 
 type DashboardIdentity = {
   name: string;
-  role: string;
-  roleCodes: string[];
-  avatarUrl: string | null;
 };
 
 async function requestDashboard() {
@@ -79,12 +75,16 @@ function DashboardLoading() {
 
 export function DashboardClient({
   identity,
+  initialData,
+  preferences,
 }: {
   identity: DashboardIdentity;
+  initialData: DashboardData;
+  preferences: WorkspacePreferencesValue;
 }) {
-  const [data, setData] = useState<DashboardData | null>(null);
+  const [data, setData] = useState<DashboardData | null>(initialData);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const loadDashboard = useCallback(async () => {
     setLoading(true);
@@ -98,48 +98,8 @@ export function DashboardClient({
     }
   }, []);
 
-  useEffect(() => {
-    let active = true;
-    void requestDashboard()
-      .then((dashboardData) => {
-        if (active) {
-          setData(dashboardData);
-        }
-      })
-      .catch((requestError: unknown) => {
-        if (active) {
-          setError(dashboardErrorMessage(requestError));
-        }
-      })
-      .finally(() => {
-        if (active) {
-          setLoading(false);
-        }
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  const pendingCount =
-    data?.kpis.find((item) => item.key === "approvals")?.value ?? 0;
-
   return (
-    <div className="relative min-h-svh overflow-hidden bg-[#f1f6f9] text-[#172b3f]">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_79%_4%,rgba(24,175,179,.11),transparent_26%),radial-gradient(circle_at_18%_78%,rgba(69,128,184,.07),transparent_24%),linear-gradient(180deg,rgba(255,255,255,.55),transparent_30%)]"
-      />
-      <Sidebar pendingCount={pendingCount} roleCodes={identity.roleCodes} />
-      <div className="relative lg:pl-[252px]">
-        <Header
-          name={identity.name}
-          role={identity.role}
-          avatarUrl={identity.avatarUrl}
-          unreadCount={data?.unreadNotificationCount ?? 0}
-        />
-
-        <main className="relative mx-auto max-w-[1720px] p-4 sm:p-6 xl:p-7 2xl:p-9">
+    <main className="relative mx-auto max-w-[1720px] p-4 sm:p-6 xl:p-7 2xl:p-9">
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 -z-10 opacity-35 [background-image:linear-gradient(rgba(15,75,112,.035)_1px,transparent_1px),linear-gradient(90deg,rgba(15,75,112,.035)_1px,transparent_1px)] [background-size:32px_32px] [mask-image:linear-gradient(to_bottom,black,transparent_38%)]"
@@ -180,6 +140,8 @@ export function DashboardClient({
                 generatedAt={data.generatedAt}
                 name={identity.name}
               />
+              <WorkspacePreferences value={preferences} />
+              {!preferences.hiddenWidgets.includes("health") && (
               <section className="grid overflow-hidden rounded-[18px] border border-white/90 bg-white/72 shadow-[0_14px_38px_-30px_rgba(9,57,91,.5)] backdrop-blur-xl sm:grid-cols-3">
                 {[
                   {
@@ -240,20 +202,21 @@ export function DashboardClient({
                   );
                 })}
               </section>
-              <KPIOverview items={data.kpis} />
+              )}
+              {!preferences.hiddenWidgets.includes("kpis") && <KPIOverview items={data.kpis} />}
               <div className="grid items-stretch gap-6 xl:grid-cols-[minmax(0,1.22fr)_minmax(410px,.78fr)]">
-                <SalesTrendChart data={data.salesTrend} />
-                <BusinessSourceChart
+                {!preferences.hiddenWidgets.includes("sales_trend") && <SalesTrendChart data={data.salesTrend} />}
+                {!preferences.hiddenWidgets.includes("business_source") && <BusinessSourceChart
                   data={data.businessSource}
                   summary={data.businessSummary}
-                />
+                />}
               </div>
               <div className="grid items-stretch gap-6 xl:grid-cols-3">
-                <ProductRanking items={data.products} />
-                <InventoryWarning items={data.inventory} />
-                <TodoList items={data.todos} />
+                {!preferences.hiddenWidgets.includes("products") && <ProductRanking items={data.products} />}
+                {!preferences.hiddenWidgets.includes("inventory") && <InventoryWarning items={data.inventory} />}
+                {!preferences.hiddenWidgets.includes("todos") && <TodoList items={data.todos} />}
               </div>
-              <QuickActions />
+              {!preferences.hiddenWidgets.includes("quick_actions") && <QuickActions />}
             </div>
           ) : (
             <div className="grid min-h-[65vh] place-items-center rounded-[20px] border border-dashed border-[#d8e4ec] bg-white text-center">
@@ -270,8 +233,6 @@ export function DashboardClient({
               </div>
             </div>
           )}
-        </main>
-      </div>
-    </div>
+    </main>
   );
 }

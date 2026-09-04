@@ -63,7 +63,7 @@ export type DashboardTodo = {
   applicant: string;
   time: string;
   href: string;
-  kind: "leave" | "expense" | "seal";
+  kind: "leave" | "expense" | "seal" | "sales_order";
   source: DashboardDataSource;
 };
 

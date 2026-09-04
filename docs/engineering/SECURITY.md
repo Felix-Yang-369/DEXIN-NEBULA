@@ -21,6 +21,19 @@ DEXIN NEBULA applies defense in depth: authenticated sessions, server authorizat
 - Administrative technical access does not automatically grant business approval authority.
 - Temporary or elevated grants require expiry and auditability.
 
+### Permission Center V2
+
+The configurable access catalog supplements the fixed compatibility roles. A
+grant combines a stable permission code, allow/deny effect, data scope, and
+field-access level. Explicit deny takes precedence when effective permissions
+are explained. System roles remain read-only in the V2 editor; custom roles are
+assigned separately so the rollout can be reversed without changing existing
+workflow authorization. The configuration UI is not an enforcement boundary:
+database RLS and transactional RPC authorization remain canonical.
+
+High-risk finance permissions must be separated across preparation, review,
+posting, payment approval, payment execution, reconciliation, and period close.
+
 ## Secret Management
 
 Secrets belong only in approved local/runtime secret stores. Never commit tokens, passwords, service-role keys, private certificates, production connection strings, private IPs, or real test-account credentials. Browser-visible variables must be explicitly designed for public exposure and remain protected by RLS and origin controls.
@@ -37,6 +50,10 @@ Secrets belong only in approved local/runtime secret stores. Never commit tokens
 
 High-impact actions validate role, current state, amount/quantity bounds, and duplicate/stale versions inside a transaction. Use reversal and audit history instead of silent edits or deletion.
 
+Bulk inventory and product-price exports require an explicit database operation
+check before any export query. Successful downloads are fail-closed on audit: if
+the audit event cannot be written, the application does not return the file.
+
 ## AI Security
 
 - Retrieval inherits user permissions and sends only bounded relevant fields.
@@ -48,6 +65,10 @@ High-impact actions validate role, current state, amount/quantity bounds, and du
 ## Logging and Incident Handling
 
 Logs may contain action type, safe object identifier, status, latency, and trace ID. They must not contain credentials, authorization headers, private document bodies, sensitive free text, or unnecessary personal data. Security incidents require containment, credential rotation where relevant, impact review, recovery verification, and a recorded corrective action.
+
+Global search and AI retrieval emit structured events containing duration,
+enabled-domain count, result count, and partial-failure count. Search text,
+prompts, retrieved content, credentials, and authorization headers are excluded.
 
 ## Security Review Checklist
 

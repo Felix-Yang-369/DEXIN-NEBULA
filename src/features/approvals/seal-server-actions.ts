@@ -98,7 +98,7 @@ export async function submitSealRequestAction(
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.rpc("submit_seal_request", {
+  const { error } = await supabase.rpc("submit_seal_request_v2", {
     p_seal_type: parsed.data.sealType,
     p_use_date: parsed.data.useDate,
     p_document_title: parsed.data.documentTitle,

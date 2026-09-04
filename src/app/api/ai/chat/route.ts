@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { getCurrentEmployee } from "@/features/auth/current-employee";
+import { businessToolContext, executeBusinessTool } from "@/features/ai/business-tools";
+import { planReadOnlyBusinessTools } from "@/features/ai/business-tool-planner";
 import { retrieveAiContext } from "@/features/ai/retrieval";
 import type { AiSource } from "@/features/ai/types";
 import { createClient } from "@/lib/supabase/server";
@@ -139,6 +141,22 @@ export async function POST(request: Request) {
 
   const retrievalStartedAt = Date.now();
   const retrieval = await retrieveAiContext(supabase, parsed.data.message);
+  const toolPlans = planReadOnlyBusinessTools(parsed.data.message);
+  const toolSettled = await Promise.allSettled(
+    toolPlans.map((plan) => executeBusinessTool(supabase, plan.tool, plan.input, employee.id)),
+  );
+  const toolResults = toolSettled.flatMap((item) => item.status === "fulfilled" ? [item.value] : []);
+  const toolContext = toolResults.map((item) => businessToolContext(item.tool, item.result)).join("\n\n");
+  const sources: AiSource[] = [
+    ...retrieval.sources,
+    ...toolResults.map((item): AiSource => ({
+      id: `tool:${item.tool}`,
+      type: item.tool === "finance.receivables.summary" ? "finance" : item.tool === "inventory.availability" ? "inventory" : "sales",
+      title: item.tool === "finance.receivables.summary" ? "当前权限范围内的应收汇总" : item.tool === "inventory.availability" ? "当前权限范围内的库存可用量" : "销售订单业务链路",
+      description: "由德馨星云只读业务工具实时查询",
+      href: item.tool === "finance.receivables.summary" ? "/finance/receivables" : item.tool === "inventory.availability" ? "/inventory" : "/sales",
+    })),
+  ];
   const model = ["deepseek-v4-flash", "deepseek-v4-pro"].includes(
     process.env.DEEPSEEK_MODEL ?? "",
   )
@@ -162,7 +180,7 @@ export async function POST(request: Request) {
         messages: [
           {
             role: "system",
-            content: systemPrompt(retrieval.context, retrieval.sources),
+            content: systemPrompt([retrieval.context, toolContext].filter(Boolean).join("\n\n"), sources),
           },
           ...history,
           { role: "user", content: parsed.data.message },
@@ -236,7 +254,7 @@ export async function POST(request: Request) {
       p_user_content: parsed.data.message,
       p_assistant_content: answer,
       p_model: payload.model ?? model,
-      p_sources: retrieval.sources,
+      p_sources: sources,
       p_prompt_tokens: payload.usage?.prompt_tokens ?? 0,
       p_completion_tokens: payload.usage?.completion_tokens ?? 0,
       p_duration_ms: durationMs,
@@ -262,7 +280,7 @@ export async function POST(request: Request) {
       id: assistantMessageId,
       role: "assistant",
       content: answer,
-      sources: retrieval.sources,
+      sources,
     },
     usage: {
       model: payload.model ?? model,

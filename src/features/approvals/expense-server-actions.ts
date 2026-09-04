@@ -90,7 +90,7 @@ export async function submitExpenseClaimAction(
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.rpc("submit_expense_claim", {
+  const { error } = await supabase.rpc("submit_expense_claim_v2", {
     p_expense_category: parsed.data.expenseCategory,
     p_occurred_on: parsed.data.occurredOn,
     p_amount: parsed.data.amount,

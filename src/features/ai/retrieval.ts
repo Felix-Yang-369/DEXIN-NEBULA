@@ -4,11 +4,14 @@ import {
   extractSearchTerms,
   relevanceScore,
   searchableText,
+  selectRetrievalTerm,
 } from "@/features/ai/search";
 import type {
   AiRetrievalAudit,
   AiSource,
 } from "@/features/ai/types";
+import { postgrestContainsFilter } from "@/lib/search/global-search";
+import { logServerEvent } from "@/lib/observability/server-log";
 
 type RetrievalResult = {
   context: string;
@@ -56,6 +59,11 @@ export async function retrieveAiContext(
 
   const startedAt = Date.now();
   const sourceLimit = intent.hasExplicitIntent ? 4 : 2;
+  const candidateLimit = intent.hasExplicitIntent ? 80 : 40;
+  const retrievalTerm = selectRetrievalTerm(query, terms);
+  const filter = (fields: string[]) =>
+    postgrestContainsFilter(fields, retrievalTerm) ?? "id.is.null";
+  const skipped = Promise.resolve({ data: [], error: null });
   const [
     knowledgeResult,
     productResult,
@@ -69,84 +77,149 @@ export async function retrieveAiContext(
     quoteResult,
     financeResult,
   ] = await Promise.all([
-    supabase
+    intent.knowledge
+      ? supabase
       .from("knowledge_documents")
       .select("id, slug, title, summary, content, keywords, updated_at")
       .eq("status", "published")
+      .or(filter(["title", "summary", "content"]))
       .order("updated_at", { ascending: false })
-      .limit(120),
-    supabase
-      .from("products")
-      .select(
-        "id, code, name, short_name, brand, specification, case_specification, shelf_life, stock_status, minimum_order, applicable_scenarios, description, delivery_notes, invoice_notes, keywords, customer_query_reply, out_of_stock_reply, order_guide_reply, updated_at",
-      )
-      .eq("status", "active")
-      .order("updated_at", { ascending: false })
-      .limit(200),
-    supabase
+      .limit(candidateLimit)
+      : skipped,
+    intent.product
+      ? (() => {
+          let productQuery = supabase
+            .from("products")
+            .select(
+              "id, code, name, short_name, brand, specification, case_specification, shelf_life, stock_status, minimum_order, applicable_scenarios, description, delivery_notes, invoice_notes, keywords, customer_query_reply, out_of_stock_reply, order_guide_reply, updated_at",
+            )
+            .eq("status", "active");
+          productQuery = intent.productCode
+            ? productQuery.eq("code", intent.productCode)
+            : productQuery.or(
+                filter([
+                  "code",
+                  "name",
+                  "short_name",
+                  "brand",
+                  "specification",
+                  "description",
+                ]),
+              );
+          return productQuery
+            .order("updated_at", { ascending: false })
+            .limit(intent.productCode ? 1 : candidateLimit);
+        })()
+      : skipped,
+    intent.inventory
+      ? supabase
       .from("inventory_items")
       .select(
         "id, product_id, sku, product_name, specification, barcode, quantity, available_quantity, reserved_quantity, quarantined_quantity, unit, location_code, warehouses(name)",
       )
       .eq("status", "active")
+      .or(filter(["sku", "product_name", "specification", "barcode", "location_code"]))
       .order("updated_at", { ascending: false })
-      .limit(500),
-    supabase
+      .limit(candidateLimit)
+      : skipped,
+    intent.customer
+      ? supabase
       .from("customers")
       .select(
         "id, customer_no, name, customer_type, level, status, source, region, tags, last_contact_at, updated_at",
       )
+      .or(filter(["customer_no", "name", "customer_type", "region"]))
       .order("updated_at", { ascending: false })
-      .limit(200),
-    supabase
+      .limit(candidateLimit)
+      : skipped,
+    intent.supplier
+      ? supabase
       .from("suppliers")
       .select(
         "id, supplier_no, name, short_name, category, cooperation_level, cooperation_status, business_scope, settlement_terms, updated_at",
       )
+      .or(filter(["supplier_no", "name", "short_name", "category", "business_scope"]))
       .order("updated_at", { ascending: false })
-      .limit(160),
-    supabase
+      .limit(candidateLimit)
+      : skipped,
+    intent.employee
+      ? supabase
       .from("employees")
       .select("id, employee_no, name, title, hired_on, status, departments(name)")
+      .eq("status", "active")
+      .or(filter(["employee_no", "name", "title"]))
       .order("name")
-      .limit(160),
-    supabase
+      .limit(candidateLimit)
+      : skipped,
+    intent.announcement
+      ? supabase
       .from("announcements")
       .select(
         "id, title, summary, content, category_code, published_at, updated_at",
       )
       .eq("status", "published")
+      .or(filter(["title", "summary", "content"]))
       .order("published_at", { ascending: false })
-      .limit(100),
-    supabase
+      .limit(candidateLimit)
+      : skipped,
+    intent.document
+      ? supabase
       .from("business_documents")
       .select(
         "id, document_no, category, title, description, original_file_name, related_party_name, reference_no, effective_on, expires_on, updated_at",
       )
       .eq("status", "active")
+      .or(
+        filter([
+          "document_no",
+          "title",
+          "description",
+          "original_file_name",
+          "related_party_name",
+          "reference_no",
+        ]),
+      )
       .order("updated_at", { ascending: false })
-      .limit(160),
-    supabase
+      .limit(candidateLimit)
+      : skipped,
+    intent.approval
+      ? supabase
       .from("approval_requests")
       .select(
         "id, request_no, request_type, title, summary, status, submitted_at, completed_at, updated_at",
       )
+      .or(filter(["request_no", "request_type", "title", "summary"]))
       .order("updated_at", { ascending: false })
-      .limit(120),
-    supabase
+      .limit(candidateLimit)
+      : skipped,
+    intent.quote
+      ? supabase
       .from("sales_quotes")
       .select(
         "id, quote_no, status, price_type, valid_until, total_cny, payment_terms, delivery_terms, created_at, updated_at, customers(name)",
       )
+      .or(filter(["quote_no", "payment_terms", "delivery_terms"]))
       .order("updated_at", { ascending: false })
-      .limit(120),
-    supabase
+      .limit(candidateLimit)
+      : skipped,
+    intent.finance
+      ? supabase
       .from("finance_documents")
       .select(
         "id, document_no, document_type, counterparty_name, source_type, source_no, issue_date, due_date, total_amount, settled_amount, status, invoice_no, summary, updated_at",
       )
+      .or(
+        filter([
+          "document_no",
+          "counterparty_name",
+          "source_no",
+          "invoice_no",
+          "summary",
+        ]),
+      )
       .order("updated_at", { ascending: false })
-      .limit(200),
+      .limit(candidateLimit)
+      : skipped,
   ]);
 
   const knowledge = intent.knowledge
@@ -573,89 +646,64 @@ export async function retrieveAiContext(
     );
   }
 
+  logServerEvent(
+    "ai_retrieval_completed",
+    {
+      durationMs: totalDuration,
+      explicitIntent: intent.hasExplicitIntent,
+      searchedDomainCount: [
+        intent.knowledge,
+        intent.product,
+        intent.inventory,
+        intent.customer,
+        intent.supplier,
+        intent.employee,
+        intent.announcement,
+        intent.document,
+        intent.approval,
+        intent.quote,
+        intent.finance,
+      ].filter(Boolean).length,
+      candidateLimit,
+      sourceCount: sources.length,
+      failedDomainCount: errors.length,
+    },
+    errors.length > 0 ? "warn" : "info",
+  );
+
   const sourceIdsByType = (type: AiSource["type"]) =>
     sources.filter((source) => source.type === type).map((source) => source.id);
+  const auditDomains: Array<{
+    enabled: boolean;
+    toolName: string;
+    type: AiSource["type"];
+    resultCount: number;
+  }> = [
+    { enabled: intent.knowledge, toolName: "search_knowledge", type: "knowledge", resultCount: knowledge.length },
+    { enabled: intent.product, toolName: "search_products", type: "product", resultCount: products.length },
+    { enabled: intent.inventory, toolName: "search_inventory", type: "inventory", resultCount: inventory.length },
+    { enabled: intent.customer, toolName: "search_customers", type: "customer", resultCount: customers.length },
+    { enabled: intent.supplier, toolName: "search_suppliers", type: "supplier", resultCount: suppliers.length },
+    { enabled: intent.employee, toolName: "search_employees", type: "employee", resultCount: employees.length },
+    { enabled: intent.announcement, toolName: "search_announcements", type: "announcement", resultCount: announcements.length },
+    { enabled: intent.document, toolName: "search_documents", type: "document", resultCount: documents.length },
+    { enabled: intent.approval, toolName: "search_approvals", type: "approval", resultCount: approvals.length },
+    { enabled: intent.quote, toolName: "search_quotes", type: "quote", resultCount: quotes.length },
+    { enabled: intent.finance, toolName: "search_finance", type: "finance", resultCount: finances.length },
+  ];
+  const audits = auditDomains
+    .filter((domain) => domain.enabled)
+    .map<AiRetrievalAudit>((domain) => ({
+      toolName: domain.toolName,
+      queryText: query,
+      resultCount: domain.resultCount,
+      sourceIds: sourceIdsByType(domain.type),
+      durationMs: totalDuration,
+    }));
+
   return {
     context: context.join("\n\n"),
     sources,
-    audits: [
-      {
-        toolName: "search_knowledge",
-        queryText: query,
-        resultCount: knowledge.length,
-        sourceIds: sourceIdsByType("knowledge"),
-        durationMs: totalDuration,
-      },
-      {
-        toolName: "search_products",
-        queryText: query,
-        resultCount: products.length,
-        sourceIds: sourceIdsByType("product"),
-        durationMs: totalDuration,
-      },
-      {
-        toolName: "search_inventory",
-        queryText: query,
-        resultCount: inventory.length,
-        sourceIds: sourceIdsByType("inventory"),
-        durationMs: totalDuration,
-      },
-      {
-        toolName: "search_customers",
-        queryText: query,
-        resultCount: customers.length,
-        sourceIds: sourceIdsByType("customer"),
-        durationMs: totalDuration,
-      },
-      {
-        toolName: "search_suppliers",
-        queryText: query,
-        resultCount: suppliers.length,
-        sourceIds: sourceIdsByType("supplier"),
-        durationMs: totalDuration,
-      },
-      {
-        toolName: "search_employees",
-        queryText: query,
-        resultCount: employees.length,
-        sourceIds: sourceIdsByType("employee"),
-        durationMs: totalDuration,
-      },
-      {
-        toolName: "search_announcements",
-        queryText: query,
-        resultCount: announcements.length,
-        sourceIds: sourceIdsByType("announcement"),
-        durationMs: totalDuration,
-      },
-      {
-        toolName: "search_documents",
-        queryText: query,
-        resultCount: documents.length,
-        sourceIds: sourceIdsByType("document"),
-        durationMs: totalDuration,
-      },
-      {
-        toolName: "search_approvals",
-        queryText: query,
-        resultCount: approvals.length,
-        sourceIds: sourceIdsByType("approval"),
-        durationMs: totalDuration,
-      },
-      {
-        toolName: "search_quotes",
-        queryText: query,
-        resultCount: quotes.length,
-        sourceIds: sourceIdsByType("quote"),
-        durationMs: totalDuration,
-      },
-      {
-        toolName: "search_finance",
-        queryText: query,
-        resultCount: finances.length,
-        sourceIds: sourceIdsByType("finance"),
-        durationMs: totalDuration,
-      },
-    ],
+    audits,
   };
 }

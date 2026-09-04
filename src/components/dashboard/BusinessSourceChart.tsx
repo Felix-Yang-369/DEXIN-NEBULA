@@ -43,7 +43,7 @@ export function BusinessSourceChart({
               业务结构概览
             </h2>
             <span className="rounded-full bg-[#fff4e3] px-2 py-0.5 text-[8px] font-medium text-[#a8752c]">
-              渠道演示
+              订单价型
             </span>
           </div>
           <p className="mt-1 text-[10px] text-[#8293a1]">

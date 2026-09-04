@@ -1,6 +1,6 @@
 # Office Automation (OA)
 
-**Status:** Implemented baseline / In Progress
+**Status:** Implemented baseline / Unified Approval V2 foundation
 
 ## Purpose
 
@@ -12,7 +12,7 @@ All authenticated employees, assigned approvers, department leads, HR, finance, 
 
 ## Core Entities
 
-Approval requests/steps/events, leave requests/actions, expense claims, seal requests, announcements/read receipts, weekly reports, knowledge documents, business documents/folders/access requests, notifications, and audit logs.
+Versioned workflow definitions and conditional nodes, approval requests/steps/events, leave requests/actions, expense claims, seal requests, sales-order approvals, announcements/read receipts, weekly reports, knowledge documents, business documents/folders/access requests, notifications, and audit logs.
 
 ## Main Workflows
 
@@ -22,6 +22,9 @@ Create request → submit → route to assigned approval steps → approve/retur
 
 - State machines determine valid actions; pages cannot skip approval nodes.
 - Approval assignments are resolved and validated server-side.
+- V2 workflow nodes resolve a manager, role holder, or named employee from a versioned definition; amount and context conditions determine which nodes are included.
+- A source document is linked to at most one approval instance, and the resolved steps remain a historical snapshot even when administrators later adjust the template.
+- Sales-order confirmation, expense claims, and seal requests are executed by V2. Existing leave and document-access instances remain compatible while their submission functions are migrated incrementally.
 - Notifications contain the minimum necessary summary.
 - Audit records preserve actor, action, object, state change, and time without copying sensitive bodies.
 - Document metadata and binary access follow folder/role/department/employee grants.
@@ -44,8 +47,8 @@ Read-only AI can retrieve authorized published knowledge, announcements, approva
 
 ## Current Limitations
 
-Visual workflow configuration, advanced forms, attachment lifecycle, notification preferences, retention policy, and broad external messaging remain incomplete.
+Drag-and-drop workflow design, parallel countersign/or-sign nodes, delegation, automatic escalation execution, advanced forms, attachment lifecycle, notification preferences, retention policy, and broad external messaging remain incomplete.
 
 ## Future Work
 
-Add governed workflow templates, stronger document lifecycle/recovery, notification preferences, retention rules, search indexing, and human-approved AI assistance for drafting—not approval execution.
+Migrate leave and document access submission to the V2 resolver; then add parallel nodes, delegation, escalation jobs, stronger document lifecycle/recovery, and human-approved AI assistance for drafting—not approval execution.
