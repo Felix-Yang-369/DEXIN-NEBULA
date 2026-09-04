@@ -23,7 +23,7 @@ function LogoVisual({
   return (
     <span
       aria-label={logoUrl ? `${name}企业 Logo` : `${name}文字标识`}
-      className="relative grid size-[52px] shrink-0 place-items-center overflow-hidden rounded-[15px] border border-[#dce8e3] bg-gradient-to-br from-[#f5faf7] to-[#e8f2ed] shadow-[0_7px_18px_-12px_rgba(20,70,58,.48)]"
+      className="relative grid size-[52px] shrink-0 place-items-center overflow-hidden rounded-md border border-border bg-card   "
       role="img"
     >
       {logoUrl ? (
@@ -36,7 +36,7 @@ function LogoVisual({
           unoptimized
         />
       ) : (
-        <span className="max-w-[42px] text-center text-[9px] font-semibold leading-[1.25] tracking-[-0.02em] text-[#245f52]">
+        <span className="max-w-[42px] text-center text-xs font-semibold leading-[1.25] tracking-[-0.02em] text-foreground">
           {logoLabel(name)}
         </span>
       )}
@@ -65,11 +65,11 @@ export function CustomerLogoUpload({
     <form action={uploadCustomerLogo} ref={formRef}>
       <input name="customerId" type="hidden" value={customerId} />
       <label
-        className="group/logo relative block cursor-pointer rounded-[15px] outline-none focus-within:ring-2 focus-within:ring-primary/25"
+        className="group/logo relative block cursor-pointer rounded-md outline-none focus-within:ring-2 focus-within:ring-primary/25"
         title="点击上传或更换企业 Logo（JPG、PNG、WebP，最大 2MB）"
       >
         <LogoVisual logoUrl={logoUrl} name={name} />
-        <span className="absolute inset-0 grid place-items-center rounded-[15px] bg-[#123e35]/72 text-white opacity-0 transition-opacity group-hover/logo:opacity-100 group-focus-within/logo:opacity-100">
+        <span className="absolute inset-0 grid place-items-center rounded-md bg-primary text-white opacity-0 transition-opacity group-hover/logo:opacity-100 group-focus-within/logo:opacity-100">
           <Upload className="size-4" />
           <span className="sr-only">上传企业 Logo</span>
         </span>

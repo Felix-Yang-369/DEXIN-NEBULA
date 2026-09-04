@@ -6,10 +6,10 @@ import {
   splitNavigationGroups,
 } from "@/config/platform-navigation";
 import {
+  getAppBootstrap,
   getCurrentEmployee,
   getCurrentEmployeeAvatarUrl,
 } from "@/features/auth/current-employee";
-import { createClient } from "@/lib/supabase/server";
 
 export async function WorkflowShell({
   breadcrumb,
@@ -23,22 +23,13 @@ export async function WorkflowShell({
   activeItem?: string;
 }) {
   const employee = await getCurrentEmployee();
+  const bootstrap = await getAppBootstrap();
   const displayName = currentUser?.name ?? employee?.name ?? "系统管理员";
   const roleLabel = currentUser?.roleLabel ?? employee?.title ?? "德馨淼盛";
-  const supabase = await createClient();
   const cookieStore = await cookies();
 
-  const [avatarUrl, shellContextResult] = await Promise.all([
-    getCurrentEmployeeAvatarUrl(),
-    employee ? supabase.rpc("current_shell_context") : Promise.resolve({ data: null }),
-  ]);
-  const shellContext = (shellContextResult.data ?? {}) as {
-    sidebarMode?: string;
-    density?: string;
-    unreadCount?: number;
-    pendingCount?: number;
-  };
-  const pendingCount = Number(shellContext.pendingCount ?? 0);
+  const avatarUrl = await getCurrentEmployeeAvatarUrl();
+  const pendingCount = bootstrap?.pendingCount ?? 0;
   const groups = navigationGroupsForRoles(
     employee?.roleCodes ?? [],
     employee?.accessPermissionCodes ?? [],
@@ -51,7 +42,7 @@ export async function WorkflowShell({
     ),
   }));
   const { mainGroups, bottomGroups } = splitNavigationGroups(groups);
-  const savedMode = shellContext.sidebarMode;
+  const savedMode = bootstrap?.workspace.sidebarMode;
   const sidebarMode: SidebarMode = savedMode === "compact" ? "compact" : "expanded";
 
   return (
@@ -61,12 +52,11 @@ export async function WorkflowShell({
       bottomGroups={bottomGroups}
       breadcrumb={breadcrumb}
       displayName={displayName}
-      density={shellContext.density === "compact" ? "compact" : "comfortable"}
       hiddenInitially={cookieStore.get("nebula_sidebar_hidden")?.value === "1"}
       mainGroups={mainGroups}
       roleLabel={roleLabel}
       sidebarMode={sidebarMode}
-      unreadCount={Number(shellContext.unreadCount ?? 0)}
+      unreadCount={bootstrap?.unreadCount ?? 0}
     >
       {children}
     </AppShellClient>

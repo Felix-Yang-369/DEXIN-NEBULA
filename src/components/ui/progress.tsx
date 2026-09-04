@@ -16,12 +16,12 @@ export function Progress({
       aria-valuemax={100}
       aria-valuemin={0}
       aria-valuenow={normalizedValue}
-      className={cn("h-1.5 overflow-hidden rounded-full bg-[#eaf0f4]", className)}
+      className={cn("h-1.5 overflow-hidden rounded-full bg-muted", className)}
       role="progressbar"
     >
       <div
         className={cn(
-          "h-full rounded-full bg-[#0d866d] transition-[width] duration-500",
+          "h-full rounded-full bg-primary transition-[width] duration-500",
           indicatorClassName,
         )}
         style={{ width: `${normalizedValue}%` }}

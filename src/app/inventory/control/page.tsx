@@ -11,7 +11,7 @@ import {
 import { createClient } from "@/lib/supabase/server";
 export const metadata: Metadata = { title: "精细库存控制" };
 export const dynamic = "force-dynamic";
-const input = "h-9 rounded-xl border border-border bg-white px-3 text-[10px]";
+const input = "h-9 rounded-md border border-border bg-white px-3 text-xs";
 export default async function Page({
   searchParams,
 }: {
@@ -45,21 +45,21 @@ export default async function Page({
       breadcrumb="供应链 / 库存 / 精细控制"
       currentUser={{ name: e.name, roleLabel: e.title ?? "内部员工" }}
     >
-      <main className="mx-auto max-w-[1400px] p-4 sm:p-6 xl:p-8">
+      <main className="mx-auto max-w-[1440px] p-4 sm:p-6 xl:p-8">
         <CapabilityHero
           eyebrow="LOCATION · LOT · FEFO · COST"
           title="精细库存控制"
           description="在现有批次、调拨和盘点之上增加库位、先进先出/先到期先出策略及库存计价。"
         />
         {(p.created || p.error) && (
-          <div className="mt-4 rounded-xl border p-3 text-[10px]">
+          <div className="mt-4 rounded-md border p-3 text-xs">
             {p.error ?? p.created}
           </div>
         )}
         <div className="mt-5 grid gap-5 lg:grid-cols-3">
           <form
             action={manageLocationAction}
-            className="grid gap-3 rounded-[20px] border border-border bg-white p-5"
+            className="grid gap-3 rounded-md border border-border bg-white p-5"
           >
             <h2 className="text-sm font-semibold">新增库位</h2>
             <select className={input} name="warehouseId">
@@ -89,13 +89,13 @@ export default async function Page({
               <option value="quarantine">隔离区</option>
               <option value="shipping">发货区</option>
             </select>
-            <button className="h-9 rounded-xl bg-primary text-[10px] text-white">
+            <button className="h-9 rounded-md bg-primary text-xs text-white">
               保存库位
             </button>
           </form>
           <form
             action={moveBatchAction}
-            className="grid gap-3 rounded-[20px] border border-border bg-white p-5"
+            className="grid gap-3 rounded-md border border-border bg-white p-5"
           >
             <h2 className="text-sm font-semibold">批次移位</h2>
             <select className={input} name="batchId">
@@ -112,13 +112,13 @@ export default async function Page({
                 </option>
               ))}
             </select>
-            <button className="h-9 rounded-xl bg-primary text-[10px] text-white">
+            <button className="h-9 rounded-md bg-primary text-xs text-white">
               确认移位
             </button>
           </form>
           <form
             action={saveInventoryPolicyAction}
-            className="grid gap-3 rounded-[20px] border border-border bg-white p-5"
+            className="grid gap-3 rounded-md border border-border bg-white p-5"
           >
             <h2 className="text-sm font-semibold">库存策略</h2>
             <input
@@ -135,7 +135,7 @@ export default async function Page({
               <option value="fefo">先到期先出 FEFO</option>
               <option value="fifo">先进先出 FIFO</option>
             </select>
-            <button className="h-9 rounded-xl bg-primary text-[10px] text-white">
+            <button className="h-9 rounded-md bg-primary text-xs text-white">
               保存策略
             </button>
           </form>
@@ -165,7 +165,7 @@ export default async function Page({
               product: (
                 <div>
                   <b>{x.product_name}</b>
-                  <div className="font-mono text-[9px]">{x.sku}</div>
+                  <div className="font-mono text-xs">{x.sku}</div>
                 </div>
               ),
               quantity: Number(x.available_quantity),

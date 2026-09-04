@@ -56,19 +56,19 @@ export default async function NewAnnouncementPage({
         roleLabel: employee.title ?? "内部员工",
       }}
     >
-      <main className="mx-auto max-w-[1180px] p-4 sm:p-6 xl:p-8">
+      <main className="mx-auto max-w-[1200px] p-4 sm:p-6 xl:p-8">
         <Link
-          className="inline-flex h-9 items-center gap-2 rounded-xl border border-border bg-white px-3 text-[10px] font-medium text-muted-foreground"
+          className="inline-flex h-9 items-center gap-2 rounded-md border border-border bg-white px-3 text-xs font-medium text-muted-foreground"
           href="/announcements"
         >
           <ArrowLeft className="size-3.5" />
           返回公告中心
         </Link>
 
-        <section className="relative mt-4 overflow-hidden rounded-[24px] bg-[#0a385d] px-6 py-8 text-white sm:px-9">
+        <section className="relative mt-4 overflow-hidden rounded-md bg-primary px-6 py-8 text-white sm:px-9">
           <Megaphone className="pointer-events-none absolute right-10 top-1/2 hidden size-36 -translate-y-1/2 text-white/[0.055] sm:block" />
           <div className="relative">
-            <div className="text-[10px] font-medium tracking-[0.14em] text-[#79d8d5]">
+            <div className="text-xs font-medium tracking-[0.14em] text-muted-foreground">
               ANNOUNCEMENT PUBLISHING
             </div>
             <h1 className="mt-3 text-2xl font-semibold">
@@ -81,21 +81,21 @@ export default async function NewAnnouncementPage({
         </section>
 
         {params.saved === "draft" && (
-          <div className="mt-5 rounded-xl border border-[#d8e3ea] bg-[#edf2f7] px-4 py-3 text-xs text-[#42647a]">
+          <div className="mt-5 rounded-md border border-border bg-muted px-4 py-3 text-xs text-foreground">
             公告草稿已保存，尚未向员工发布。
           </div>
         )}
 
-        <section className="mt-5 rounded-[22px] border border-border/80 bg-white p-5 sm:p-7">
+        <section className="mt-5 rounded-md border border-border/80 bg-white p-5 sm:p-7">
           <AnnouncementForm
             departments={(departments ?? []) as Array<{ id: string; name: string }>}
             draft={draft}
           />
         </section>
 
-        <section className="mt-5 flex gap-3 rounded-[20px] border border-[#d9e8ee] bg-[#eef4f8] p-5">
+        <section className="mt-5 flex gap-3 rounded-md border border-border bg-muted p-5">
           <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />
-          <p className="text-[10px] leading-6 text-[#5c7587]">
+          <p className="text-xs leading-6 text-foreground">
             不要在公告中写入身份证号、银行卡、工资、私人联系方式、客户底价或账号密码等敏感内容。
           </p>
         </section>

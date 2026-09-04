@@ -97,6 +97,9 @@ const orderSchema = z.object({
 
 export async function createSalesOrderAction(formData: FormData) {
   await requireCurrentEmployee();
+  const returnPath = formData.get("returnTo") === "/mobile/orders/new" ? "/mobile/orders/new" : "/sales";
+  const submitForApproval = formData.get("submitForApproval") === "true";
+  const orderRedirect = (params: Record<string, string>): never => redirect(`${returnPath}?${new URLSearchParams(params).toString()}`);
   const parsed = orderSchema.safeParse({
     customerId: formData.get("customerId"),
     legalEntityId: formData.get("legalEntityId") ?? "",
@@ -110,19 +113,19 @@ export async function createSalesOrderAction(formData: FormData) {
     items: parseItems(formData.get("items")),
   });
   if (!parsed.success) {
-    salesRedirect({ error: "销售订单资料不正确，请检查客户、日期和商品数量" });
+    return orderRedirect({ error: "销售订单资料不正确，请检查客户、日期和商品数量" });
   }
   if (
     new Set(parsed.data.items.map((item) => item.productId)).size !==
     parsed.data.items.length
   ) {
-    salesRedirect({ error: "同一商品不能在订单中重复添加" });
+    return orderRedirect({ error: "同一商品不能在订单中重复添加" });
   }
   if (
     parsed.data.requestedDeliveryOn &&
     parsed.data.requestedDeliveryOn < parsed.data.orderDate
   ) {
-    salesRedirect({ error: "要求交付日期不能早于订单日期" });
+    return orderRedirect({ error: "要求交付日期不能早于订单日期" });
   }
 
   const supabase = await createClient();
@@ -141,7 +144,7 @@ export async function createSalesOrderAction(formData: FormData) {
   if (error || !data) {
     console.error("createSalesOrderAction failed", error?.code);
     const message = error?.message ?? "";
-    salesRedirect({
+    return orderRedirect({
       error: message.includes("未配置当前价格")
         ? "订单商品缺少所选价格口径，请先完善产品价格"
         : error?.code === "42501"
@@ -149,12 +152,25 @@ export async function createSalesOrderAction(formData: FormData) {
           : "销售订单创建失败，请确认数据库迁移和客户资料",
     });
   }
-  const result = data as { orderNo?: string };
+  const result = data as { id?: string; orderNo?: string };
+  if (submitForApproval && result.id) {
+    const approvalResult = await supabase.rpc("transition_sales_order", {
+      p_order_id: result.id,
+      p_target_status: "confirmed",
+      p_note: "移动端创建并提交审批",
+    });
+    if (approvalResult.error) {
+      console.error("mobile sales order approval submission failed", approvalResult.error.code);
+      revalidatePath("/sales");
+      orderRedirect({ error: "订单草稿已保存，但提交审批失败，请到销售订单中重试" });
+    }
+  }
   revalidatePath("/sales");
-  salesRedirect({
+  revalidatePath("/mobile");
+  orderRedirect({
     created: result.orderNo
-      ? `销售订单 ${result.orderNo} 已保存为草稿`
-      : "销售订单已保存为草稿",
+      ? `销售订单 ${result.orderNo} ${submitForApproval ? "已提交审批" : "已保存为草稿"}`
+      : submitForApproval ? "销售订单已提交审批" : "销售订单已保存为草稿",
   });
 }
 

@@ -330,14 +330,14 @@ export async function ConnectedApprovalCenter({
             value: pending.length + expensePending.length + sealPending.length + unifiedPending.length,
             note: "只显示分配给当前账号的有效节点",
             icon: Clock3,
-            tone: "bg-[#fff4e7] text-[#9a6321]",
+            tone: "bg-muted text-foreground",
           },
           {
             label: "我的申请",
             value: mine.length + expenseMine.length + sealMine.length + unifiedMine.length,
             note: "本人申请由数据库行级策略隔离",
             icon: FileText,
-            tone: "bg-[#edf2f7] text-[#42647a]",
+            tone: "bg-muted text-foreground",
           },
           {
             label: "可见已完成",
@@ -345,13 +345,13 @@ export async function ConnectedApprovalCenter({
               completed.length + expenseCompleted.length + sealCompleted.length + unifiedCompleted.length,
             note: "按本人、负责人和角色范围统计",
             icon: CircleCheck,
-            tone: "bg-[#eaf3f8] text-[#0d6c78]",
+            tone: "bg-muted text-foreground",
           },
         ].map((item) => {
           const Icon = item.icon;
           return (
             <article
-              className="rounded-[20px] border border-border/80 bg-white p-5"
+              className="rounded-md border border-border/80 bg-white p-5"
               key={item.label}
             >
               <div className="flex items-start justify-between">
@@ -364,12 +364,12 @@ export async function ConnectedApprovalCenter({
                   </div>
                 </div>
                 <span
-                  className={`grid size-10 place-items-center rounded-xl ${item.tone}`}
+                  className={`grid size-10 place-items-center rounded-md ${item.tone}`}
                 >
                   <Icon className="size-[17px]" />
                 </span>
               </div>
-              <div className="mt-4 border-t border-border/80 pt-3 text-[10px] text-muted-foreground">
+              <div className="mt-4 border-t border-border/80 pt-3 text-xs text-muted-foreground">
                 {item.note}
               </div>
             </article>
@@ -378,23 +378,23 @@ export async function ConnectedApprovalCenter({
       </section>
 
       {message && (
-        <div className="mt-5 rounded-xl border border-[#d8e8ee] bg-[#eef4f8] px-4 py-3 text-xs text-primary">
+        <div className="mt-5 rounded-md border border-border bg-muted px-4 py-3 text-xs text-primary">
           {message}
         </div>
       )}
 
       {error && (
-        <div className="mt-5 rounded-xl border border-[#ead8d8] bg-[#f8eeee] px-4 py-3 text-xs text-[#965151]">
+        <div className="mt-5 rounded-md border border-border bg-muted px-4 py-3 text-xs text-foreground">
           无法读取审批数据，请确认数据库迁移和账号绑定已经完成。
         </div>
       )}
 
-      <section className="mt-5 rounded-[22px] border border-border/80 bg-white p-5 sm:p-6">
+      <section className="mt-5 rounded-md border border-border/80 bg-white p-5 sm:p-6">
         <div className="flex items-center gap-2">
           <ShieldCheck className="size-4 text-primary" />
           <div>
             <h2 className="text-base font-semibold">我的待审批</h2>
-            <p className="mt-1 text-[10px] text-muted-foreground">
+            <p className="mt-1 text-xs text-muted-foreground">
               服务端会再次校验当前处理人、状态和版本号
             </p>
           </div>
@@ -403,25 +403,25 @@ export async function ConnectedApprovalCenter({
         {pending.length === 0 &&
         expensePending.length === 0 &&
         sealPending.length === 0 && unifiedPending.length === 0 ? (
-          <div className="mt-5 rounded-2xl border border-dashed border-border bg-[#fafcfe] py-10 text-center">
+          <div className="mt-5 rounded-lg border border-dashed border-border bg-muted py-10 text-center">
             <CircleCheck className="mx-auto size-7 text-primary" />
             <div className="mt-3 text-xs font-medium">当前没有待审批</div>
           </div>
         ) : (
           <div className="mt-5 space-y-4">
-            {unifiedPending.map((request)=><article className="rounded-[18px] border border-cyan-100 bg-cyan-50/40 p-4 sm:p-5" key={request.id}><div className="flex flex-wrap items-start justify-between gap-3"><div><div className="font-mono text-[10px] text-primary">{request.request_no}</div><h3 className="mt-2 text-sm font-semibold">{request.title}</h3><p className="mt-1 text-[10px] text-muted-foreground">申请人 {Array.isArray(request.applicant)?request.applicant[0]?.name:request.applicant?.name} · 金额 {request.amount_cny===null?"—":formatCurrency(request.amount_cny)}</p></div><span className="rounded-full bg-[#fff4e7] px-3 py-1 text-[9px] text-[#9a6321]">节点 {request.current_step_order}/{request.total_steps}</span></div><form action={processUnifiedApprovalAction} className="mt-4"><input name="requestId" type="hidden" value={request.id}/><input name="version" type="hidden" value={request.version}/><textarea className="min-h-20 w-full rounded-xl border border-border bg-white px-3 py-2 text-xs" name="opinion" placeholder="同意可选，退回或驳回时必填"/><div className="mt-3 flex justify-end gap-2"><button className="h-9 rounded-xl border border-[#f0dfc7] px-3 text-[10px] text-[#8b612c]" name="workflowAction" value="return">退回</button><button className="h-9 rounded-xl border border-[#ead8d8] px-3 text-[10px] text-[#965151]" name="workflowAction" value="reject">驳回</button><button className="h-9 rounded-xl bg-primary px-4 text-[10px] text-primary-foreground" name="workflowAction" value="approve">同意</button></div></form></article>)}
+            {unifiedPending.map((request)=><article className="rounded-md border border-border bg-muted p-4 sm:p-5" key={request.id}><div className="flex flex-wrap items-start justify-between gap-3"><div><div className="font-mono text-xs text-primary">{request.request_no}</div><h3 className="mt-2 text-sm font-semibold">{request.title}</h3><p className="mt-1 text-xs text-muted-foreground">申请人 {Array.isArray(request.applicant)?request.applicant[0]?.name:request.applicant?.name} · 金额 {request.amount_cny===null?"—":formatCurrency(request.amount_cny)}</p></div><span className="rounded-full bg-muted px-3 py-1 text-xs text-foreground">节点 {request.current_step_order}/{request.total_steps}</span></div><form action={processUnifiedApprovalAction} className="mt-4"><input name="requestId" type="hidden" value={request.id}/><input name="version" type="hidden" value={request.version}/><textarea className="min-h-20 w-full rounded-md border border-border bg-white px-3 py-2 text-xs" name="opinion" placeholder="同意可选，退回或驳回时必填"/><div className="mt-3 flex justify-end gap-2"><button className="h-9 rounded-md border border-border px-3 text-xs text-foreground" name="workflowAction" value="return">退回</button><button className="h-9 rounded-md border border-border px-3 text-xs text-foreground" name="workflowAction" value="reject">驳回</button><button className="h-9 rounded-md bg-primary px-4 text-xs text-primary-foreground" name="workflowAction" value="approve">同意</button></div></form></article>)}
             {sealPending.map((request) => {
               const detail = sealDetail(request);
               if (!detail) return null;
 
               return (
                 <article
-                  className="rounded-[18px] border border-[#dfd5e9] bg-[#fdfbff] p-4 sm:p-5"
+                  className="rounded-md border border-border bg-muted p-4 sm:p-5"
                   key={request.id}
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
-                      <div className="flex items-center gap-2 text-[10px] text-[#76589c]">
+                      <div className="flex items-center gap-2 text-xs text-foreground">
                         <Stamp className="size-3.5" />
                         {request.request_no}
                       </div>
@@ -430,7 +430,7 @@ export async function ConnectedApprovalCenter({
                         {sealApplicantName(request)}
                       </h3>
                     </div>
-                    <span className="rounded-full bg-[#f3edfa] px-3 py-1.5 text-[9px] font-medium text-[#76589c]">
+                    <span className="rounded-full bg-muted px-3 py-1.5 text-xs font-medium text-foreground">
                       {sealStepLabel(request)}
                     </span>
                   </div>
@@ -448,10 +448,10 @@ export async function ConnectedApprovalCenter({
                       ],
                     ].map(([label, value]) => (
                       <div
-                        className="rounded-xl bg-[#f6f1fa] px-3 py-2.5"
+                        className="rounded-md bg-muted px-3 py-2.5"
                         key={label}
                       >
-                        <div className="text-[9px] text-muted-foreground">
+                        <div className="text-xs text-muted-foreground">
                           {label}
                         </div>
                         <div className="mt-1 truncate text-xs font-medium">
@@ -462,14 +462,14 @@ export async function ConnectedApprovalCenter({
                   </div>
 
                   <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-xl border border-border bg-white p-3">
-                      <div className="text-[9px] text-muted-foreground">
+                    <div className="rounded-md border border-border bg-white p-3">
+                      <div className="text-xs text-muted-foreground">
                         用印事由
                       </div>
                       <p className="mt-2 text-xs leading-5">{detail.purpose}</p>
                     </div>
-                    <div className="rounded-xl border border-border bg-white p-3">
-                      <div className="text-[9px] text-muted-foreground">
+                    <div className="rounded-md border border-border bg-white p-3">
+                      <div className="text-xs text-muted-foreground">
                         对方单位
                       </div>
                       <p className="mt-2 text-xs leading-5">
@@ -486,7 +486,7 @@ export async function ConnectedApprovalCenter({
                       value={request.version}
                     />
                     <textarea
-                      className="min-h-20 w-full resize-y rounded-xl border border-border bg-white px-3 py-2.5 text-xs leading-5 outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
+                      className="min-h-20 w-full resize-y rounded-md border border-border bg-white px-3 py-2.5 text-xs leading-5 outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
                       name="opinion"
                       placeholder={
                         request.current_step_order === request.total_steps
@@ -496,7 +496,7 @@ export async function ConnectedApprovalCenter({
                     />
                     <div className="mt-3 flex flex-wrap justify-end gap-2">
                       <button
-                        className="h-9 rounded-xl border border-[#f0dfc7] bg-[#fff8ee] px-3 text-[10px] font-medium text-[#8b612c]"
+                        className="h-9 rounded-md border border-border bg-muted px-3 text-xs font-medium text-foreground"
                         name="workflowAction"
                         type="submit"
                         value="return"
@@ -504,7 +504,7 @@ export async function ConnectedApprovalCenter({
                         退回修改
                       </button>
                       <button
-                        className="h-9 rounded-xl border border-[#ead8d8] bg-[#f8eeee] px-3 text-[10px] font-medium text-[#965151]"
+                        className="h-9 rounded-md border border-border bg-muted px-3 text-xs font-medium text-foreground"
                         name="workflowAction"
                         type="submit"
                         value="reject"
@@ -512,7 +512,7 @@ export async function ConnectedApprovalCenter({
                         驳回
                       </button>
                       <button
-                        className="h-9 rounded-xl bg-primary px-4 text-[10px] font-medium text-primary-foreground"
+                        className="h-9 rounded-md bg-primary px-4 text-xs font-medium text-primary-foreground"
                         name="workflowAction"
                         type="submit"
                         value="approve"
@@ -533,12 +533,12 @@ export async function ConnectedApprovalCenter({
 
               return (
                 <article
-                  className="rounded-[18px] border border-[#d8e8ee] bg-[#fbfcfe] p-4 sm:p-5"
+                  className="rounded-md border border-border bg-muted p-4 sm:p-5"
                   key={request.id}
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
-                      <div className="flex items-center gap-2 text-[10px] text-primary">
+                      <div className="flex items-center gap-2 text-xs text-primary">
                         <ReceiptText className="size-3.5" />
                         {request.request_no}
                       </div>
@@ -547,7 +547,7 @@ export async function ConnectedApprovalCenter({
                         {expenseApplicantName(request)}
                       </h3>
                     </div>
-                    <span className="rounded-full bg-[#fff4e7] px-3 py-1.5 text-[9px] font-medium text-[#9a6321]">
+                    <span className="rounded-full bg-muted px-3 py-1.5 text-xs font-medium text-foreground">
                       {expenseStepLabel(request.current_step_order)}
                     </span>
                   </div>
@@ -560,10 +560,10 @@ export async function ConnectedApprovalCenter({
                       ["审批进度", `${request.current_step_order}/${request.total_steps}`],
                     ].map(([label, value]) => (
                       <div
-                        className="rounded-xl bg-[#f1f6f4] px-3 py-2.5"
+                        className="rounded-md bg-muted px-3 py-2.5"
                         key={label}
                       >
-                        <div className="text-[9px] text-muted-foreground">
+                        <div className="text-xs text-muted-foreground">
                           {label}
                         </div>
                         <div className="mt-1 text-xs font-medium">{value}</div>
@@ -571,8 +571,8 @@ export async function ConnectedApprovalCenter({
                     ))}
                   </div>
 
-                  <div className="mt-4 rounded-xl border border-border bg-white p-3">
-                    <div className="text-[9px] text-muted-foreground">
+                  <div className="mt-4 rounded-md border border-border bg-white p-3">
+                    <div className="text-xs text-muted-foreground">
                       费用说明
                     </div>
                     <p className="mt-2 text-xs leading-5">
@@ -588,13 +588,13 @@ export async function ConnectedApprovalCenter({
                       value={request.version}
                     />
                     <textarea
-                      className="min-h-20 w-full resize-y rounded-xl border border-border bg-white px-3 py-2.5 text-xs leading-5 outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
+                      className="min-h-20 w-full resize-y rounded-md border border-border bg-white px-3 py-2.5 text-xs leading-5 outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
                       name="opinion"
                       placeholder="同意时可选，退回或驳回时必填"
                     />
                     <div className="mt-3 flex flex-wrap justify-end gap-2">
                       <button
-                        className="h-9 rounded-xl border border-[#f0dfc7] bg-[#fff8ee] px-3 text-[10px] font-medium text-[#8b612c]"
+                        className="h-9 rounded-md border border-border bg-muted px-3 text-xs font-medium text-foreground"
                         name="workflowAction"
                         type="submit"
                         value="return"
@@ -602,7 +602,7 @@ export async function ConnectedApprovalCenter({
                         退回修改
                       </button>
                       <button
-                        className="h-9 rounded-xl border border-[#ead8d8] bg-[#f8eeee] px-3 text-[10px] font-medium text-[#965151]"
+                        className="h-9 rounded-md border border-border bg-muted px-3 text-xs font-medium text-foreground"
                         name="workflowAction"
                         type="submit"
                         value="reject"
@@ -610,7 +610,7 @@ export async function ConnectedApprovalCenter({
                         驳回
                       </button>
                       <button
-                        className="h-9 rounded-xl bg-primary px-4 text-[10px] font-medium text-primary-foreground"
+                        className="h-9 rounded-md bg-primary px-4 text-xs font-medium text-primary-foreground"
                         name="workflowAction"
                         type="submit"
                         value="approve"
@@ -625,12 +625,12 @@ export async function ConnectedApprovalCenter({
 
             {pending.map((request) => (
               <article
-                className="rounded-[18px] border border-border p-4 sm:p-5"
+                className="rounded-md border border-border p-4 sm:p-5"
                 key={request.id}
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <div className="text-[10px] text-primary">
+                    <div className="text-xs text-primary">
                       {request.id}
                     </div>
                     <h3 className="mt-2 text-sm font-semibold">
@@ -638,7 +638,7 @@ export async function ConnectedApprovalCenter({
                       {applicantName(request)}
                     </h3>
                   </div>
-                  <span className="rounded-full bg-[#fff4e7] px-3 py-1.5 text-[9px] font-medium text-[#9a6321]">
+                  <span className="rounded-full bg-muted px-3 py-1.5 text-xs font-medium text-foreground">
                     {statusLabels[request.status]}
                   </span>
                 </div>
@@ -651,10 +651,10 @@ export async function ConnectedApprovalCenter({
                     ["当前版本", `V${request.version}`],
                   ].map(([label, value]) => (
                     <div
-                      className="rounded-xl bg-[#f3f7fa] px-3 py-2.5"
+                      className="rounded-md bg-muted px-3 py-2.5"
                       key={label}
                     >
-                      <div className="text-[9px] text-muted-foreground">
+                      <div className="text-xs text-muted-foreground">
                         {label}
                       </div>
                       <div className="mt-1 text-xs font-medium">{value}</div>
@@ -663,14 +663,14 @@ export async function ConnectedApprovalCenter({
                 </div>
 
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-xl border border-border p-3">
-                    <div className="text-[9px] text-muted-foreground">
+                  <div className="rounded-md border border-border p-3">
+                    <div className="text-xs text-muted-foreground">
                       请假事由
                     </div>
                     <p className="mt-2 text-xs leading-5">{request.reason}</p>
                   </div>
-                  <div className="rounded-xl border border-border p-3">
-                    <div className="text-[9px] text-muted-foreground">
+                  <div className="rounded-md border border-border p-3">
+                    <div className="text-xs text-muted-foreground">
                       工作交接
                     </div>
                     <p className="mt-2 text-xs leading-5">{request.handover}</p>
@@ -685,13 +685,13 @@ export async function ConnectedApprovalCenter({
                     value={request.version}
                   />
                   <textarea
-                    className="min-h-20 w-full resize-y rounded-xl border border-border bg-[#fafcfe] px-3 py-2.5 text-xs leading-5 outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
+                    className="min-h-20 w-full resize-y rounded-md border border-border bg-muted px-3 py-2.5 text-xs leading-5 outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
                     name="opinion"
                     placeholder="同意时可选，退回或驳回时必填"
                   />
                   <div className="mt-3 flex flex-wrap justify-end gap-2">
                     <button
-                      className="h-9 rounded-xl border border-[#f0dfc7] bg-[#fff8ee] px-3 text-[10px] font-medium text-[#8b612c]"
+                      className="h-9 rounded-md border border-border bg-muted px-3 text-xs font-medium text-foreground"
                       name="workflowAction"
                       type="submit"
                       value="return"
@@ -699,7 +699,7 @@ export async function ConnectedApprovalCenter({
                       退回修改
                     </button>
                     <button
-                      className="h-9 rounded-xl border border-[#ead8d8] bg-[#f8eeee] px-3 text-[10px] font-medium text-[#965151]"
+                      className="h-9 rounded-md border border-border bg-muted px-3 text-xs font-medium text-foreground"
                       name="workflowAction"
                       type="submit"
                       value="reject"
@@ -707,7 +707,7 @@ export async function ConnectedApprovalCenter({
                       驳回
                     </button>
                     <button
-                      className="h-9 rounded-xl bg-primary px-4 text-[10px] font-medium text-primary-foreground"
+                      className="h-9 rounded-md bg-primary px-4 text-xs font-medium text-primary-foreground"
                       name="workflowAction"
                       type="submit"
                       value="approve"
@@ -724,13 +724,13 @@ export async function ConnectedApprovalCenter({
         )}
       </section>
 
-      <section className="mt-5 rounded-[22px] border border-border/80 bg-white p-5 sm:p-6">
+      <section className="mt-5 rounded-md border border-border/80 bg-white p-5 sm:p-6">
         <h2 className="text-base font-semibold">我的申请</h2>
         <div className="mt-4 space-y-3">
           {mine.length === 0 &&
           expenseMine.length === 0 &&
           sealMine.length === 0 ? (
-            <div className="rounded-xl bg-[#f3f7fa] px-4 py-8 text-center text-xs text-muted-foreground">
+            <div className="rounded-md bg-muted px-4 py-8 text-center text-xs text-muted-foreground">
               还没有审批申请
             </div>
           ) : (
@@ -741,22 +741,22 @@ export async function ConnectedApprovalCenter({
 
                 return (
                   <article
-                    className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border px-4 py-3"
+                    className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border px-4 py-3"
                     key={request.id}
                   >
                     <div>
                       <div className="flex items-center gap-2 text-xs font-medium">
-                        <Stamp className="size-3.5 text-[#76589c]" />
+                        <Stamp className="size-3.5 text-foreground" />
                         {sealTypeLabels[detail.seal_type]} ·{" "}
                         {detail.document_title}
                       </div>
-                      <div className="mt-1 text-[9px] text-muted-foreground">
+                      <div className="mt-1 text-xs text-muted-foreground">
                         {request.request_no} · 计划 {detail.use_date} ·{" "}
                         {detail.copies} 份
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="rounded-full bg-[#f3f6f5] px-2.5 py-1 text-[9px] text-muted-foreground">
+                      <span className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">
                         {request.status === "pending"
                           ? sealStepLabel(request)
                           : statusLabels[request.status]}
@@ -776,7 +776,7 @@ export async function ConnectedApprovalCenter({
                             />
                             <input name="opinion" type="hidden" value="" />
                             <button
-                              className="h-8 rounded-lg border border-[#ead8d8] bg-[#f8eeee] px-3 text-[9px] font-medium text-[#965151]"
+                              className="h-8 rounded-lg border border-border bg-muted px-3 text-xs font-medium text-foreground"
                               name="workflowAction"
                               type="submit"
                               value="withdraw"
@@ -803,7 +803,7 @@ export async function ConnectedApprovalCenter({
                             value="确认文件信息后重新提交"
                           />
                           <button
-                            className="h-8 rounded-lg bg-primary px-3 text-[9px] font-medium text-primary-foreground"
+                            className="h-8 rounded-lg bg-primary px-3 text-xs font-medium text-primary-foreground"
                             name="workflowAction"
                             type="submit"
                             value="resubmit"
@@ -823,7 +823,7 @@ export async function ConnectedApprovalCenter({
 
                 return (
                   <article
-                    className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border px-4 py-3"
+                    className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border px-4 py-3"
                     key={request.id}
                   >
                     <div>
@@ -832,12 +832,12 @@ export async function ConnectedApprovalCenter({
                         {expenseCategoryLabels[detail.expense_category]} ·{" "}
                         {formatCurrency(detail.amount)}
                       </div>
-                      <div className="mt-1 text-[9px] text-muted-foreground">
+                      <div className="mt-1 text-xs text-muted-foreground">
                         {request.request_no} · {detail.occurred_on}
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="rounded-full bg-[#f3f6f5] px-2.5 py-1 text-[9px] text-muted-foreground">
+                      <span className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">
                         {request.status === "pending"
                           ? expenseStepLabel(request.current_step_order)
                           : statusLabels[request.status]}
@@ -857,7 +857,7 @@ export async function ConnectedApprovalCenter({
                             />
                             <input name="opinion" type="hidden" value="" />
                             <button
-                              className="h-8 rounded-lg border border-[#ead8d8] bg-[#f8eeee] px-3 text-[9px] font-medium text-[#965151]"
+                              className="h-8 rounded-lg border border-border bg-muted px-3 text-xs font-medium text-foreground"
                               name="workflowAction"
                               type="submit"
                               value="withdraw"
@@ -884,7 +884,7 @@ export async function ConnectedApprovalCenter({
                             value="确认材料后重新提交"
                           />
                           <button
-                            className="h-8 rounded-lg bg-primary px-3 text-[9px] font-medium text-primary-foreground"
+                            className="h-8 rounded-lg bg-primary px-3 text-xs font-medium text-primary-foreground"
                             name="workflowAction"
                             type="submit"
                             value="resubmit"
@@ -900,19 +900,19 @@ export async function ConnectedApprovalCenter({
 
               {mine.map((request) => (
               <article
-                className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border px-4 py-3"
+                className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border px-4 py-3"
                 key={request.id}
               >
                 <div>
                   <div className="text-xs font-medium">
                     {leaveTypeLabels[request.leave_type]} · {request.leave_days} 天
                   </div>
-                  <div className="mt-1 text-[9px] text-muted-foreground">
+                  <div className="mt-1 text-xs text-muted-foreground">
                     {request.start_date} 至 {request.end_date}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="rounded-full bg-[#f3f6f5] px-2.5 py-1 text-[9px] text-muted-foreground">
+                  <span className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">
                     {statusLabels[request.status]}
                   </span>
                   {request.status === "pending_department" && (
@@ -929,7 +929,7 @@ export async function ConnectedApprovalCenter({
                       />
                       <input name="opinion" type="hidden" value="" />
                       <button
-                        className="h-8 rounded-lg border border-[#ead8d8] bg-[#f8eeee] px-3 text-[9px] font-medium text-[#965151]"
+                        className="h-8 rounded-lg border border-border bg-muted px-3 text-xs font-medium text-foreground"
                         name="workflowAction"
                         type="submit"
                         value="withdraw"
@@ -956,7 +956,7 @@ export async function ConnectedApprovalCenter({
                         value="修改后重新提交"
                       />
                       <button
-                        className="h-8 rounded-lg bg-primary px-3 text-[9px] font-medium text-primary-foreground"
+                        className="h-8 rounded-lg bg-primary px-3 text-xs font-medium text-primary-foreground"
                         name="workflowAction"
                         type="submit"
                         value="resubmit"

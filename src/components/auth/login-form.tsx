@@ -38,9 +38,9 @@ export function LoginForm({
           {isEnglish ? "Company email" : "企业邮箱"}
         </label>
         <div className="group relative">
-          <Mail className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-[#7b91a4]" />
+          <Mail className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-foreground" />
           <input
-            className="h-12 w-full rounded-xl border border-[#cddce7] bg-white/75 pl-11 pr-4 text-[15px] outline-none transition-[border-color,box-shadow] placeholder:text-muted-foreground/60 focus:border-[#149eaa]/45 focus:bg-white focus:ring-4 focus:ring-[#149eaa]/8"
+            className="h-12 w-full rounded-md border border-border bg-white/75 pl-11 pr-4 text-[15px] outline-none transition-[border-color,box-shadow] placeholder:text-muted-foreground/60 focus:border-border focus:bg-white focus:ring-4 focus:ring-ring/20"
             id="email"
             name="email"
             type="email"
@@ -60,7 +60,7 @@ export function LoginForm({
             {isEnglish ? "Password" : "登录密码"}
           </label>
           <span
-            className="truncate text-right text-xs font-medium text-[#d83b46]"
+            className="truncate text-right text-xs font-medium text-foreground"
             aria-live="polite"
           >
             {state.error}
@@ -68,7 +68,7 @@ export function LoginForm({
         </div>
         <div className="group relative">
           <input
-            className="h-12 w-full rounded-xl border border-[#cddce7] bg-white/75 px-4 pr-12 text-[15px] outline-none transition-[border-color,box-shadow] placeholder:text-muted-foreground/60 focus:border-[#149eaa]/45 focus:bg-white focus:ring-4 focus:ring-[#149eaa]/8"
+            className="h-12 w-full rounded-md border border-border bg-white/75 px-4 pr-12 text-[15px] outline-none transition-[border-color,box-shadow] placeholder:text-muted-foreground/60 focus:border-border focus:bg-white focus:ring-4 focus:ring-ring/20"
             id="password"
             name="password"
             type={showPassword ? "text" : "password"}
@@ -98,20 +98,20 @@ export function LoginForm({
       <div className="flex items-center justify-between text-xs">
         <label className="flex cursor-pointer items-center gap-2 text-muted-foreground">
           <input
-            className="size-3.5 rounded border-[#b8cad8] accent-[#138d9d]"
+            className="size-3.5 rounded border-border accent-primary"
             defaultChecked
             name="remember"
             type="checkbox"
           />
           {isEnglish ? "Remember me" : "记住我"}
         </label>
-        <Link className="font-medium text-[#0c8294] transition hover:text-[#096776]" href="/forgot-password">
+        <Link className="font-medium text-foreground transition hover:text-foreground" href="/forgot-password">
           {isEnglish ? "Forgot password?" : "忘记密码？"}
         </Link>
       </div>
 
       <button
-        className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[linear-gradient(90deg,#0d9a9e,#166fb5)] px-4 text-[15px] font-medium text-white shadow-[0_14px_34px_-16px_rgba(11,108,151,.72)] transition hover:brightness-105 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#138d9d]/18 disabled:cursor-not-allowed disabled:opacity-60"
+        className="flex h-12 w-full items-center justify-center gap-2 rounded-md bg-primary px-4 text-[15px] font-medium text-primary-foreground transition-colors hover:bg-primary/85 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/20 disabled:cursor-not-allowed disabled:opacity-60"
         disabled={isPending}
         type="submit"
       >
@@ -125,7 +125,7 @@ export function LoginForm({
         <span aria-hidden="true">→</span>
       </button>
 
-      <div className="flex items-center gap-3 py-0.5 text-[11px] text-muted-foreground/60">
+      <div className="flex items-center gap-3 py-0.5 text-xs text-muted-foreground/60">
         <span className="h-px flex-1 bg-border" />
         <span>{isEnglish ? "or" : "或"}</span>
         <span className="h-px flex-1 bg-border" />
@@ -133,15 +133,15 @@ export function LoginForm({
 
       {wecomConfigured ? (
         <Link
-          className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-[#c9dce6] bg-white/80 px-4 text-[15px] font-medium text-[#183e59] shadow-[0_10px_28px_-22px_rgba(20,66,105,.5)] transition hover:border-[#20a7ae]/45 hover:bg-[#f4fbfb] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#138d9d]/12"
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-md border border-border bg-white/80 px-4 text-[15px] font-medium text-foreground  transition hover:border-border hover:bg-muted focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/20"
           href={`/auth/wecom?next=${encodeURIComponent(nextPath)}`}
         >
-          <QrCode className="size-[18px] text-[#159b83]" />
+          <QrCode className="size-[18px] text-foreground" />
           {isEnglish ? "Sign in with WeCom QR code" : "企业微信扫码登录"}
         </Link>
       ) : (
         <div
-          className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-dashed border-[#cddce7] bg-[#f7f9fb]/80 px-4 text-[14px] font-medium text-muted-foreground"
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-md border border-dashed border-border bg-muted px-4 text-[14px] font-medium text-muted-foreground"
           title={isEnglish ? "Administrator configuration required" : "需管理员配置企业微信应用参数"}
         >
           <QrCode className="size-[18px]" />
@@ -153,7 +153,7 @@ export function LoginForm({
         className="flex min-h-5 items-start justify-center gap-2 text-center text-xs leading-5 text-muted-foreground"
         aria-live="polite"
       >
-        <ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-[#527995]" />
+        <ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-foreground" />
         <span>
         {initialMessage ||
           (configured
@@ -168,7 +168,7 @@ export function LoginForm({
 
       {!configured && (
         <Link
-          className="flex h-10 w-full items-center justify-center rounded-xl border border-border bg-card text-sm font-medium text-foreground transition-colors hover:bg-muted"
+          className="flex h-10 w-full items-center justify-center rounded-md border border-border bg-white text-sm font-medium text-foreground transition-colors hover:bg-muted"
           href="/dashboard"
         >
           {isEnglish ? "Open local Dashboard preview" : "进入 Dashboard 本机体验版"}

@@ -155,6 +155,7 @@ The design combines authenticated server operations, scoped data access, Postgre
 - [AI Architecture](./docs/AI_ARCHITECTURE.md)
 - [Roadmap](./docs/ROADMAP.md)
 - [Engineering Decisions](./docs/DECISIONS.md)
+- [UI System V3](./docs/engineering/UI_SYSTEM.md)
 - [Evaluation](./docs/EVALUATION.md)
 - [Case Study](./docs/portfolio/CASE_STUDY.md)
 

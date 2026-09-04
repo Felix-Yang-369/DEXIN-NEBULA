@@ -178,7 +178,7 @@ export default async function SupplierDetailPage({
   const owner = one(supplier.owner);
   const message = feedbackMessage(feedback);
   const inputClass =
-    "h-10 rounded-xl border border-border bg-white px-3 text-xs text-foreground";
+    "h-10 rounded-md border border-border bg-white px-3 text-xs text-foreground";
 
   return (
     <WorkflowShell
@@ -189,19 +189,19 @@ export default async function SupplierDetailPage({
         roleLabel: currentEmployee.title ?? "内部员工",
       }}
     >
-      <main className="mx-auto max-w-[1400px] p-4 sm:p-6 xl:p-8">
+      <main className="mx-auto max-w-[1440px] p-4 sm:p-6 xl:p-8">
         <Link
-          className="inline-flex items-center gap-2 text-[11px] text-muted-foreground hover:text-primary"
+          className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-primary"
           href="/suppliers"
         >
           <ArrowLeft className="size-4" />
           返回供应商列表
         </Link>
 
-        <section className="relative mt-5 overflow-hidden rounded-[24px] bg-[#0a385d] px-6 py-8 text-white sm:px-8">
+        <section className="relative mt-5 overflow-hidden rounded-md bg-primary px-6 py-8 text-white sm:px-8">
           <ShieldCheck className="absolute right-10 top-1/2 hidden size-36 -translate-y-1/2 text-white/[0.06] md:block" />
           <div className="relative">
-            <div className="text-[10px] tracking-[0.16em] text-[#79d8d5]">
+            <div className="text-xs tracking-[0.16em] text-muted-foreground">
               {supplier.supplier_no} · SUPPLIER PROFILE
             </div>
             <div className="mt-3 flex flex-col justify-between gap-4 md:flex-row md:items-end">
@@ -215,7 +215,7 @@ export default async function SupplierDetailPage({
                   {statusLabels[supplier.cooperation_status]}
                 </p>
               </div>
-              <div className="text-[10px] text-white/50">
+              <div className="text-xs text-white/50">
                 内部负责人：{owner?.name ?? "未分配"}
               </div>
             </div>
@@ -224,10 +224,10 @@ export default async function SupplierDetailPage({
 
         {message && (
           <div
-            className={`mt-4 rounded-xl border px-4 py-3 text-xs ${
+            className={`mt-4 rounded-md border px-4 py-3 text-xs ${
               feedback.error
-                ? "border-[#ead3d3] bg-[#fff7f7] text-[#914949]"
-                : "border-[#cfe6dc] bg-[#f1f8f5] text-primary"
+                ? "border-border bg-muted text-foreground"
+                : "border-border bg-muted text-primary"
             }`}
           >
             {message}
@@ -235,7 +235,7 @@ export default async function SupplierDetailPage({
         )}
 
         <section className="mt-5 grid gap-5 xl:grid-cols-[1.1fr_.9fr]">
-          <article className="rounded-[20px] border border-border/75 bg-white p-5 sm:p-6">
+          <article className="rounded-md border border-border/75 bg-white p-5 sm:p-6">
             <div className="flex items-center gap-2">
               <FileText className="size-5 text-primary" />
               <h2 className="text-base font-semibold">企业信息</h2>
@@ -247,27 +247,27 @@ export default async function SupplierDetailPage({
                 ["结算约定", supplier.settlement_terms ?? "未填写"],
                 ["内部负责人", owner?.name ?? "未分配"],
               ].map(([label, value]) => (
-                <div className="rounded-xl bg-[#f6f8f7] p-4" key={label}>
-                  <dt className="text-[9px] text-muted-foreground">{label}</dt>
+                <div className="rounded-md bg-muted p-4" key={label}>
+                  <dt className="text-xs text-muted-foreground">{label}</dt>
                   <dd className="mt-1 text-xs font-medium">{value}</dd>
                 </div>
               ))}
             </dl>
             {supplier.address && (
-              <div className="mt-4 flex items-start gap-2 text-[10px] leading-5 text-muted-foreground">
+              <div className="mt-4 flex items-start gap-2 text-xs leading-5 text-muted-foreground">
                 <MapPin className="mt-0.5 size-3.5 shrink-0 text-primary" />
                 {supplier.address}
               </div>
             )}
             {supplier.business_scope && (
-              <div className="mt-4 border-t border-border/60 pt-4 text-[10px] leading-6 text-muted-foreground">
+              <div className="mt-4 border-t border-border/60 pt-4 text-xs leading-6 text-muted-foreground">
                 <strong className="text-foreground">经营范围：</strong>
                 {supplier.business_scope}
               </div>
             )}
           </article>
 
-          <article className="rounded-[20px] border border-border/75 bg-white p-5 sm:p-6">
+          <article className="rounded-md border border-border/75 bg-white p-5 sm:p-6">
             <div className="flex items-center gap-2">
               <ContactRound className="size-5 text-primary" />
               <h2 className="text-base font-semibold">联系人</h2>
@@ -279,7 +279,7 @@ export default async function SupplierDetailPage({
                   .sort((a, b) => Number(b.is_primary) - Number(a.is_primary))
                   .map((contact) => (
                     <div
-                      className="rounded-xl border border-border/70 p-4"
+                      className="rounded-md border border-border/70 p-4"
                       key={contact.id}
                     >
                       <div className="flex items-center justify-between gap-3">
@@ -290,12 +290,12 @@ export default async function SupplierDetailPage({
                           </span>
                         </div>
                         {contact.is_primary && (
-                          <span className="rounded-full bg-[#eaf6f0] px-2 py-1 text-[9px] text-primary">
+                          <span className="rounded-full bg-muted px-2 py-1 text-xs text-primary">
                             主要联系人
                           </span>
                         )}
                       </div>
-                      <div className="mt-3 flex flex-wrap gap-4 text-[10px] text-muted-foreground">
+                      <div className="mt-3 flex flex-wrap gap-4 text-xs text-muted-foreground">
                         {contact.mobile && (
                           <span className="inline-flex items-center gap-1">
                             <Phone className="size-3" />
@@ -312,7 +312,7 @@ export default async function SupplierDetailPage({
                     </div>
                   ))
               ) : (
-                <div className="rounded-xl border border-dashed border-border p-8 text-center text-[10px] text-muted-foreground">
+                <div className="rounded-md border border-dashed border-border p-8 text-center text-xs text-muted-foreground">
                   尚未添加联系人。
                 </div>
               )}
@@ -322,7 +322,7 @@ export default async function SupplierDetailPage({
 
         {canManage && (
           <section className="mt-5 grid gap-5 xl:grid-cols-2">
-            <details className="rounded-[20px] border border-border/75 bg-white p-5">
+            <details className="rounded-md border border-border/75 bg-white p-5">
               <summary className="cursor-pointer list-none text-sm font-semibold">
                 + 添加联系人
               </summary>
@@ -331,28 +331,28 @@ export default async function SupplierDetailPage({
                 className="mt-5 grid gap-3 sm:grid-cols-2"
               >
                 <input name="supplierId" type="hidden" value={supplier.id} />
-                <label className="grid gap-2 text-[10px] text-muted-foreground">
+                <label className="grid gap-2 text-xs text-muted-foreground">
                   姓名 *
                   <input className={inputClass} name="name" required />
                 </label>
-                <label className="grid gap-2 text-[10px] text-muted-foreground">
+                <label className="grid gap-2 text-xs text-muted-foreground">
                   职务
                   <input className={inputClass} name="position" />
                 </label>
-                <label className="grid gap-2 text-[10px] text-muted-foreground">
+                <label className="grid gap-2 text-xs text-muted-foreground">
                   手机
                   <input className={inputClass} name="mobile" />
                 </label>
-                <label className="grid gap-2 text-[10px] text-muted-foreground">
+                <label className="grid gap-2 text-xs text-muted-foreground">
                   邮箱
                   <input className={inputClass} name="email" type="email" />
                 </label>
-                <label className="flex items-center gap-2 text-[10px] text-muted-foreground">
+                <label className="flex items-center gap-2 text-xs text-muted-foreground">
                   <input name="isPrimary" type="checkbox" />
                   设为主要联系人
                 </label>
                 <button
-                  className="h-10 rounded-xl bg-primary px-4 text-xs text-white sm:justify-self-end"
+                  className="h-10 rounded-md bg-primary px-4 text-xs text-white sm:justify-self-end"
                   type="submit"
                 >
                   保存联系人
@@ -360,7 +360,7 @@ export default async function SupplierDetailPage({
               </form>
             </details>
 
-            <details className="rounded-[20px] border border-border/75 bg-white p-5">
+            <details className="rounded-md border border-border/75 bg-white p-5">
               <summary className="cursor-pointer list-none text-sm font-semibold">
                 + 登记供应商资质
               </summary>
@@ -369,7 +369,7 @@ export default async function SupplierDetailPage({
                 className="mt-5 grid gap-3 sm:grid-cols-2"
               >
                 <input name="supplierId" type="hidden" value={supplier.id} />
-                <label className="grid gap-2 text-[10px] text-muted-foreground">
+                <label className="grid gap-2 text-xs text-muted-foreground">
                   资质类型 *
                   <select className={inputClass} name="qualificationType">
                     {Object.entries(qualificationLabels).map(([value, label]) => (
@@ -379,15 +379,15 @@ export default async function SupplierDetailPage({
                     ))}
                   </select>
                 </label>
-                <label className="grid gap-2 text-[10px] text-muted-foreground">
+                <label className="grid gap-2 text-xs text-muted-foreground">
                   资质名称 *
                   <input className={inputClass} name="name" required />
                 </label>
-                <label className="grid gap-2 text-[10px] text-muted-foreground">
+                <label className="grid gap-2 text-xs text-muted-foreground">
                   证书 / 文件编号
                   <input className={inputClass} name="certificateNo" />
                 </label>
-                <label className="grid gap-2 text-[10px] text-muted-foreground">
+                <label className="grid gap-2 text-xs text-muted-foreground">
                   关联私有文件
                   <select className={inputClass} name="businessDocumentId">
                     <option value="">暂不关联</option>
@@ -398,16 +398,16 @@ export default async function SupplierDetailPage({
                     ))}
                   </select>
                 </label>
-                <label className="grid gap-2 text-[10px] text-muted-foreground">
+                <label className="grid gap-2 text-xs text-muted-foreground">
                   生效日期
                   <input className={inputClass} name="effectiveOn" type="date" />
                 </label>
-                <label className="grid gap-2 text-[10px] text-muted-foreground">
+                <label className="grid gap-2 text-xs text-muted-foreground">
                   到期日期
                   <input className={inputClass} name="expiresOn" type="date" />
                 </label>
                 <button
-                  className="h-10 rounded-xl bg-primary px-4 text-xs text-white sm:col-start-2 sm:justify-self-end"
+                  className="h-10 rounded-md bg-primary px-4 text-xs text-white sm:col-start-2 sm:justify-self-end"
                   type="submit"
                 >
                   登记资质
@@ -417,16 +417,16 @@ export default async function SupplierDetailPage({
           </section>
         )}
 
-        <section className="mt-5 overflow-hidden rounded-[20px] border border-border/75 bg-white">
+        <section className="mt-5 overflow-hidden rounded-md border border-border/75 bg-white">
           <div className="flex flex-col justify-between gap-3 border-b border-border/70 px-5 py-4 sm:flex-row sm:items-center">
             <div>
               <h2 className="text-base font-semibold">资质台账</h2>
-              <p className="mt-1 text-[10px] text-muted-foreground">
+              <p className="mt-1 text-xs text-muted-foreground">
                 到期前 60 天进入预警
               </p>
             </div>
             <Link
-              className="inline-flex items-center gap-1 text-[10px] text-primary"
+              className="inline-flex items-center gap-1 text-xs text-primary"
               href={`/documents?category=supplier&q=${encodeURIComponent(supplier.name)}`}
             >
               管理供应商文件
@@ -450,12 +450,12 @@ export default async function SupplierDetailPage({
                       <div className="text-xs font-medium">
                         {qualification.name}
                       </div>
-                      <div className="mt-1 text-[9px] text-muted-foreground">
+                      <div className="mt-1 text-xs text-muted-foreground">
                         {qualificationLabels[qualification.qualification_type]} ·{" "}
                         {qualification.certificate_no ?? "未填写编号"}
                       </div>
                     </div>
-                    <div className="text-[10px] text-muted-foreground">
+                    <div className="text-xs text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <CalendarDays className="size-3" />
                         {qualification.effective_on ?? "未设置"}
@@ -465,12 +465,12 @@ export default async function SupplierDetailPage({
                       </div>
                     </div>
                     <span
-                      className={`inline-flex w-fit items-center gap-1 rounded-lg px-2 py-1 text-[9px] ${
+                      className={`inline-flex w-fit items-center gap-1 rounded-lg px-2 py-1 text-xs ${
                         risk === "expired"
-                          ? "bg-[#fff0f0] text-[#a34f4f]"
+                          ? "bg-muted text-foreground"
                           : risk === "expiring"
-                            ? "bg-[#fff4df] text-[#96651f]"
-                            : "bg-[#eaf6f0] text-primary"
+                            ? "bg-muted text-foreground"
+                            : "bg-muted text-primary"
                       }`}
                     >
                       {risk === "expired" || risk === "expiring" ? (
@@ -488,14 +488,14 @@ export default async function SupplierDetailPage({
                     </span>
                     {document ? (
                       <Link
-                        className="inline-flex items-center gap-1 text-[10px] text-primary"
+                        className="inline-flex items-center gap-1 text-xs text-primary"
                         href={`/documents/${document.id}/download`}
                       >
                         <FileCheck2 className="size-3" />
                         {document.document_no}
                       </Link>
                     ) : (
-                      <span className="text-[9px] text-muted-foreground">
+                      <span className="text-xs text-muted-foreground">
                         未关联文件
                       </span>
                     )}
@@ -504,14 +504,14 @@ export default async function SupplierDetailPage({
               })}
             </div>
           ) : (
-            <div className="p-12 text-center text-[10px] text-muted-foreground">
+            <div className="p-12 text-center text-xs text-muted-foreground">
               尚未登记供应商资质。
             </div>
           )}
         </section>
 
         {canManage && (
-          <details className="mt-5 rounded-[20px] border border-border/75 bg-[#f5f8fb] p-5">
+          <details className="mt-5 rounded-md border border-border/75 bg-muted p-5">
             <summary className="cursor-pointer list-none text-sm font-semibold">
               编辑供应商档案
             </summary>
@@ -519,7 +519,7 @@ export default async function SupplierDetailPage({
               <SupplierFields employees={employees} supplier={supplier} />
               <div className="mt-4 flex justify-end">
                 <button
-                  className="h-10 rounded-xl bg-primary px-5 text-xs font-medium text-white"
+                  className="h-10 rounded-md bg-primary px-5 text-xs font-medium text-white"
                   type="submit"
                 >
                   保存修改
@@ -530,7 +530,7 @@ export default async function SupplierDetailPage({
         )}
 
         {supplier.note && (
-          <div className="mt-5 rounded-[18px] border border-border bg-white px-5 py-4 text-[10px] leading-5 text-muted-foreground">
+          <div className="mt-5 rounded-md border border-border bg-white px-5 py-4 text-xs leading-5 text-muted-foreground">
             <strong className="text-foreground">内部备注：</strong>
             {supplier.note}
           </div>

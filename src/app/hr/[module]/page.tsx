@@ -117,7 +117,7 @@ export default async function HrModulePage({
     >
       <main className="mx-auto max-w-[1200px] p-4 sm:p-6 xl:p-8">
         <Link
-          className="inline-flex items-center gap-2 text-[11px] text-muted-foreground hover:text-primary"
+          className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-primary"
           href="/hr"
         >
           <ArrowLeft className="size-4" />
@@ -125,8 +125,8 @@ export default async function HrModulePage({
         </Link>
 
         {!allowed ? (
-          <section className="mt-5 rounded-[22px] border border-[#ead8d8] bg-white p-12 text-center">
-            <LockKeyhole className="mx-auto size-9 text-[#965151]" />
+          <section className="mt-5 rounded-md border border-border bg-white p-12 text-center">
+            <LockKeyhole className="mx-auto size-9 text-foreground" />
             <h1 className="mt-4 text-lg font-semibold">暂无模块访问权限</h1>
             <p className="mt-2 text-xs text-muted-foreground">
               {config.title}包含人事敏感信息，仅向指定角色开放。
@@ -134,8 +134,8 @@ export default async function HrModulePage({
           </section>
         ) : (
           <>
-            <section className="mt-5 rounded-[24px] bg-[#0a385d] px-6 py-8 text-white sm:px-8">
-              <div className="text-[10px] tracking-[0.15em] text-[#79d8d5]">
+            <section className="mt-5 rounded-md bg-primary px-6 py-8 text-white sm:px-8">
+              <div className="text-xs tracking-[0.15em] text-muted-foreground">
                 HRM · {config.english.toUpperCase()}
               </div>
               <div className="mt-3 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
@@ -145,7 +145,7 @@ export default async function HrModulePage({
                     {config.description}
                   </p>
                 </div>
-                <span className="self-start rounded-full bg-white/10 px-3 py-2 text-[10px] sm:self-auto">
+                <span className="self-start rounded-full bg-white/10 px-3 py-2 text-xs sm:self-auto">
                   {config.stage}
                 </span>
               </div>
@@ -154,16 +154,16 @@ export default async function HrModulePage({
             <section className="mt-5 grid gap-4 sm:grid-cols-2">
               {config.capabilities.map(([title, description], index) => (
                 <article
-                  className="rounded-[20px] border border-border/75 bg-white p-5"
+                  className="rounded-md border border-border/75 bg-white p-5"
                   key={title}
                 >
                   <div className="flex items-start gap-3">
-                    <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-[#eaf3f8] text-[10px] font-semibold text-primary">
+                    <span className="grid size-8 shrink-0 place-items-center rounded-md bg-muted text-xs font-semibold text-primary">
                       {String(index + 1).padStart(2, "0")}
                     </span>
                     <div>
                       <h2 className="text-sm font-semibold">{title}</h2>
-                      <p className="mt-2 text-[10px] leading-5 text-muted-foreground">
+                      <p className="mt-2 text-xs leading-5 text-muted-foreground">
                         {description}
                       </p>
                     </div>
@@ -172,7 +172,7 @@ export default async function HrModulePage({
               ))}
             </section>
 
-            <section className="mt-5 rounded-[20px] border border-border/75 bg-[#eef4f8] p-5 sm:p-6">
+            <section className="mt-5 rounded-md border border-border/75 bg-muted p-5 sm:p-6">
               <div className="flex items-start gap-3">
                 {config.stage.includes("规划") ? (
                   <CircleDashed className="mt-0.5 size-5 text-primary" />
@@ -183,20 +183,20 @@ export default async function HrModulePage({
                 )}
                 <div>
                   <h2 className="text-sm font-semibold">当前建议</h2>
-                  <p className="mt-2 text-[11px] leading-6 text-[#5c7587]">
+                  <p className="mt-2 text-xs leading-6 text-foreground">
                     {config.nextAction}
                   </p>
                   {module === "attendance" && (
                     <div className="mt-4 flex flex-wrap gap-2">
                       <Link
-                        className="inline-flex h-9 items-center gap-1 rounded-xl bg-white px-3 text-[10px] font-medium text-primary"
+                        className="inline-flex h-9 items-center gap-1 rounded-md bg-white px-3 text-xs font-medium text-primary"
                         href="/requests/leave"
                       >
                         发起请假
                         <ChevronRight className="size-3" />
                       </Link>
                       <Link
-                        className="inline-flex h-9 items-center gap-1 rounded-xl bg-white px-3 text-[10px] font-medium text-primary"
+                        className="inline-flex h-9 items-center gap-1 rounded-md bg-white px-3 text-xs font-medium text-primary"
                         href="/approvals"
                       >
                         审批中心
@@ -206,7 +206,7 @@ export default async function HrModulePage({
                   )}
                   {module === "onboarding" && (
                     <Link
-                      className="mt-4 inline-flex h-9 items-center gap-1 rounded-xl bg-white px-3 text-[10px] font-medium text-primary"
+                      className="mt-4 inline-flex h-9 items-center gap-1 rounded-md bg-white px-3 text-xs font-medium text-primary"
                       href="/employees"
                     >
                       查看员工档案

@@ -63,12 +63,12 @@ export function WeeklyReportForm({
 
   if (locked) {
     return (
-      <div className="rounded-[22px] border border-[#d9e8ee] bg-[#eef4f8] p-6 text-center">
+      <div className="rounded-md border border-border bg-muted p-6 text-center">
         <CheckCircle2 className="mx-auto size-7 text-primary" />
-        <h2 className="mt-3 text-sm font-semibold text-[#234b42]">
+        <h2 className="mt-3 text-sm font-semibold text-foreground">
           本周期周报已经提交
         </h2>
-        <p className="mt-2 text-xs text-[#5c7587]">
+        <p className="mt-2 text-xs text-foreground">
           提交后的内容已锁定，可在下方“我的周报”中查看完整内容。
         </p>
       </div>
@@ -81,24 +81,24 @@ export function WeeklyReportForm({
       <div className="grid gap-5 xl:grid-cols-2">
         {fields.map((field, index) => (
           <label
-            className="block rounded-[18px] border border-border/80 bg-[#fbfcfc] p-4 transition-colors focus-within:border-primary/25 focus-within:bg-white"
+            className="block rounded-md border border-border/80 bg-muted p-4 transition-colors focus-within:border-primary/25 focus-within:bg-white"
             key={field.name}
           >
             <span className="flex items-start gap-3">
-              <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-[#e8f3ef] text-[10px] font-semibold text-primary">
+              <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-muted text-xs font-semibold text-primary">
                 {index + 1}
               </span>
               <span>
-                <span className="block text-xs font-semibold text-[#294b65]">
+                <span className="block text-xs font-semibold text-foreground">
                   {field.label}
                 </span>
-                <span className="mt-1 block text-[10px] leading-5 text-muted-foreground">
+                <span className="mt-1 block text-xs leading-5 text-muted-foreground">
                   {field.description}
                 </span>
               </span>
             </span>
             <textarea
-              className="mt-4 min-h-36 w-full resize-y rounded-xl border border-border bg-white px-4 py-3 text-xs leading-6 outline-none transition focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
+              className="mt-4 min-h-36 w-full resize-y rounded-md border border-border bg-white px-4 py-3 text-xs leading-6 outline-none transition focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
               defaultValue={report?.[field.valueKey] ?? ""}
               disabled={pending}
               maxLength={5000}
@@ -112,7 +112,7 @@ export function WeeklyReportForm({
 
       {state.error && (
         <div
-          className="mt-5 rounded-xl border border-[#ead8d8] bg-[#f8eeee] px-4 py-3 text-xs text-[#965151]"
+          className="mt-5 rounded-md border border-border bg-muted px-4 py-3 text-xs text-foreground"
           role="alert"
         >
           {state.error}
@@ -120,12 +120,12 @@ export function WeeklyReportForm({
       )}
 
       <div className="mt-5 flex flex-col-reverse gap-3 border-t border-border/75 pt-5 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-[10px] leading-5 text-muted-foreground">
+        <p className="text-xs leading-5 text-muted-foreground">
           草稿仅本人可见；提交后直属负责人将收到站内通知，内容不可再次修改。
         </p>
         <div className="flex gap-2">
           <button
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-border bg-white px-4 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted disabled:opacity-50"
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-border bg-white px-4 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted disabled:opacity-50"
             disabled={pending}
             name="intent"
             type="submit"
@@ -135,7 +135,7 @@ export function WeeklyReportForm({
             {pending ? "保存中" : "保存草稿"}
           </button>
           <button
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-primary px-5 text-xs font-medium text-primary-foreground transition-colors hover:bg-[#184c41] disabled:opacity-50"
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-primary px-5 text-xs font-medium text-primary-foreground transition-colors hover:bg-muted disabled:opacity-50"
             disabled={pending}
             name="intent"
             type="submit"

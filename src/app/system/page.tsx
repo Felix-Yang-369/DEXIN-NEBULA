@@ -48,8 +48,8 @@ export default async function SystemPage() {
       currentUser={{ name: employee.name, roleLabel: employee.title ?? "内部员工" }}
     >
       <main className="mx-auto max-w-[1200px] p-4 sm:p-6 xl:p-8">
-        <section className="rounded-[24px] bg-[#0a385d] px-6 py-8 text-white sm:px-8">
-          <div className="text-[10px] tracking-[0.15em] text-[#79d8d5]">
+        <section className="rounded-md bg-primary px-6 py-8 text-white sm:px-8">
+          <div className="text-xs tracking-[0.15em] text-muted-foreground">
             SYSTEM · IAM · BPM · AUDIT
           </div>
           <h1 className="mt-3 text-2xl font-semibold">系统管理</h1>
@@ -59,7 +59,7 @@ export default async function SystemPage() {
         </section>
 
         {!canView ? (
-          <div className="mt-5 rounded-[18px] border border-[#ead8d8] bg-white p-8 text-center text-xs text-[#965151]">
+          <div className="mt-5 rounded-md border border-border bg-white p-8 text-center text-xs text-foreground">
             系统管理仅向系统管理员和董事长开放。
           </div>
         ) : (
@@ -67,22 +67,22 @@ export default async function SystemPage() {
             {systemModules.map((module) => {
               const Icon = module.icon;
               return (
-                <Link className="group rounded-[20px] border border-border bg-white p-5" href={module.href} key={module.title}>
+                <Link className="group rounded-md border border-border bg-white p-5" href={module.href} key={module.title}>
                   <div className="flex items-start justify-between">
-                    <span className="grid size-10 place-items-center rounded-xl bg-[#eaf3f8] text-primary">
+                    <span className="grid size-10 place-items-center rounded-md bg-muted text-primary">
                       <Icon className="size-5" />
                     </span>
                     <ChevronRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
                   </div>
                   <h2 className="mt-4 text-sm font-semibold">{module.title}</h2>
-                  <p className="mt-2 text-[10px] leading-5 text-muted-foreground">{module.description}</p>
+                  <p className="mt-2 text-xs leading-5 text-muted-foreground">{module.description}</p>
                 </Link>
               );
             })}
           </section>
         )}
 
-        <div className="mt-5 flex items-center gap-3 rounded-[18px] border border-border bg-[#eef4f8] p-4 text-[10px] text-[#5c7587]">
+        <div className="mt-5 flex items-center gap-3 rounded-md border border-border bg-muted p-4 text-xs text-foreground">
           <Network className="size-4 text-primary" />
           HRM 管理员工任职与人事档案；系统管理负责账号、权限和平台运行配置，两者共享同一组织主数据。
         </div>

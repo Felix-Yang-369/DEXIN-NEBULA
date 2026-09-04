@@ -10,6 +10,7 @@ import Link from "next/link";
 import { EmployeeAvatar } from "@/components/business/employee-avatar";
 import type { CurrentEmployee } from "@/features/auth/current-employee";
 import { createClient } from "@/lib/supabase/server";
+import { statusToneClass } from "@/lib/ui/status";
 import { contractExpiresWithin } from "./hrm";
 import {
   linkEmployeeAccountAction,
@@ -79,17 +80,6 @@ const employmentStatusLabels: Record<EmployeeRow["employment_status"], string> =
   part_time: "兼职",
 };
 
-const employmentStatusTones: Record<
-  EmployeeRow["employment_status"],
-  string
-> = {
-  active: "bg-[#eaf3f8] text-primary",
-  departed: "bg-[#f3f6f5] text-muted-foreground",
-  probation: "bg-[#fff4df] text-[#97651e]",
-  intern: "bg-[#edf3fb] text-[#426c9b]",
-  part_time: "bg-[#f1edfa] text-[#72529a]",
-};
-
 function relationOne<T>(value: T | T[] | null) {
   return Array.isArray(value) ? (value[0] ?? null) : value;
 }
@@ -152,36 +142,36 @@ function EmployeeFields({
       />
       <div className="grid gap-4 sm:grid-cols-2">
         <label>
-          <span className="text-[10px] font-medium">员工编号 *</span>
+          <span className="text-xs font-medium">员工编号 *</span>
           <input
-            className="mt-2 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
+            className="mt-2 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
             defaultValue={employee?.employee_no}
             name="employeeNo"
             required
           />
         </label>
         <label>
-          <span className="text-[10px] font-medium">姓名 *</span>
+          <span className="text-xs font-medium">姓名 *</span>
           <input
-            className="mt-2 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
+            className="mt-2 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
             defaultValue={employee?.name}
             name="name"
             required
           />
         </label>
         <label>
-          <span className="text-[10px] font-medium">英文名</span>
+          <span className="text-xs font-medium">英文名</span>
           <input
-            className="mt-2 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
+            className="mt-2 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
             defaultValue={employee?.english_name ?? ""}
             name="englishName"
             placeholder="例如 Felix Yang"
           />
         </label>
         <label>
-          <span className="text-[10px] font-medium">企业邮箱</span>
+          <span className="text-xs font-medium">企业邮箱</span>
           <input
-            className="mt-2 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
+            className="mt-2 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
             defaultValue={employee?.email ?? ""}
             name="email"
             placeholder="账号开通前可暂留空"
@@ -189,17 +179,17 @@ function EmployeeFields({
           />
         </label>
         <label>
-          <span className="text-[10px] font-medium">职位</span>
+          <span className="text-xs font-medium">职位</span>
           <input
-            className="mt-2 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
+            className="mt-2 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
             defaultValue={employee?.title ?? ""}
             name="title"
           />
         </label>
         <label>
-          <span className="text-[10px] font-medium">部门</span>
+          <span className="text-xs font-medium">部门</span>
           <select
-            className="mt-2 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
+            className="mt-2 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
             defaultValue={employee?.department_id ?? ""}
             name="departmentId"
           >
@@ -212,9 +202,9 @@ function EmployeeFields({
           </select>
         </label>
         <label>
-          <span className="text-[10px] font-medium">直属负责人</span>
+          <span className="text-xs font-medium">直属负责人</span>
           <select
-            className="mt-2 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
+            className="mt-2 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
             defaultValue={employee?.manager_id ?? ""}
             name="managerId"
           >
@@ -232,18 +222,18 @@ function EmployeeFields({
           </select>
         </label>
         <label>
-          <span className="text-[10px] font-medium">入职日期</span>
+          <span className="text-xs font-medium">入职日期</span>
           <input
-            className="mt-2 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
+            className="mt-2 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
             defaultValue={employee?.hired_on ?? ""}
             name="hiredOn"
             type="date"
           />
         </label>
         <label>
-          <span className="text-[10px] font-medium">员工状态</span>
+          <span className="text-xs font-medium">员工状态</span>
           <select
-            className="mt-2 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
+            className="mt-2 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
             defaultValue={employee?.employment_status ?? "active"}
             name="status"
           >
@@ -281,9 +271,9 @@ export async function ConnectedEmployeeManagement({
 
   if (!canView) {
     return (
-      <main className="mx-auto max-w-[1000px] p-4 sm:p-6 xl:p-8">
-        <section className="rounded-[22px] border border-[#ead8d8] bg-white p-8 text-center">
-          <CircleAlert className="mx-auto size-8 text-[#965151]" />
+      <main className="mx-auto max-w-[1200px] p-4 sm:p-6 xl:p-8">
+        <section className="rounded-md border border-border bg-white p-8 text-center">
+          <CircleAlert className="mx-auto size-8 text-foreground" />
           <h1 className="mt-4 text-lg font-semibold">无权维护员工档案</h1>
           <p className="mt-2 text-xs text-muted-foreground">
             该页面仅向人事行政、系统管理员和董事长只读开放。
@@ -374,7 +364,7 @@ export async function ConnectedEmployeeManagement({
   const message = feedbackMessage(feedback);
 
   return (
-    <main className="mx-auto max-w-[1600px] p-4 sm:p-6 xl:p-8">
+    <main className="mx-auto max-w-[1440px] p-4 sm:p-6 xl:p-8">
       <section className="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
         <div>
           <div className="text-xs font-medium text-primary">
@@ -388,10 +378,10 @@ export async function ConnectedEmployeeManagement({
           </p>
         </div>
         {canManage && <details className="group">
-          <summary className="flex h-10 cursor-pointer list-none items-center rounded-xl bg-primary px-4 text-xs font-medium text-primary-foreground">
+          <summary className="flex h-10 cursor-pointer list-none items-center rounded-md bg-primary px-4 text-xs font-medium text-primary-foreground">
             ＋ 新建员工
           </summary>
-          <div className="absolute right-8 z-10 mt-2 w-[min(680px,calc(100vw-32px))] rounded-[20px] border border-border bg-[#fafcfe] p-5 shadow-xl">
+          <div className="absolute right-8 z-10 mt-2 w-[min(680px,calc(100vw-32px))] rounded-md border border-border bg-muted p-5 ">
             <form action={saveEmployeeAction}>
               <h2 className="mb-4 text-sm font-semibold">创建员工档案</h2>
               <EmployeeFields
@@ -400,7 +390,7 @@ export async function ConnectedEmployeeManagement({
               />
               <div className="mt-5 flex justify-end">
                 <button
-                  className="h-9 rounded-xl bg-primary px-4 text-[10px] font-medium text-primary-foreground"
+                  className="h-9 rounded-md bg-primary px-4 text-xs font-medium text-primary-foreground"
                   type="submit"
                 >
                   保存员工
@@ -413,10 +403,10 @@ export async function ConnectedEmployeeManagement({
 
       {message && (
         <div
-          className={`mt-5 rounded-xl px-4 py-3 text-xs ${
+          className={`mt-5 rounded-md px-4 py-3 text-xs ${
             feedback.error
-              ? "border border-[#ead8d8] bg-[#f8eeee] text-[#965151]"
-              : "border border-[#d8e8ee] bg-[#eef4f8] text-primary"
+              ? "border border-border bg-muted text-foreground"
+              : "border border-border bg-muted text-primary"
           }`}
         >
           {message}
@@ -439,33 +429,33 @@ export async function ConnectedEmployeeManagement({
           [String(avatarCount), "职业照", "私有头像库已关联"],
         ].map(([value, label, note]) => (
           <article
-            className="rounded-[18px] border border-border/75 bg-card p-5"
+            className="rounded-md border border-border/75 bg-card p-5"
             key={label}
           >
             <div className="text-[26px] font-semibold tracking-[-0.04em]">
               {value}
             </div>
             <div className="mt-2 text-xs font-medium">{label}</div>
-            <div className="mt-1 text-[10px] text-muted-foreground">{note}</div>
+            <div className="mt-1 text-xs text-muted-foreground">{note}</div>
           </article>
         ))}
       </section>
 
-      <section className="mt-5 overflow-hidden rounded-[20px] border border-border/75 bg-card">
+      <section className="mt-5 overflow-hidden rounded-md border border-border/75 bg-card">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/70 p-5 sm:px-6">
           <div>
             <h2 className="text-base font-semibold">员工列表</h2>
-            <p className="mt-1 text-[11px] text-muted-foreground">
+            <p className="mt-1 text-xs text-muted-foreground">
               人事可维护档案；管理员额外维护角色和登录账号绑定
             </p>
           </div>
-          <span className="rounded-full bg-[#eaf3f8] px-3 py-1.5 text-[9px] font-medium text-primary">
+          <span className="rounded-full bg-muted px-3 py-1.5 text-xs font-medium text-primary">
             服务端权限已启用
           </span>
         </div>
 
         {error ? (
-          <div className="px-6 py-14 text-center text-xs text-[#965151]">
+          <div className="px-6 py-14 text-center text-xs text-foreground">
             无法读取员工数据，请刷新后重试；若问题持续出现，请联系系统管理员。
           </div>
         ) : employees.length === 0 ? (
@@ -496,22 +486,22 @@ export async function ConnectedEmployeeManagement({
                           {employee.name}
                         </h3>
                         <span
-                          className={`rounded-full px-2 py-0.5 text-[9px] ${employmentStatusTones[employee.employment_status]}`}
+                          className={`rounded-full px-2 py-0.5 text-xs ${statusToneClass(employee.employment_status)}`}
                         >
                           {employmentStatusLabels[employee.employment_status]}
                         </span>
                       </div>
-                      <p className="mt-1 text-[10px] text-muted-foreground">
+                      <p className="mt-1 text-xs text-muted-foreground">
                         {employee.employee_no} · {department?.name ?? "未分部门"} ·{" "}
                         {employee.title ?? "未设置职位"}
                       </p>
                       {employee.english_name && (
-                        <p className="mt-1 text-[9px] text-muted-foreground/75">
+                        <p className="mt-1 text-xs text-muted-foreground/75">
                           {employee.english_name}
                         </p>
                       )}
                     </div>
-                    <div className="grid min-w-[220px] grid-cols-2 gap-3 text-[10px]">
+                    <div className="grid min-w-[220px] grid-cols-2 gap-3 text-xs">
                       <div>
                         <div className="text-muted-foreground">直属负责人</div>
                         <div className="mt-1 font-medium">
@@ -528,13 +518,13 @@ export async function ConnectedEmployeeManagement({
                       </div>
                     </div>
                     {canManage && <details>
-                      <summary className="cursor-pointer list-none rounded-xl border border-border bg-white px-3 py-2 text-[10px] font-medium">
+                      <summary className="cursor-pointer list-none rounded-md border border-border bg-white px-3 py-2 text-xs font-medium">
                         管理
                       </summary>
                       <div className="mt-3 grid gap-4 xl:grid-cols-[minmax(0,1.3fr)_minmax(280px,.7fr)]">
                         <form
                           action={saveEmployeeAction}
-                          className="rounded-2xl border border-border bg-[#fafcfe] p-4"
+                          className="rounded-lg border border-border bg-muted p-4"
                         >
                           <div className="mb-4 flex items-center gap-2">
                             <UserCog className="size-4 text-primary" />
@@ -549,7 +539,7 @@ export async function ConnectedEmployeeManagement({
                           />
                           <div className="mt-4 flex justify-end">
                             <button
-                              className="h-9 rounded-xl bg-primary px-4 text-[10px] font-medium text-primary-foreground"
+                              className="h-9 rounded-md bg-primary px-4 text-xs font-medium text-primary-foreground"
                               type="submit"
                             >
                               保存档案
@@ -558,7 +548,7 @@ export async function ConnectedEmployeeManagement({
                         </form>
 
                         <div className="space-y-4">
-                          <section className="rounded-2xl border border-border bg-[#fafcfe] p-4">
+                          <section className="rounded-lg border border-border bg-muted p-4">
                             <div className="flex items-center gap-3">
                               <EmployeeAvatar
                                 name={employee.name}
@@ -573,7 +563,7 @@ export async function ConnectedEmployeeManagement({
                                 <h4 className="text-xs font-semibold">
                                   员工职业照
                                 </h4>
-                                <p className="mt-1 text-[9px] text-muted-foreground">
+                                <p className="mt-1 text-xs text-muted-foreground">
                                   私有存储，仅公司内部登录后可查看
                                 </p>
                               </div>
@@ -589,13 +579,13 @@ export async function ConnectedEmployeeManagement({
                               />
                               <input
                                 accept="image/jpeg,image/png,image/webp"
-                                className="block w-full text-[9px] text-muted-foreground file:mr-3 file:rounded-lg file:border-0 file:bg-white file:px-3 file:py-2 file:text-[9px] file:font-medium file:text-primary"
+                                className="block w-full text-xs text-muted-foreground file:mr-3 file:rounded-lg file:border-0 file:bg-white file:px-3 file:py-2 file:text-xs file:font-medium file:text-primary"
                                 name="avatar"
                                 required
                                 type="file"
                               />
                               <button
-                                className="mt-3 h-8 w-full rounded-lg border border-primary/20 bg-white text-[9px] font-medium text-primary"
+                                className="mt-3 h-8 w-full rounded-lg border border-primary/20 bg-white text-xs font-medium text-primary"
                                 type="submit"
                               >
                                 上传或更换职业照
@@ -603,7 +593,7 @@ export async function ConnectedEmployeeManagement({
                             </form>
                           </section>
 
-                          <section className="rounded-2xl border border-border bg-[#fafcfe] p-4">
+                          <section className="rounded-lg border border-border bg-muted p-4">
                             <div className="flex items-center gap-2">
                               <BadgeCheck className="size-4 text-primary" />
                               <h4 className="text-xs font-semibold">角色分配</h4>
@@ -621,7 +611,7 @@ export async function ConnectedEmployeeManagement({
                                 <div className="grid grid-cols-2 gap-2">
                                   {roleOptions.map(([code, label]) => (
                                     <label
-                                      className="flex items-center gap-2 rounded-lg bg-white px-2.5 py-2 text-[9px]"
+                                      className="flex items-center gap-2 rounded-lg bg-white px-2.5 py-2 text-xs"
                                       key={code}
                                     >
                                       <input
@@ -634,41 +624,41 @@ export async function ConnectedEmployeeManagement({
                                     </label>
                                   ))}
                                 </div>
-                                <label className="mt-3 block rounded-lg border border-[#f0dec5] bg-[#fff9ef] p-3">
-                                  <span className="text-[9px] font-medium text-[#9a6321]">
+                                <label className="mt-3 block rounded-lg border border-border bg-muted p-3">
+                                  <span className="text-xs font-medium text-foreground">
                                     高危角色二次确认
                                   </span>
-                                  <span className="mt-1 block text-[9px] leading-4 text-muted-foreground">
+                                  <span className="mt-1 block text-xs leading-4 text-muted-foreground">
                                     新增或移除系统管理员、董事长时，请输入“{employee.name}”。
                                   </span>
                                   <input
                                     autoComplete="off"
-                                    className="mt-2 h-8 w-full rounded-lg border border-[#ead8b8] bg-white px-2.5 text-[9px] outline-none focus:border-[#c89a52]"
+                                    className="mt-2 h-8 w-full rounded-lg border border-border bg-white px-2.5 text-xs outline-none focus:border-border"
                                     name="highRiskConfirmation"
                                     placeholder={`输入 ${employee.name} 确认`}
                                   />
                                 </label>
                                 <button
-                                  className="mt-3 h-8 w-full rounded-lg border border-primary/20 bg-white text-[9px] font-medium text-primary"
+                                  className="mt-3 h-8 w-full rounded-lg border border-primary/20 bg-white text-xs font-medium text-primary"
                                   type="submit"
                                 >
                                   保存角色
                                 </button>
                               </form>
                             ) : (
-                              <p className="mt-3 text-[9px] leading-5 text-muted-foreground">
+                              <p className="mt-3 text-xs leading-5 text-muted-foreground">
                                 只有系统管理员可以调整角色。
                               </p>
                             )}
                           </section>
 
-                          <section className="rounded-2xl border border-border bg-[#fafcfe] p-4">
+                          <section className="rounded-lg border border-border bg-muted p-4">
                             <div className="flex items-center gap-2">
                               <KeyRound className="size-4 text-primary" />
                               <h4 className="text-xs font-semibold">登录账号</h4>
                             </div>
                             {employee.auth_user_id ? (
-                              <div className="mt-3 rounded-lg bg-[#eaf3f8] px-3 py-2 text-[9px] text-primary">
+                              <div className="mt-3 rounded-lg bg-muted px-3 py-2 text-xs text-primary">
                                 已绑定 Supabase Auth 账号
                               </div>
                             ) : isAdmin ? (
@@ -682,20 +672,20 @@ export async function ConnectedEmployeeManagement({
                                   value={employee.id}
                                 />
                                 <input
-                                  className="h-9 w-full rounded-lg border border-border bg-white px-3 text-[9px]"
+                                  className="h-9 w-full rounded-lg border border-border bg-white px-3 text-xs"
                                   name="authUserId"
                                   placeholder="Auth User UUID"
                                   required
                                 />
                                 <button
-                                  className="mt-2 h-8 w-full rounded-lg border border-primary/20 bg-white text-[9px] font-medium text-primary"
+                                  className="mt-2 h-8 w-full rounded-lg border border-primary/20 bg-white text-xs font-medium text-primary"
                                   type="submit"
                                 >
                                   绑定已有账号
                                 </button>
                               </form>
                             ) : (
-                              <p className="mt-3 text-[9px] leading-5 text-muted-foreground">
+                              <p className="mt-3 text-xs leading-5 text-muted-foreground">
                                 只有系统管理员可以绑定登录账号。
                               </p>
                             )}
@@ -704,7 +694,7 @@ export async function ConnectedEmployeeManagement({
                       </div>
                     </details>}
                     <Link
-                      className="rounded-xl bg-[#eaf3f8] px-3 py-2 text-[10px] font-medium text-primary"
+                      className="rounded-md bg-muted px-3 py-2 text-xs font-medium text-primary"
                       href={`/employees/${employee.id}`}
                     >
                       人事档案
@@ -738,12 +728,12 @@ export async function ConnectedEmployeeManagement({
           const Icon = item.icon;
           return (
             <article
-              className="rounded-[18px] border border-border bg-white p-4"
+              className="rounded-md border border-border bg-white p-4"
               key={item.title}
             >
               <Icon className="size-4 text-primary" />
               <h3 className="mt-3 text-xs font-semibold">{item.title}</h3>
-              <p className="mt-2 text-[10px] leading-5 text-muted-foreground">
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">
                 {item.copy}
               </p>
             </article>

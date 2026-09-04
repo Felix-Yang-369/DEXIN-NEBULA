@@ -91,11 +91,11 @@ export default async function HelpPage() {
         roleLabel: employee.title ?? "内部员工",
       }}
     >
-      <main className="mx-auto max-w-[1380px] p-4 sm:p-6 xl:p-8">
-        <section className="relative overflow-hidden rounded-[24px] bg-[#0a385d] px-6 py-8 text-white sm:px-9">
+      <main className="mx-auto max-w-[1200px] p-4 sm:p-6 xl:p-8">
+        <section className="ui-page-header">
           <CircleHelp className="pointer-events-none absolute right-12 top-1/2 hidden size-40 -translate-y-1/2 text-white/[0.055] sm:block" />
           <div className="relative max-w-3xl">
-            <div className="text-[10px] font-medium tracking-[0.14em] text-[#79d8d5]">
+            <div className="text-xs font-medium tracking-[0.14em] text-muted-foreground">
               DEXIN NEBULA GUIDE
             </div>
             <h1 className="mt-3 text-2xl font-semibold">德馨星云使用指南</h1>
@@ -110,20 +110,20 @@ export default async function HelpPage() {
             const Icon = card.icon;
             return (
               <article
-                className="flex min-h-56 flex-col rounded-[22px] border border-border/80 bg-white p-6 shadow-[0_10px_35px_-28px_rgba(23,57,50,.32)]"
+                className="flex min-h-56 flex-col rounded-md border border-border/80 bg-white p-6 "
                 key={card.title}
               >
-                <span className="grid size-10 place-items-center rounded-xl bg-[#eef4f8] text-primary">
+                <span className="grid size-10 place-items-center rounded-md bg-muted text-primary">
                   <Icon className="size-[18px]" />
                 </span>
-                <h2 className="mt-5 text-base font-semibold text-[#294b65]">
+                <h2 className="mt-5 text-base font-semibold text-foreground">
                   {card.title}
                 </h2>
-                <p className="mt-2 text-[11px] leading-6 text-muted-foreground">
+                <p className="mt-2 text-xs leading-6 text-muted-foreground">
                   {card.description}
                 </p>
                 <Link
-                  className="mt-auto pt-5 text-[10px] font-medium text-primary"
+                  className="mt-auto pt-5 text-xs font-medium text-primary"
                   href={card.href}
                 >
                   {card.action}　→
@@ -134,35 +134,35 @@ export default async function HelpPage() {
         </section>
 
         <div className="mt-5 grid gap-5 lg:grid-cols-2">
-          <section className="rounded-[22px] border border-border/80 bg-white p-6">
+          <section className="rounded-md border border-border/80 bg-white p-6">
             <div className="flex items-center gap-3">
               <ShieldCheck className="size-5 text-primary" />
-              <h2 className="text-sm font-semibold text-[#294b65]">
+              <h2 className="text-sm font-semibold text-foreground">
                 权限与数据安全
               </h2>
             </div>
-            <ul className="mt-5 space-y-3 text-[11px] leading-6 text-muted-foreground">
+            <ul className="mt-5 space-y-3 text-xs leading-6 text-muted-foreground">
               <li>● 页面菜单是否显示，不代表可以绕过服务端或数据库权限。</li>
               <li>● 客户价格、采购价、员工档案和财务数据按角色限制。</li>
               <li>● 不通过截图、导出或转发扩大内部数据使用范围。</li>
               <li>● 不在公告、周报或备注中填写密码、银行卡等敏感信息。</li>
             </ul>
             <Link
-              className="mt-5 inline-flex h-9 items-center rounded-xl bg-[#eef4f8] px-4 text-[10px] font-medium text-primary"
+              className="mt-5 inline-flex h-9 items-center rounded-md bg-muted px-4 text-xs font-medium text-primary"
               href="/roles"
             >
               查看角色权限矩阵
             </Link>
           </section>
 
-          <section className="rounded-[22px] border border-[#d9e8ee] bg-[#eef4f8] p-6">
+          <section className="rounded-md border border-border bg-muted p-6">
             <div className="flex items-center gap-3">
               <CheckCircle2 className="size-5 text-primary" />
-              <h2 className="text-sm font-semibold text-[#294b65]">
+              <h2 className="text-sm font-semibold text-foreground">
                 遇到问题怎么办
               </h2>
             </div>
-            <ol className="mt-5 space-y-3 text-[11px] leading-6 text-[#5c7587]">
+            <ol className="mt-5 space-y-3 text-xs leading-6 text-foreground">
               <li>1. 先刷新页面，确认网络和企业邮箱账号登录状态。</li>
               <li>2. 查看页面是否提示缺少负责人、角色或数据库迁移。</li>
               <li>3. 业务数据有误时联系对应部门负责人核实。</li>

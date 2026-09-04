@@ -76,33 +76,33 @@ function SearchGroup({
   if (results.length === 0) return null;
 
   return (
-    <section className="overflow-hidden rounded-[22px] border border-border/80 bg-white">
+    <section className="overflow-hidden rounded-md border border-border/80 bg-white">
       <div className="flex items-center justify-between border-b border-border/75 px-5 py-4 sm:px-6">
         <div className="flex items-center gap-3">
-          <span className="grid size-9 place-items-center rounded-xl bg-[#eef4f8] text-primary">
+          <span className="grid size-9 place-items-center rounded-md bg-muted text-primary">
             <Icon className="size-4" />
           </span>
-          <h2 className="text-sm font-semibold text-[#294b65]">{title}</h2>
+          <h2 className="text-sm font-semibold text-foreground">{title}</h2>
         </div>
-        <span className="text-[10px] text-muted-foreground">{count} 条结果</span>
+        <span className="text-xs text-muted-foreground">{count} 条结果</span>
       </div>
       <div className="divide-y divide-border/75">
         {results.map((result) => (
           <Link
-            className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-[#fbfcfc] sm:px-6"
+            className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-muted sm:px-6"
             href={result.href}
             key={result.id}
           >
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <h3 className="text-xs font-semibold text-[#294b65]">
+                <h3 className="text-xs font-semibold text-foreground">
                   {result.title}
                 </h3>
-                <span className="rounded-full bg-[#f1f5f3] px-2 py-1 text-[9px] text-muted-foreground">
+                <span className="rounded-full bg-muted px-2 py-1 text-xs text-muted-foreground">
                   {result.meta}
                 </span>
               </div>
-              <p className="mt-1.5 line-clamp-2 text-[10px] leading-5 text-muted-foreground">
+              <p className="mt-1.5 line-clamp-2 text-xs leading-5 text-muted-foreground">
                 {result.description}
               </p>
             </div>
@@ -687,11 +687,11 @@ export default async function SearchPage({
         roleLabel: employee.title ?? "内部员工",
       }}
     >
-      <main className="mx-auto max-w-[1280px] p-4 sm:p-6 xl:p-8">
-        <section className="relative overflow-hidden rounded-[24px] bg-[#0a385d] px-6 py-8 text-white sm:px-9">
+      <main className="mx-auto max-w-[1200px] p-4 sm:p-6 xl:p-8">
+        <section className="ui-page-header">
           <Search className="pointer-events-none absolute right-12 top-1/2 hidden size-40 -translate-y-1/2 text-white/[0.055] sm:block" />
           <div className="relative max-w-3xl">
-            <div className="text-[10px] font-medium tracking-[0.14em] text-[#79d8d5]">
+            <div className="text-xs font-medium tracking-[0.14em] text-muted-foreground">
               GLOBAL SEARCH
             </div>
             <h1 className="mt-3 text-2xl font-semibold">全局搜索</h1>
@@ -699,10 +699,10 @@ export default async function SearchPage({
               搜索功能、员工、客户、供应商、商品、业务单据和企业知识。结果只包含当前账号有权查看的数据。
             </p>
             <form className="relative mt-6" method="get">
-              <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-[#52756c]" />
+              <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-foreground" />
               <input
                 autoFocus
-                className="h-12 w-full rounded-2xl bg-white pl-11 pr-24 text-xs text-[#294b65] outline-none ring-4 ring-white/8 placeholder:text-[#82958f]"
+                className="h-12 w-full rounded-lg bg-white pl-11 pr-24 text-xs text-foreground outline-none ring-4 ring-white/8 placeholder:text-foreground"
                 defaultValue={query}
                 maxLength={80}
                 name="q"
@@ -710,7 +710,7 @@ export default async function SearchPage({
                 type="search"
               />
               <button
-                className="absolute right-1.5 top-1.5 h-9 rounded-xl bg-primary px-4 text-xs font-medium text-white"
+                className="absolute right-1.5 top-1.5 h-9 rounded-md bg-primary px-4 text-xs font-medium text-white"
                 type="submit"
               >
                 搜索
@@ -720,24 +720,24 @@ export default async function SearchPage({
         </section>
 
         {unavailableCount > 0 && (
-          <div className="mt-5 rounded-xl border border-[#f0dfc7] bg-[#fff8ee] px-4 py-3 text-xs text-[#8b6d46]">
+          <div className="mt-5 rounded-md border border-border bg-muted px-4 py-3 text-xs text-foreground">
             有 {unavailableCount} 类数据暂时无法检索，其余结果仍可正常使用。
           </div>
         )}
 
         {!query ? (
-          <section className="mt-5 rounded-[22px] border border-border/80 bg-white px-6 py-14 text-center">
+          <section className="mt-5 rounded-md border border-border/80 bg-white px-6 py-14 text-center">
             <Search className="mx-auto size-7 text-muted-foreground/40" />
             <h2 className="mt-4 text-sm font-semibold">输入关键词开始搜索</h2>
-            <p className="mt-2 text-[10px] text-muted-foreground">
+            <p className="mt-2 text-xs text-muted-foreground">
               例如：应收、销售订单号、五常大米、客户名称或员工姓名。
             </p>
           </section>
         ) : total === 0 ? (
-          <section className="mt-5 rounded-[22px] border border-border/80 bg-white px-6 py-14 text-center">
+          <section className="mt-5 rounded-md border border-border/80 bg-white px-6 py-14 text-center">
             <Search className="mx-auto size-7 text-muted-foreground/40" />
             <h2 className="mt-4 text-sm font-semibold">没有找到“{query}”</h2>
-            <p className="mt-2 text-[10px] text-muted-foreground">
+            <p className="mt-2 text-xs text-muted-foreground">
               尝试缩短关键词，或确认当前账号是否具有对应模块权限。
             </p>
           </section>

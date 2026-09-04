@@ -73,12 +73,12 @@ export default async function NotificationsPage({
         roleLabel: employee.title ?? "内部员工",
       }}
     >
-      <main className="mx-auto max-w-[1600px] p-4 sm:p-6 xl:p-8">
-        <section className="relative overflow-hidden rounded-[24px] bg-[#0a385d] px-6 py-7 text-white shadow-[0_18px_50px_-32px_rgba(12,47,41,.75)] sm:px-8 lg:px-10">
+      <main className="mx-auto max-w-[1440px] p-4 sm:p-6 xl:p-8">
+        <section className="ui-page-header">
           <BellRing className="pointer-events-none absolute right-12 top-1/2 hidden size-40 -translate-y-1/2 text-white/[0.055] sm:block" />
           <div className="relative flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
             <div>
-              <div className="text-xs font-medium tracking-[0.12em] text-[#79d8d5]">
+              <div className="text-xs font-medium tracking-[0.12em] text-muted-foreground">
                 NOTIFICATION CENTER
               </div>
               <h1 className="mt-3 text-2xl font-semibold tracking-[-0.035em] sm:text-[30px]">
@@ -91,7 +91,7 @@ export default async function NotificationsPage({
             {unread.length > 0 && (
               <form action={readAllNotificationsAction}>
                 <button
-                  className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#6bd7d4] px-4 text-xs font-medium text-[#0b3152]"
+                  className="inline-flex h-10 items-center gap-2 rounded-md bg-muted px-4 text-xs font-medium text-foreground"
                   type="submit"
                 >
                   <CheckCheck className="size-4" />
@@ -108,25 +108,25 @@ export default async function NotificationsPage({
               label: "全部消息",
               value: notifications.length,
               icon: Inbox,
-              tone: "bg-[#edf2f7] text-[#42647a]",
+              tone: "bg-muted text-foreground",
             },
             {
               label: "未读消息",
               value: unread.length,
               icon: Clock3,
-              tone: "bg-[#fff4e7] text-[#9a6321]",
+              tone: "bg-muted text-foreground",
             },
             {
               label: "待审批提醒",
               value: approvalPending.length,
               icon: BellRing,
-              tone: "bg-[#eaf3f8] text-[#0d6c78]",
+              tone: "bg-muted text-foreground",
             },
           ].map((item) => {
             const Icon = item.icon;
             return (
               <article
-                className="rounded-[20px] border border-border/80 bg-white p-5"
+                className="rounded-md border border-border/80 bg-white p-5"
                 key={item.label}
               >
                 <div className="flex items-start justify-between">
@@ -139,7 +139,7 @@ export default async function NotificationsPage({
                     </div>
                   </div>
                   <span
-                    className={`grid size-10 place-items-center rounded-xl ${item.tone}`}
+                    className={`grid size-10 place-items-center rounded-md ${item.tone}`}
                   >
                     <Icon className="size-[17px]" />
                   </span>
@@ -150,27 +150,27 @@ export default async function NotificationsPage({
         </section>
 
         {feedback.updated === "1" && (
-          <div className="mt-5 rounded-xl border border-[#d8e8ee] bg-[#eef4f8] px-4 py-3 text-xs text-primary">
+          <div className="mt-5 rounded-md border border-border bg-muted px-4 py-3 text-xs text-primary">
             所有消息已标记为已读。
           </div>
         )}
 
         {(error || feedback.error) && (
-          <div className="mt-5 rounded-xl border border-[#ead8d8] bg-[#f8eeee] px-4 py-3 text-xs text-[#965151]">
+          <div className="mt-5 rounded-md border border-border bg-muted px-4 py-3 text-xs text-foreground">
             无法读取消息，请确认第十个数据库迁移已经执行。
           </div>
         )}
 
-        <section className="mt-5 rounded-[22px] border border-border/80 bg-white p-5 sm:p-6">
+        <section className="mt-5 rounded-md border border-border/80 bg-white p-5 sm:p-6">
           <div>
             <h2 className="text-base font-semibold">最近消息</h2>
-            <p className="mt-1 text-[10px] text-muted-foreground">
+            <p className="mt-1 text-xs text-muted-foreground">
               最多展示最近 100 条，仅当前账号可见
             </p>
           </div>
 
           {notifications.length === 0 ? (
-            <div className="mt-5 rounded-2xl border border-dashed border-border bg-[#fafcfe] py-12 text-center">
+            <div className="mt-5 rounded-lg border border-dashed border-border bg-muted py-12 text-center">
               <CircleCheck className="mx-auto size-7 text-primary" />
               <div className="mt-3 text-xs font-medium">暂时没有消息</div>
             </div>
@@ -183,7 +183,7 @@ export default async function NotificationsPage({
                 >
                   <span
                     className={`mt-1 size-2 shrink-0 rounded-full ${
-                      notification.read_at ? "bg-border" : "bg-[#d88163]"
+                      notification.read_at ? "bg-border" : "bg-muted"
                     }`}
                   />
                   <div className="min-w-0 flex-1">
@@ -192,7 +192,7 @@ export default async function NotificationsPage({
                         {notification.title}
                       </h3>
                       {!notification.read_at && (
-                        <span className="rounded-full bg-[#fff4e7] px-2 py-0.5 text-[9px] text-[#9a6321]">
+                        <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-foreground">
                           未读
                         </span>
                       )}
@@ -200,12 +200,12 @@ export default async function NotificationsPage({
                     <p className="mt-1 text-xs leading-5 text-muted-foreground">
                       {notification.body}
                     </p>
-                    <div className="mt-1 text-[9px] text-muted-foreground/70">
+                    <div className="mt-1 text-xs text-muted-foreground/70">
                       {formatDateTime(notification.created_at)}
                     </div>
                   </div>
                   {notification.read_at ? (
-                    <span className="text-[10px] text-muted-foreground">
+                    <span className="text-xs text-muted-foreground">
                       已读
                     </span>
                   ) : (
@@ -221,7 +221,7 @@ export default async function NotificationsPage({
                         value={notification.href ?? "/notifications"}
                       />
                       <button
-                        className="h-9 rounded-xl bg-primary px-4 text-[10px] font-medium text-primary-foreground"
+                        className="h-9 rounded-md bg-primary px-4 text-xs font-medium text-primary-foreground"
                         type="submit"
                       >
                         查看并标记已读

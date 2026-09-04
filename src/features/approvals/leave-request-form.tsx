@@ -143,7 +143,7 @@ export function LeaveRequestForm() {
 
   if (!isReady) {
     return (
-      <div className="rounded-[22px] border border-border/80 bg-white p-8 text-center text-xs text-muted-foreground">
+      <div className="rounded-md border border-border/80 bg-white p-8 text-center text-xs text-muted-foreground">
         正在读取本机演示申请…
       </div>
     );
@@ -151,9 +151,9 @@ export function LeaveRequestForm() {
 
   if (!canEdit && request) {
     return (
-      <section className="rounded-[22px] border border-border/80 bg-white p-6 sm:p-8">
+      <section className="rounded-md border border-border/80 bg-white p-6 sm:p-8">
         <div className="mx-auto max-w-xl text-center">
-          <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-[#eaf3f8] text-primary">
+          <span className="mx-auto grid size-14 place-items-center rounded-lg bg-muted text-primary">
             <Send className="size-6" />
           </span>
           <h2 className="mt-5 text-lg font-semibold">已有进行中的请假申请</h2>
@@ -163,13 +163,13 @@ export function LeaveRequestForm() {
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Link
-              className="inline-flex h-10 items-center rounded-xl bg-primary px-4 text-xs font-medium text-primary-foreground"
+              className="inline-flex h-10 items-center rounded-md bg-primary px-4 text-xs font-medium text-primary-foreground"
               href="/approvals"
             >
               前往审批中心
             </Link>
             <button
-              className="h-10 rounded-xl border border-border bg-white px-4 text-xs font-medium text-muted-foreground"
+              className="h-10 rounded-md border border-border bg-white px-4 text-xs font-medium text-muted-foreground"
               onClick={() => {
                 clearRequest();
                 setInput(initialInput);
@@ -186,21 +186,21 @@ export function LeaveRequestForm() {
 
   return (
     <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_330px]">
-      <section className="rounded-[22px] border border-border/80 bg-white p-5 sm:p-6">
+      <section className="rounded-md border border-border/80 bg-white p-5 sm:p-6">
         <div className="flex items-center gap-3 border-b border-border/80 pb-5">
-          <span className="grid size-10 place-items-center rounded-xl bg-[#eaf3f8] text-primary">
+          <span className="grid size-10 place-items-center rounded-md bg-muted text-primary">
             <FilePenLine className="size-[18px]" />
           </span>
           <div>
             <h2 className="text-base font-semibold">
               {request?.status === "returned" ? "修改请假申请" : "填写请假申请"}
             </h2>
-            <p className="mt-1 text-[10px] text-muted-foreground">
+            <p className="mt-1 text-xs text-muted-foreground">
               演示员工 · 演示部门
             </p>
           </div>
           {request && (
-            <span className="ml-auto rounded-full bg-[#fff4e7] px-2.5 py-1 text-[9px] font-medium text-[#9a6321]">
+            <span className="ml-auto rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-foreground">
               {request.status === "returned" ? "已退回" : "草稿"}
             </span>
           )}
@@ -210,7 +210,7 @@ export function LeaveRequestForm() {
           <label className="block">
             <span className="text-xs font-medium">请假类型 *</span>
             <select
-              className="mt-2 h-11 w-full rounded-xl border border-border bg-[#fafcfe] px-3 text-xs outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
+              className="mt-2 h-11 w-full rounded-md border border-border bg-muted px-3 text-xs outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
               onChange={(event) =>
                 updateField(
                   "leaveType",
@@ -226,8 +226,8 @@ export function LeaveRequestForm() {
               ))}
             </select>
           </label>
-          <div className="rounded-xl border border-[#c8d9d4] bg-[#eef4f8] px-4 py-3">
-            <div className="text-[10px] text-primary/75">预计请假天数</div>
+          <div className="rounded-md border border-border bg-muted px-4 py-3">
+            <div className="text-xs text-primary/75">预计请假天数</div>
             <div className="mt-1 text-xl font-semibold text-primary">
               {leaveDays || "—"}
               {leaveDays > 0 && <span className="ml-1 text-xs">天</span>}
@@ -236,13 +236,13 @@ export function LeaveRequestForm() {
           <label className="block">
             <span className="text-xs font-medium">开始日期 *</span>
             <input
-              className="mt-2 h-11 w-full rounded-xl border border-border bg-[#fafcfe] px-3 text-xs outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
+              className="mt-2 h-11 w-full rounded-md border border-border bg-muted px-3 text-xs outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
               onChange={(event) => updateField("startDate", event.target.value)}
               type="date"
               value={input.startDate}
             />
             {errors.startDate && (
-              <span className="mt-1 block text-[10px] text-[#a25d52]">
+              <span className="mt-1 block text-xs text-foreground">
                 {errors.startDate}
               </span>
             )}
@@ -250,13 +250,13 @@ export function LeaveRequestForm() {
           <label className="block">
             <span className="text-xs font-medium">结束日期 *</span>
             <input
-              className="mt-2 h-11 w-full rounded-xl border border-border bg-[#fafcfe] px-3 text-xs outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
+              className="mt-2 h-11 w-full rounded-md border border-border bg-muted px-3 text-xs outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
               onChange={(event) => updateField("endDate", event.target.value)}
               type="date"
               value={input.endDate}
             />
             {errors.endDate && (
-              <span className="mt-1 block text-[10px] text-[#a25d52]">
+              <span className="mt-1 block text-xs text-foreground">
                 {errors.endDate}
               </span>
             )}
@@ -266,22 +266,22 @@ export function LeaveRequestForm() {
         <label className="mt-5 block">
           <span className="text-xs font-medium">请假事由 *</span>
           <textarea
-            className="mt-2 min-h-28 w-full resize-y rounded-xl border border-border bg-[#fafcfe] px-3 py-3 text-xs leading-6 outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
+            className="mt-2 min-h-28 w-full resize-y rounded-md border border-border bg-muted px-3 py-3 text-xs leading-6 outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
             onChange={(event) => updateField("reason", event.target.value)}
             placeholder="请说明请假原因，演示环境请勿填写真实隐私信息"
             value={input.reason}
           />
           {errors.reason && (
-            <span className="mt-1 block text-[10px] text-[#a25d52]">
+            <span className="mt-1 block text-xs text-foreground">
               {errors.reason}
             </span>
           )}
         </label>
 
-        <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-xl border border-border bg-[#fafcfe] p-4">
+        <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-md border border-border bg-muted p-4">
           <input
             checked={input.isEmergency}
-            className="mt-0.5 size-4 accent-[#0d6c78]"
+            className="mt-0.5 size-4 accent-primary"
             onChange={(event) =>
               updateField("isEmergency", event.target.checked)
             }
@@ -289,7 +289,7 @@ export function LeaveRequestForm() {
           />
           <span>
             <span className="block text-xs font-medium">紧急情况补办</span>
-            <span className="mt-1 block text-[10px] leading-5 text-muted-foreground">
+            <span className="mt-1 block text-xs leading-5 text-muted-foreground">
               仅用于突发情况。应先通过电话或企业微信通知直属主管，并在返岗后补办手续。
             </span>
           </span>
@@ -299,7 +299,7 @@ export function LeaveRequestForm() {
           <label className="mt-4 block">
             <span className="text-xs font-medium">紧急情况说明 *</span>
             <textarea
-              className="mt-2 min-h-20 w-full resize-y rounded-xl border border-border bg-[#fafcfe] px-3 py-3 text-xs leading-6 outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
+              className="mt-2 min-h-20 w-full resize-y rounded-md border border-border bg-muted px-3 py-3 text-xs leading-6 outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
               onChange={(event) =>
                 updateField("emergencyNote", event.target.value)
               }
@@ -307,7 +307,7 @@ export function LeaveRequestForm() {
               value={input.emergencyNote}
             />
             {errors.emergencyNote && (
-              <span className="mt-1 block text-[10px] text-[#a25d52]">
+              <span className="mt-1 block text-xs text-foreground">
                 {errors.emergencyNote}
               </span>
             )}
@@ -317,20 +317,20 @@ export function LeaveRequestForm() {
         <label className="mt-5 block">
           <span className="text-xs font-medium">工作交接 *</span>
           <textarea
-            className="mt-2 min-h-24 w-full resize-y rounded-xl border border-border bg-[#fafcfe] px-3 py-3 text-xs leading-6 outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
+            className="mt-2 min-h-24 w-full resize-y rounded-md border border-border bg-muted px-3 py-3 text-xs leading-6 outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
             onChange={(event) => updateField("handover", event.target.value)}
             placeholder="填写工作交接对象和事项"
             value={input.handover}
           />
           {errors.handover && (
-            <span className="mt-1 block text-[10px] text-[#a25d52]">
+            <span className="mt-1 block text-xs text-foreground">
               {errors.handover}
             </span>
           )}
         </label>
 
         {feedback && (
-          <div className="mt-5 flex items-center gap-2 rounded-xl bg-[#fff8ee] px-3 py-2.5 text-[10px] text-[#8b6d46]">
+          <div className="mt-5 flex items-center gap-2 rounded-md bg-muted px-3 py-2.5 text-xs text-foreground">
             <CircleAlert className="size-3.5 shrink-0" />
             {feedback}
           </div>
@@ -338,7 +338,7 @@ export function LeaveRequestForm() {
 
         <div className="mt-6 flex flex-wrap justify-end gap-3 border-t border-border/80 pt-5">
           <button
-            className="inline-flex h-10 items-center gap-2 rounded-xl border border-border bg-white px-4 text-xs font-medium text-muted-foreground transition-colors hover:bg-[#f3f7fa]"
+            className="inline-flex h-10 items-center gap-2 rounded-md border border-border bg-white px-4 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted"
             onClick={handleSaveDraft}
             type="button"
           >
@@ -346,7 +346,7 @@ export function LeaveRequestForm() {
             保存草稿
           </button>
           <button
-            className="inline-flex h-10 items-center gap-2 rounded-xl bg-primary px-4 text-xs font-medium text-primary-foreground shadow-[0_10px_25px_-15px_rgba(39,108,93,.7)]"
+            className="inline-flex h-10 items-center gap-2 rounded-md bg-primary px-4 text-xs font-medium text-primary-foreground "
             onClick={handleSubmit}
             type="button"
           >
@@ -357,7 +357,7 @@ export function LeaveRequestForm() {
       </section>
 
       <aside className="space-y-5">
-        <section className="rounded-[22px] border border-border/80 bg-white p-5">
+        <section className="rounded-md border border-border/80 bg-white p-5">
           <div className="flex items-center gap-2">
             <CalendarRange className="size-4 text-primary" />
             <h2 className="text-sm font-semibold">审批路线</h2>
@@ -379,7 +379,7 @@ export function LeaveRequestForm() {
             ).map(([number, title, copy], index, list) => (
               <div className="flex gap-3" key={title}>
                 <div className="flex flex-col items-center">
-                  <span className="grid size-7 place-items-center rounded-lg bg-[#eef4f8] text-[9px] font-semibold text-primary">
+                  <span className="grid size-7 place-items-center rounded-lg bg-muted text-xs font-semibold text-primary">
                     {number}
                   </span>
                   {index < list.length - 1 && (
@@ -388,7 +388,7 @@ export function LeaveRequestForm() {
                 </div>
                 <div className="pb-4">
                   <div className="text-xs font-semibold">{title}</div>
-                  <p className="mt-1 text-[10px] leading-5 text-muted-foreground">
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
                     {copy}
                   </p>
                 </div>
@@ -397,27 +397,27 @@ export function LeaveRequestForm() {
           </div>
         </section>
 
-        <section className="rounded-[22px] bg-[#0a385d] p-5 text-white">
-          <div className="text-[10px] font-medium tracking-[0.12em] text-[#79d8d5]">
+        <section className="rounded-md bg-primary p-5 text-white">
+          <div className="text-xs font-medium tracking-[0.12em] text-muted-foreground">
             POLICY SOURCE
           </div>
           <h2 className="mt-3 text-sm font-semibold">《考勤管理制度》摘要</h2>
-          <ul className="mt-4 space-y-3 text-[10px] leading-5 text-white/58">
+          <ul className="mt-4 space-y-3 text-xs leading-5 text-white/58">
             <li>● 福利假转正后为 4 天/年，逐年增加，最高 10 天。</li>
             <li>● 福利假当年有效，不累计至下一年度。</li>
             <li>● 请假应提前申请，紧急情况先通知主管后补办。</li>
             <li>● 需要续假的，应在原批准期限届满前完成审批。</li>
           </ul>
-          <div className="mt-4 text-[9px] text-white/35">
+          <div className="mt-4 text-xs text-white/35">
             规则来源：考勤管理制度 · 第九至十二条
           </div>
         </section>
 
-        <section className="rounded-[20px] border border-[#f0dfc7] bg-[#fff8ee] p-5">
-          <div className="text-xs font-semibold text-[#8b612c]">
+        <section className="rounded-md border border-border bg-muted p-5">
+          <div className="text-xs font-semibold text-foreground">
             演示数据提醒
           </div>
-          <p className="mt-2 text-[10px] leading-5 text-[#8b6d46]">
+          <p className="mt-2 text-xs leading-5 text-foreground">
             申请仅保存在当前浏览器，不会发送给真实负责人。请勿填写身份证、疾病诊断或其他真实敏感信息。
           </p>
         </section>

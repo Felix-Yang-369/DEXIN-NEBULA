@@ -6,8 +6,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "企业数字化经营、供应链、财务与协同工作台",
     start_url: "/dashboard",
     display: "standalone",
-    background_color: "#f1f6f9",
-    theme_color: "#0a385d",
+    background_color: "#f5f7f9",
+    theme_color: "#0a2340",
     orientation: "any",
     icons: [
       {

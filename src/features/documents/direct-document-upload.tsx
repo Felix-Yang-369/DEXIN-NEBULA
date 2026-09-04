@@ -26,7 +26,7 @@ export function DirectDocumentUpload({
 
   if (!folderId) {
     return (
-      <span className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-[#edf0f2] px-4 text-[11px] font-medium text-muted-foreground">
+      <span className="inline-flex h-9 items-center gap-1.5 rounded-md bg-muted px-4 text-xs font-medium text-muted-foreground">
         <Upload className="size-3.5" />
         上传
       </span>
@@ -56,7 +56,7 @@ export function DirectDocumentUpload({
       />
       <label
         aria-disabled={uploading}
-        className={`inline-flex h-9 items-center gap-1.5 rounded-xl bg-primary px-4 text-[11px] font-medium text-white ${uploading ? "pointer-events-none cursor-wait opacity-75" : "cursor-pointer"}`}
+        className={`inline-flex h-9 items-center gap-1.5 rounded-md bg-primary px-4 text-xs font-medium text-white ${uploading ? "pointer-events-none cursor-wait opacity-75" : "cursor-pointer"}`}
         htmlFor={inputId}
       >
         {uploading ? (

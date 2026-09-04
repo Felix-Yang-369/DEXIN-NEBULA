@@ -35,12 +35,12 @@ export default async function ExpenseRequestPage() {
         roleLabel: employee.title ?? "内部员工",
       }}
     >
-      <main className="mx-auto max-w-[1600px] p-4 sm:p-6 xl:p-8">
-        <section className="relative overflow-hidden rounded-[24px] bg-[#0a385d] px-6 py-7 text-white shadow-[0_18px_50px_-32px_rgba(12,47,41,.75)] sm:px-8 lg:px-10">
+      <main className="mx-auto max-w-[1440px] p-4 sm:p-6 xl:p-8">
+        <section className="ui-page-header">
           <div className="absolute -right-16 -top-24 size-72 rounded-full border border-white/8" />
           <ReceiptText className="pointer-events-none absolute right-12 top-1/2 hidden size-40 -translate-y-1/2 text-white/[0.055] sm:block" />
           <div className="relative">
-            <div className="text-xs font-medium tracking-[0.12em] text-[#79d8d5]">
+            <div className="text-xs font-medium tracking-[0.12em] text-muted-foreground">
               EXPENSE CLAIM · UNIFIED WORKFLOW
             </div>
             <h1 className="mt-3 text-2xl font-semibold tracking-[-0.035em] sm:text-[30px]">

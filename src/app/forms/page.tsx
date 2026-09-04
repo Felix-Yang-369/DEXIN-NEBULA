@@ -38,15 +38,15 @@ export default async function Page() {
         <section className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {(forms ?? []).map((form) => (
             <Link
-              className="rounded-[18px] border border-border bg-white p-5"
+              className="rounded-md border border-border bg-white p-5"
               href={`/forms/${form.id}`}
               key={form.id}
             >
               <div className="text-sm font-semibold">{form.name}</div>
-              <p className="mt-2 text-[10px] leading-5 text-muted-foreground">
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">
                 {form.description ?? "企业内部标准表单"}
               </p>
-              <div className="mt-4 text-[9px] text-primary">
+              <div className="mt-4 text-xs text-primary">
                 {Array.isArray(form.field_schema)
                   ? form.field_schema.length
                   : 0}{" "}
@@ -63,7 +63,7 @@ export default async function Page() {
               : row.configurable_forms;
             return (
               <div
-                className="flex justify-between rounded-xl border border-border bg-white p-4 text-[10px]"
+                className="flex justify-between rounded-md border border-border bg-white p-4 text-xs"
                 key={row.id}
               >
                 <span>

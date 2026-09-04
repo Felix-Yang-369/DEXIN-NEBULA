@@ -3,6 +3,7 @@
 import type { CSSProperties, KeyboardEvent as ReactKeyboardEvent, ReactNode } from "react";
 import { startTransition, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Bell,
   ChevronLeft,
@@ -19,8 +20,10 @@ import { NebulaLogo } from "@/components/brand/nebula-logo";
 import { EmployeeAvatar } from "@/components/business/employee-avatar";
 import { PlatformNavigationList } from "@/components/navigation/platform-navigation-list";
 import { CommandCenter } from "@/components/navigation/command-center";
+import { desktopOnlyPrefixes, MobileDesktopOnlyNotice, MobileTaskShell } from "@/components/navigation/mobile-task-shell";
 import type { PlatformNavigationGroup } from "@/config/platform-navigation";
 import { saveSidebarModeAction } from "@/features/workspace/actions";
+import { cn } from "@/lib/utils";
 
 export type SidebarMode = "expanded" | "compact";
 
@@ -31,7 +34,6 @@ type AppShellClientProps = {
   breadcrumb: string;
   children: ReactNode;
   displayName: string;
-  density: "comfortable" | "compact";
   hiddenInitially: boolean;
   mainGroups: PlatformNavigationGroup[];
   roleLabel: string;
@@ -60,7 +62,6 @@ export function AppShellClient({
   breadcrumb,
   children,
   displayName,
-  density,
   hiddenInitially,
   mainGroups,
   roleLabel,
@@ -71,9 +72,11 @@ export function AppShellClient({
   const [hidden, setHidden] = useState(hiddenInitially);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
+  const pathname = usePathname();
   const drawerRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const sidebarWidth = hidden ? "0px" : mode === "compact" ? "72px" : "252px";
+  const sidebarWidth = hidden ? "0px" : mode === "compact" ? "64px" : "232px";
+  const desktopOnly = desktopOnlyPrefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
 
   useEffect(() => {
     const handleShortcut = (event: globalThis.KeyboardEvent) => {
@@ -141,7 +144,11 @@ export function AppShellClient({
 
   const navigation = (compact: boolean, onNavigate?: () => void) => (
     <>
-      <nav className="mt-4 min-h-0 flex-1 overflow-y-auto overflow-x-visible pb-3">
+      <nav
+        className={`min-h-0 flex-1 pb-2 ${
+          compact ? "mt-2 overflow-visible" : "mt-2 overflow-y-auto overflow-x-hidden"
+        }`}
+      >
         <PlatformNavigationList
           activeItem={activeItem}
           breadcrumb={breadcrumb}
@@ -167,25 +174,26 @@ export function AppShellClient({
   return (
     <div
       className="min-h-svh bg-background text-foreground"
+      data-ui-system="v3"
       data-sidebar-hidden={hidden}
       data-sidebar-mode={mode}
-      data-workspace-density={density}
+      data-workspace-density="compact"
       style={{ "--sidebar-width": sidebarWidth } as CSSProperties}
     >
       <aside
         aria-label="主导航"
-        className={`fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-white/10 bg-[radial-gradient(circle_at_10%_0%,rgba(24,175,179,.24),transparent_29%),linear-gradient(180deg,#0a2b4b_0%,#0a2340_58%,#06182c_100%)] py-4 text-white shadow-[12px_0_36px_rgba(6,24,44,.12)] transition-[width,transform] duration-200 print:hidden lg:flex ${
+        className={`fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-white/10 bg-sidebar py-4 text-white transition-[width,transform] duration-200 print:hidden lg:flex ${
           hidden ? "pointer-events-none -translate-x-full" : "translate-x-0"
-        } ${mode === "compact" ? "w-[72px] overflow-visible px-2" : "w-[252px] overflow-hidden px-3.5"}`}
+        } ${mode === "compact" ? "w-16 overflow-visible px-2" : "w-[232px] overflow-hidden px-3"}`}
       >
-        <div className={`border-b border-white/[0.08] pb-5 pt-1 ${mode === "compact" ? "px-1" : "px-2.5"}`}>
+        <div className={`border-b border-white/[0.08] pb-3 pt-0 ${mode === "compact" ? "px-0" : "px-2"}`}>
           <NebulaLogo compact={mode === "compact"} inverse />
         </div>
         {navigation(mode === "compact")}
         <div className={`mt-2 flex gap-1 border-t border-white/10 pt-3 ${mode === "compact" ? "flex-col" : "items-center"}`}>
           <button
             aria-label={mode === "expanded" ? "收窄侧边栏" : "展开侧边栏"}
-            className="grid size-9 place-items-center rounded-xl text-white/55 transition hover:bg-white/10 hover:text-white"
+            className="grid size-9 place-items-center rounded-md text-white/55 transition hover:bg-white/10 hover:text-white"
             onClick={toggleCompact}
             title={mode === "expanded" ? "收窄侧边栏" : "展开侧边栏"}
             type="button"
@@ -194,7 +202,7 @@ export function AppShellClient({
           </button>
           <button
             aria-label="隐藏侧边栏"
-            className="grid size-9 place-items-center rounded-xl text-white/55 transition hover:bg-white/10 hover:text-white"
+            className="grid size-9 place-items-center rounded-md text-white/55 transition hover:bg-white/10 hover:text-white"
             onClick={toggleHidden}
             title="隐藏侧边栏（Ctrl/Command + \\）"
             type="button"
@@ -203,12 +211,12 @@ export function AppShellClient({
           </button>
           <Link
             aria-label="账号信息"
-            className={`rounded-xl transition hover:bg-white/10 ${mode === "compact" ? "grid size-9 place-items-center" : "ml-auto flex min-w-0 items-center gap-2 px-2 py-1"}`}
+            className={`rounded-md transition hover:bg-white/10 ${mode === "compact" ? "grid size-9 place-items-center" : "ml-auto flex min-w-0 items-center gap-2 px-2 py-1"}`}
             href="/account"
             title={`${displayName} · ${roleLabel}`}
           >
             <EmployeeAvatar name={displayName} size="sm" src={avatarUrl} />
-            {mode === "expanded" ? <span className="min-w-0 truncate text-[10px] text-white/65">{displayName}</span> : null}
+            {mode === "expanded" ? <span className="min-w-0 truncate text-xs text-white/65">{displayName}</span> : null}
           </Link>
         </div>
       </aside>
@@ -216,7 +224,7 @@ export function AppShellClient({
       {hidden ? (
         <button
           aria-label="恢复侧边栏"
-          className="fixed left-3 top-20 z-30 hidden size-10 place-items-center rounded-xl border border-border bg-white text-primary shadow-lg transition hover:bg-muted lg:grid print:hidden"
+          className="fixed left-3 top-20 z-30 hidden size-10 place-items-center rounded-md border border-border bg-white text-primary  transition hover:bg-muted lg:grid print:hidden"
           onClick={toggleHidden}
           title="恢复侧边栏（Ctrl/Command + \\）"
           type="button"
@@ -229,14 +237,14 @@ export function AppShellClient({
         <div className="fixed inset-0 z-50 lg:hidden" role="presentation">
           <button
             aria-label="关闭导航"
-            className="absolute inset-0 bg-[#06182c]/55 backdrop-blur-sm"
+            className="absolute inset-0 bg-foreground/40 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)}
             type="button"
           />
           <div
             aria-label="移动端主导航"
             aria-modal="true"
-            className="absolute inset-y-0 left-0 flex w-[min(88vw,320px)] flex-col overflow-hidden bg-[linear-gradient(180deg,#0a2b4b,#06182c)] px-4 py-4 text-white shadow-2xl"
+            className="absolute inset-y-0 left-0 flex w-[min(88vw,320px)] flex-col overflow-hidden bg-sidebar px-4 py-4 text-white "
             onKeyDown={handleDrawerKeyDown}
             ref={drawerRef}
             role="dialog"
@@ -245,7 +253,7 @@ export function AppShellClient({
               <NebulaLogo inverse />
               <button
                 aria-label="关闭导航"
-                className="grid size-10 place-items-center rounded-xl text-white/65 hover:bg-white/10"
+                className="grid size-10 place-items-center rounded-md text-white/65 hover:bg-white/10"
                 onClick={() => setMobileOpen(false)}
                 ref={closeButtonRef}
                 type="button"
@@ -259,11 +267,11 @@ export function AppShellClient({
       ) : null}
 
       <div className="transition-[padding] duration-200 print:pl-0 lg:pl-[var(--sidebar-width)]">
-        <header className="sticky top-0 z-20 flex h-[72px] items-center border-b border-border/80 bg-white/88 px-4 backdrop-blur-xl print:hidden sm:px-6 xl:px-8">
+        <header className="sticky top-0 z-20 flex h-16 items-center border-b border-border bg-white/96 px-4 backdrop-blur-md print:hidden sm:px-6 xl:px-8">
           <button
             aria-expanded={mobileOpen}
             aria-label="打开主导航"
-            className="mr-2 grid size-10 place-items-center rounded-xl border border-border bg-white text-muted-foreground lg:hidden"
+            className="mr-2 grid size-10 place-items-center rounded-md border border-border bg-white text-muted-foreground lg:hidden"
             onClick={() => setMobileOpen(true)}
             type="button"
           >
@@ -275,7 +283,7 @@ export function AppShellClient({
           <div className="ml-auto flex items-center gap-2">
             <button
               aria-label="打开命令搜索"
-              className="grid size-9 place-items-center rounded-xl border border-border bg-white text-muted-foreground md:hidden"
+              className="grid size-9 place-items-center rounded-md border border-border bg-white text-muted-foreground md:hidden"
               onClick={() => setCommandOpen(true)}
               type="button"
             >
@@ -285,42 +293,44 @@ export function AppShellClient({
               <Search className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground/60" />
               <input
                 aria-label="全局搜索"
-                className="h-9 w-52 rounded-xl border border-border bg-[#f3f7fa] pl-9 pr-12 text-[10px] outline-none transition-all placeholder:text-muted-foreground/55 focus:w-64 focus:border-primary/35 focus:bg-white focus:ring-4 focus:ring-primary/7 xl:w-64"
+                className="h-9 w-52 rounded-md border border-border bg-muted/60 pl-9 pr-12 text-sm outline-none transition-[width,border-color,box-shadow] placeholder:text-muted-foreground/70 focus:w-64 focus:border-primary/35 focus:bg-white focus:ring-3 focus:ring-primary/10 xl:w-64"
                 name="q"
                 placeholder="搜索功能、员工、单据编号…"
                 type="search"
               />
-              <span className="pointer-events-none absolute right-2.5 top-1/2 hidden -translate-y-1/2 items-center gap-0.5 rounded border border-border bg-white px-1.5 py-0.5 text-[8px] text-muted-foreground xl:flex">
+              <span className="pointer-events-none absolute right-2.5 top-1/2 hidden -translate-y-1/2 items-center gap-0.5 rounded border border-border bg-white px-1.5 py-0.5 text-xs text-muted-foreground xl:flex">
                 <Command className="size-2.5" />K
               </span>
             </form>
             <Link
               aria-label={`查看消息，${unreadCount} 条未读`}
-              className="relative grid size-9 place-items-center rounded-xl border border-border bg-white text-muted-foreground hover:bg-muted"
+              className="relative grid size-9 place-items-center rounded-md border border-border bg-white text-muted-foreground hover:bg-muted"
               href="/notifications"
             >
               <Bell className="size-4" />
-              {unreadCount > 0 ? <span className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-[#ef6b73]" /> : null}
+              {unreadCount > 0 ? <span className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-destructive" /> : null}
             </Link>
             <Link
               aria-label="打开使用指南"
-              className="grid size-9 place-items-center rounded-xl border border-border bg-white text-muted-foreground hover:bg-muted"
+              className="grid size-9 place-items-center rounded-md border border-border bg-white text-muted-foreground hover:bg-muted"
               href="/help"
             >
               <CircleHelp className="size-4" />
             </Link>
-            <Link aria-label="进入账号信息管理" className="rounded-full" href="/account">
+            <Link aria-label="进入账号信息管理" className="rounded-md" href="/account">
               <EmployeeAvatar name={displayName} size="sm" src={avatarUrl} />
             </Link>
             <form action="/auth/signout" method="post">
-              <button className="hidden h-8 rounded-xl border border-border bg-white px-3 text-[10px] text-muted-foreground hover:bg-muted sm:block" type="submit">
+              <button className="hidden h-8 rounded-md border border-border bg-white px-3 text-xs text-muted-foreground hover:bg-muted sm:block" type="submit">
                 退出
               </button>
             </form>
           </div>
         </header>
-        {children}
+        {desktopOnly ? <MobileDesktopOnlyNotice /> : null}
+        <div className={cn(desktopOnly && "hidden lg:block", "pb-20 lg:pb-0")}>{children}</div>
       </div>
+      <MobileTaskShell />
       {commandOpen ? <CommandCenter groups={[...mainGroups, ...bottomGroups]} onClose={() => setCommandOpen(false)} /> : null}
     </div>
   );

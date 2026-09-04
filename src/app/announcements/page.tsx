@@ -51,21 +51,21 @@ export default async function AnnouncementsPage() {
       value: published.length,
       note: "当前账号有权查看",
       icon: Megaphone,
-      tone: "bg-[#eaf3f8] text-[#0d6c78]",
+      tone: "bg-muted text-foreground",
     },
     {
       label: "未读",
       value: published.filter((item) => !readSet.has(item.id)).length,
       note: "打开详情后自动标记",
       icon: BellRing,
-      tone: "bg-[#fff4e7] text-[#9a6321]",
+      tone: "bg-muted text-foreground",
     },
     {
       label: "置顶",
       value: published.filter((item) => item.is_pinned).length,
       note: "优先展示重要通知",
       icon: Pin,
-      tone: "bg-[#f8eeee] text-[#965151]",
+      tone: "bg-muted text-foreground",
     },
     {
       label: "草稿",
@@ -74,7 +74,7 @@ export default async function AnnouncementsPage() {
         : 0,
       note: canPublish ? "仅发布人员可见" : "无发布权限",
       icon: FileClock,
-      tone: "bg-[#edf2f7] text-[#42647a]",
+      tone: "bg-muted text-foreground",
     },
   ];
 
@@ -87,13 +87,13 @@ export default async function AnnouncementsPage() {
         roleLabel: employee.title ?? "内部员工",
       }}
     >
-      <main className="mx-auto max-w-[1600px] p-4 sm:p-6 xl:p-8">
-        <section className="relative overflow-hidden rounded-[24px] bg-[#0a385d] px-6 py-7 text-white shadow-[0_18px_50px_-32px_rgba(12,47,41,.75)] sm:px-8 lg:px-10">
+      <main className="mx-auto max-w-[1440px] p-4 sm:p-6 xl:p-8">
+        <section className="ui-page-header">
           <div className="absolute -right-16 -top-24 size-72 rounded-full border border-white/8" />
           <Megaphone className="pointer-events-none absolute right-12 top-1/2 hidden size-40 -translate-y-1/2 text-white/[0.055] sm:block" />
           <div className="relative flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
             <div>
-              <div className="text-xs font-medium tracking-[0.12em] text-[#79d8d5]">
+              <div className="text-xs font-medium tracking-[0.12em] text-muted-foreground">
                 ANNOUNCEMENT CENTER
               </div>
               <h1 className="mt-3 text-2xl font-semibold tracking-[-0.035em] sm:text-[30px]">
@@ -105,14 +105,14 @@ export default async function AnnouncementsPage() {
             </div>
             {canPublish ? (
               <Link
-                className="inline-flex h-10 w-fit items-center gap-2 rounded-xl bg-[#6bd7d4] px-4 text-xs font-medium text-[#0b3152]"
+                className="inline-flex h-10 w-fit items-center gap-2 rounded-md bg-muted px-4 text-xs font-medium text-foreground"
                 href="/announcements/new"
               >
                 <PenLine className="size-4" />
                 新建公告
               </Link>
             ) : (
-              <span className="inline-flex h-10 w-fit items-center rounded-xl border border-white/14 bg-white/8 px-4 text-xs text-white/65">
+              <span className="inline-flex h-10 w-fit items-center rounded-md border border-white/14 bg-white/8 px-4 text-xs text-white/65">
                 当前账号为阅读权限
               </span>
             )}
@@ -124,7 +124,7 @@ export default async function AnnouncementsPage() {
             const Icon = stat.icon;
             return (
               <article
-                className="rounded-[20px] border border-border/80 bg-white p-5 shadow-[0_8px_30px_-24px_rgba(23,57,50,.35)]"
+                className="rounded-md border border-border/80 bg-white p-5 "
                 key={stat.label}
               >
                 <div className="flex items-start justify-between">
@@ -134,11 +134,11 @@ export default async function AnnouncementsPage() {
                       {stat.value}
                     </div>
                   </div>
-                  <span className={`grid size-10 place-items-center rounded-xl ${stat.tone}`}>
+                  <span className={`grid size-10 place-items-center rounded-md ${stat.tone}`}>
                     <Icon className="size-[17px]" />
                   </span>
                 </div>
-                <div className="mt-4 border-t border-border/80 pt-3 text-[10px] text-muted-foreground">
+                <div className="mt-4 border-t border-border/80 pt-3 text-xs text-muted-foreground">
                   {stat.note}
                 </div>
               </article>
@@ -147,25 +147,25 @@ export default async function AnnouncementsPage() {
         </section>
 
         {error ? (
-          <section className="mt-5 rounded-[22px] border border-[#ead8d8] bg-[#f8eeee] px-6 py-12 text-center text-[#965151]">
+          <section className="mt-5 rounded-md border border-border bg-muted px-6 py-12 text-center text-foreground">
             <Megaphone className="mx-auto size-7" />
             <h2 className="mt-4 text-sm font-semibold">暂时无法读取公告数据</h2>
-            <p className="mt-2 text-xs text-[#965151]/75">
+            <p className="mt-2 text-xs text-foreground">
               请确认第十三个数据库迁移已经执行。
             </p>
           </section>
         ) : (
           <div className="mt-5 grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_330px]">
-            <section className="overflow-hidden rounded-[22px] border border-border/80 bg-white">
+            <section className="overflow-hidden rounded-md border border-border/80 bg-white">
               <div className="px-5 pt-5 sm:px-6">
                 <div className="flex items-start justify-between">
                   <div>
                     <h2 className="text-base font-semibold">公告列表</h2>
-                    <p className="mt-1 text-[10px] text-muted-foreground">
+                    <p className="mt-1 text-xs text-muted-foreground">
                       数据和可见范围来自 Supabase 当前登录账号
                     </p>
                   </div>
-                  <span className="rounded-full bg-[#eef4f8] px-2.5 py-1 text-[9px] font-medium text-primary">
+                  <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-primary">
                     {announcements.length} 条
                   </span>
                 </div>
@@ -178,7 +178,7 @@ export default async function AnnouncementsPage() {
             </section>
 
             <aside className="space-y-5">
-              <section className="rounded-[22px] border border-border/80 bg-white p-5">
+              <section className="rounded-md border border-border/80 bg-white p-5">
                 <div className="flex items-center gap-2">
                   <UsersRound className="size-4 text-primary" />
                   <h2 className="text-sm font-semibold">发布范围</h2>
@@ -189,12 +189,12 @@ export default async function AnnouncementsPage() {
                     ["指定部门", "仅所选部门成员和管理人员可见"],
                   ].map(([title, copy], index) => (
                     <div className="flex gap-3" key={title}>
-                      <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-[#eef4f8] text-[9px] font-semibold text-primary">
+                      <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-muted text-xs font-semibold text-primary">
                         0{index + 1}
                       </span>
                       <div>
                         <div className="text-xs font-semibold">{title}</div>
-                        <p className="mt-1 text-[10px] leading-5 text-muted-foreground">
+                        <p className="mt-1 text-xs leading-5 text-muted-foreground">
                           {copy}
                         </p>
                       </div>
@@ -203,12 +203,12 @@ export default async function AnnouncementsPage() {
                 </div>
               </section>
 
-              <section className="rounded-[22px] bg-[#0a385d] p-5 text-white">
+              <section className="rounded-md bg-primary p-5 text-white">
                 <div className="flex items-center gap-2">
-                  <ShieldCheck className="size-4 text-[#79d8d5]" />
+                  <ShieldCheck className="size-4 text-muted-foreground" />
                   <h2 className="text-sm font-semibold">权限与留痕</h2>
                 </div>
-                <ul className="mt-4 space-y-3 text-[10px] leading-5 text-white/58">
+                <ul className="mt-4 space-y-3 text-xs leading-5 text-white/58">
                   <li>● 人事或管理员可以创建和发布公告。</li>
                   <li>● 员工草稿不可见，发布后按范围通知。</li>
                   <li>● 每个账号独立记录已读状态。</li>

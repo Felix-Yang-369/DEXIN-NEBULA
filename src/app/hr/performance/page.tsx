@@ -174,19 +174,19 @@ function MetricCard({
   icon: React.ReactNode;
 }) {
   return (
-    <article className="rounded-[18px] border border-border/75 bg-white p-5 shadow-[0_8px_24px_rgba(14,62,52,0.035)]">
+    <article className="rounded-md border border-border/75 bg-white p-5 ">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="text-[10px] text-muted-foreground">{title}</div>
-          <div className="mt-2 text-xl font-semibold tracking-[-0.035em] text-[#0a385d]">
+          <div className="text-xs text-muted-foreground">{title}</div>
+          <div className="mt-2 text-xl font-semibold tracking-[-0.035em] text-foreground">
             {value}
           </div>
         </div>
-        <span className="grid size-10 place-items-center rounded-xl bg-[#eaf3f8] text-[#0d6c78]">
+        <span className="grid size-10 place-items-center rounded-md bg-muted text-foreground">
           {icon}
         </span>
       </div>
-      <div className="mt-4 border-t border-border/70 pt-3 text-[9px] text-muted-foreground">
+      <div className="mt-4 border-t border-border/70 pt-3 text-xs text-muted-foreground">
         {note}
       </div>
     </article>
@@ -252,13 +252,13 @@ export default async function PerformancePage({
         roleLabel: roleLabel(currentEmployee.roleCodes, currentEmployee.title),
       }}
     >
-      <main className="mx-auto max-w-[1600px] p-4 sm:p-6 xl:p-8">
-        <section className="relative overflow-hidden rounded-[24px] bg-[#0a385d] px-6 py-8 text-white sm:px-8 lg:px-10">
+      <main className="mx-auto max-w-[1440px] p-4 sm:p-6 xl:p-8">
+        <section className="ui-page-header">
           <div className="absolute -right-20 -top-24 size-80 rounded-full border border-white/8" />
           <Target className="absolute right-12 top-1/2 hidden size-40 -translate-y-1/2 text-white/[0.05] sm:block" />
           <div className="relative flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
             <div>
-              <div className="text-[10px] font-medium tracking-[0.16em] text-[#79d8d5]">
+              <div className="text-xs font-medium tracking-[0.16em] text-muted-foreground">
                 HRM · INDIVIDUAL PERFORMANCE
               </div>
               <h1 className="mt-3 text-2xl font-semibold tracking-[-0.035em] sm:text-[30px]">
@@ -269,7 +269,7 @@ export default async function PerformancePage({
               </p>
             </div>
             <Link
-              className="inline-flex h-10 items-center rounded-xl bg-white px-4 text-xs font-medium text-[#0b3a5d]"
+              className="inline-flex h-10 items-center rounded-md bg-white px-4 text-xs font-medium text-foreground"
               href="/customers"
             >
               管理 CRM 客户归属
@@ -277,39 +277,39 @@ export default async function PerformancePage({
           </div>
         </section>
 
-        <section className="mt-5 flex flex-col justify-between gap-3 rounded-[18px] border border-border/75 bg-white p-4 sm:flex-row sm:items-center">
+        <section className="mt-5 flex flex-col justify-between gap-3 rounded-md border border-border/75 bg-white p-4 sm:flex-row sm:items-center">
           <div>
             <div className="text-xs font-medium">{monthLabel(month)}</div>
-            <div className="mt-1 text-[10px] text-muted-foreground">
+            <div className="mt-1 text-xs text-muted-foreground">
               绩效结果随 CRM 报价状态和财务确认收入实时重算
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Link className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-border px-3 text-[10px] text-muted-foreground hover:bg-muted" href={`/hr/performance?month=${shiftedMonth(month, -1)}`}>
+            <Link className="inline-flex h-9 items-center gap-1.5 rounded-md border border-border px-3 text-xs text-muted-foreground hover:bg-muted" href={`/hr/performance?month=${shiftedMonth(month, -1)}`}>
               <ArrowLeft className="size-3.5" />上月
             </Link>
-            <Link className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-border px-3 text-[10px] text-muted-foreground hover:bg-muted" href={`/hr/performance?month=${shiftedMonth(month, 1)}`}>
+            <Link className="inline-flex h-9 items-center gap-1.5 rounded-md border border-border px-3 text-xs text-muted-foreground hover:bg-muted" href={`/hr/performance?month=${shiftedMonth(month, 1)}`}>
               下月<ArrowRight className="size-3.5" />
             </Link>
           </div>
         </section>
 
         {query.saved ? (
-          <div className="mt-5 flex items-center gap-2 rounded-[14px] border border-[#cfe5da] bg-[#eef8f3] px-4 py-3 text-xs text-[#0d6c78]">
+          <div className="mt-5 flex items-center gap-2 rounded-md border border-border bg-muted px-4 py-3 text-xs text-foreground">
             <BadgeCheck className="size-4" />绩效方案已保存并开始按生效月份计算。
           </div>
         ) : null}
         {query.error ? (
-          <div className="mt-5 flex items-center gap-2 rounded-[14px] border border-[#edd3ce] bg-[#fff4f1] px-4 py-3 text-xs text-[#9a564a]" role="alert">
+          <div className="mt-5 flex items-center gap-2 rounded-md border border-border bg-muted px-4 py-3 text-xs text-foreground" role="alert">
             <CircleAlert className="size-4" />{query.error}
           </div>
         ) : null}
 
         {summaryResult.error ? (
-          <section className="mt-5 rounded-[20px] border border-[#eed3cd] bg-[#fff4f1] px-6 py-12 text-center">
-            <CircleAlert className="mx-auto size-8 text-[#a65548]" />
-            <h2 className="mt-3 text-sm font-semibold text-[#8f4d42]">暂时无法读取绩效数据</h2>
-            <p className="mt-2 text-xs text-[#a96a5f]">请确认绩效考核数据库迁移已经执行。</p>
+          <section className="mt-5 rounded-md border border-border bg-muted px-6 py-12 text-center">
+            <CircleAlert className="mx-auto size-8 text-foreground" />
+            <h2 className="mt-3 text-sm font-semibold text-foreground">暂时无法读取绩效数据</h2>
+            <p className="mt-2 text-xs text-foreground">请确认绩效考核数据库迁移已经执行。</p>
           </section>
         ) : (
           <>
@@ -322,21 +322,21 @@ export default async function PerformancePage({
 
             <section className="mt-5 space-y-4">
               {rows.map((row) => (
-                <article className="overflow-hidden rounded-[20px] border border-border/75 bg-white shadow-[0_8px_28px_rgba(14,62,52,0.035)]" key={row.employeeId}>
+                <article className="overflow-hidden rounded-md border border-border/75 bg-white " key={row.employeeId}>
                   <div className="flex flex-col justify-between gap-4 border-b border-border/70 px-5 py-4 sm:flex-row sm:items-center sm:px-6">
                     <div className="flex items-center gap-3">
-                      <span className="grid size-10 place-items-center rounded-xl bg-[#eaf3f8] font-semibold text-[#0d6c78]">{row.employeeName.slice(0, 1)}</span>
+                      <span className="grid size-10 place-items-center rounded-md bg-muted font-semibold text-foreground">{row.employeeName.slice(0, 1)}</span>
                       <div>
                         <div className="flex flex-wrap items-center gap-2">
-                          <Link className="text-sm font-semibold text-[#0a385d]" href={`/employees/${row.employeeId}`}>{row.employeeName}</Link>
-                          <span className="rounded-full bg-[#f0f4f2] px-2 py-1 text-[9px] text-muted-foreground">{row.departmentName}</span>
+                          <Link className="text-sm font-semibold text-foreground" href={`/employees/${row.employeeId}`}>{row.employeeName}</Link>
+                          <span className="rounded-full bg-muted px-2 py-1 text-xs text-muted-foreground">{row.departmentName}</span>
                         </div>
-                        <div className="mt-1 font-mono text-[9px] text-muted-foreground">{row.employeeNo}</div>
+                        <div className="mt-1 font-mono text-xs text-muted-foreground">{row.employeeNo}</div>
                       </div>
                     </div>
                     <div className="sm:text-right">
-                      <div className="text-xs font-medium text-[#244a42]">{row.planName ?? "尚未配置个人绩效方案"}</div>
-                      <div className="mt-1 text-[9px] text-muted-foreground">{row.planId ? `${row.metrics.length} 项考核指标` : "由 HR 或管理员配置"}</div>
+                      <div className="text-xs font-medium text-foreground">{row.planName ?? "尚未配置个人绩效方案"}</div>
+                      <div className="mt-1 text-xs text-muted-foreground">{row.planId ? `${row.metrics.length} 项考核指标` : "由 HR 或管理员配置"}</div>
                     </div>
                   </div>
 
@@ -346,32 +346,32 @@ export default async function PerformancePage({
                         {row.metrics.map((metric) => {
                           const completion = metric.targetValue && metric.value != null && metric.targetValue !== 0 ? (metric.value / metric.targetValue) * 100 : null;
                           return (
-                            <div className="rounded-[16px] border border-border/70 bg-[#fbfcfb] p-4" key={metric.code}>
+                            <div className="rounded-md border border-border/70 bg-muted p-4" key={metric.code}>
                               <div className="flex items-start justify-between gap-2">
-                                <div className="text-[10px] text-muted-foreground">{metric.name}</div>
-                                {metric.weightPercent != null ? <span className="rounded-full bg-[#eaf3f8] px-2 py-1 text-[8px] text-[#0d6c78]">权重 {metric.weightPercent}%</span> : null}
+                                <div className="text-xs text-muted-foreground">{metric.name}</div>
+                                {metric.weightPercent != null ? <span className="rounded-full bg-muted px-2 py-1 text-xs text-foreground">权重 {metric.weightPercent}%</span> : null}
                               </div>
-                              <div className={`mt-2 text-lg font-semibold tabular-nums ${metric.value != null && metric.value < 0 ? "text-[#bd5b64]" : "text-[#0a385d]"}`}>{metricValue(metric)}</div>
-                              <div className="mt-2 text-[9px] leading-5 text-muted-foreground">{metric.targetValue == null ? "未设置目标值，不自动生成分数" : `目标 ${currency.format(metric.targetValue)}${completion == null ? "" : ` · 完成 ${completion.toFixed(1)}%`}`}</div>
-                              <div className="mt-3 border-t border-border/60 pt-3 text-[9px] leading-5 text-muted-foreground">{metric.formulaNote}</div>
+                              <div className={`mt-2 text-lg font-semibold tabular-nums ${metric.value != null && metric.value < 0 ? "text-foreground" : "text-foreground"}`}>{metricValue(metric)}</div>
+                              <div className="mt-2 text-xs leading-5 text-muted-foreground">{metric.targetValue == null ? "未设置目标值，不自动生成分数" : `目标 ${currency.format(metric.targetValue)}${completion == null ? "" : ` · 完成 ${completion.toFixed(1)}%`}`}</div>
+                              <div className="mt-3 border-t border-border/60 pt-3 text-xs leading-5 text-muted-foreground">{metric.formulaNote}</div>
                             </div>
                           );
                         })}
                       </div>
-                      <aside className="rounded-[18px] bg-[#0a385d] p-5 text-white">
-                        <div className="flex items-center gap-2 text-[10px] text-white/55"><Calculator className="size-3.5" />薪酬关联测算</div>
+                      <aside className="rounded-md bg-primary p-5 text-white">
+                        <div className="flex items-center gap-2 text-xs text-white/55"><Calculator className="size-3.5" />薪酬关联测算</div>
                         {row.baseSalary == null ? (
                           <div className="mt-5 text-xs leading-6 text-white/60">当前方案只考核业务指标，尚未配置底薪或提成规则。</div>
                         ) : (
                           <>
                             <div className="mt-4 text-xl font-semibold">{currency.format(row.estimatedCompensation ?? 0)}</div>
-                            <div className="mt-3 rounded-xl bg-white/[0.07] p-3 text-[9px] leading-5 text-white/60">
+                            <div className="mt-3 rounded-md bg-white/[0.07] p-3 text-xs leading-5 text-white/60">
                               {currency.format(row.baseSalary)} + {currency.format(row.operatingRevenue)} × {(row.commissionRate * 10_000).toFixed(4).replace(/\.?0+$/, "")}‱
                               <br />浮动测算：{currency.format(row.variablePay)}
                             </div>
                           </>
                         )}
-                        <div className="mt-4 border-t border-white/10 pt-3 text-[8px] leading-4 text-white/40">仅为规则测算，不是工资条，也不替代财务复核。</div>
+                        <div className="mt-4 border-t border-white/10 pt-3 text-xs leading-4 text-white/40">仅为规则测算，不是工资条，也不替代财务复核。</div>
                       </aside>
                     </div>
                   ) : (
@@ -384,30 +384,30 @@ export default async function PerformancePage({
         )}
 
         {canConfigure ? (
-          <section className="mt-5 overflow-hidden rounded-[20px] border border-border/75 bg-white" id="configure">
+          <section className="mt-5 overflow-hidden rounded-md border border-border/75 bg-white" id="configure">
             <div className="flex items-center gap-3 border-b border-border/70 px-5 py-4 sm:px-6">
-              <span className="grid size-10 place-items-center rounded-xl bg-[#eaf3f8] text-[#0d6c78]"><SlidersHorizontal className="size-5" /></span>
-              <div><h2 className="text-sm font-semibold">配置个人绩效方案</h2><p className="mt-1 text-[10px] text-muted-foreground">每位员工可使用不同指标；目标留空时只展示实际值，不自动评分。</p></div>
+              <span className="grid size-10 place-items-center rounded-md bg-muted text-foreground"><SlidersHorizontal className="size-5" /></span>
+              <div><h2 className="text-sm font-semibold">配置个人绩效方案</h2><p className="mt-1 text-xs text-muted-foreground">每位员工可使用不同指标；目标留空时只展示实际值，不自动评分。</p></div>
             </div>
             <form action={savePerformancePlanAction} className="grid gap-5 p-5 sm:grid-cols-2 lg:grid-cols-4 lg:p-6">
-              <label className="block"><span className="text-[10px] font-medium">员工</span><select className="mt-2 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs" name="employeeId" required><option value="">请选择员工</option>{employeeOptions.map((employee) => { const department = Array.isArray(employee.departments) ? employee.departments[0] : employee.departments; return <option key={employee.id} value={employee.id}>{employee.name} · {department?.name ?? "未分配部门"}</option>; })}</select></label>
-              <label className="block"><span className="text-[10px] font-medium">方案名称</span><input className="mt-2 h-10 w-full rounded-xl border border-border px-3 text-xs" maxLength={80} name="planName" placeholder="例如：客服客户经营绩效" required /></label>
-              <label className="block"><span className="text-[10px] font-medium">底薪（元，可留空）</span><input className="mt-2 h-10 w-full rounded-xl border border-border px-3 text-xs" min="0" name="baseSalary" placeholder="未关联薪酬时留空" step="0.01" type="number" /></label>
-              <label className="block"><span className="text-[10px] font-medium">营收提成（万分之几）</span><input className="mt-2 h-10 w-full rounded-xl border border-border px-3 text-xs" defaultValue="0" min="0" name="revenueCommissionWanfen" step="0.0001" type="number" /></label>
-              <label className="block"><span className="text-[10px] font-medium">生效日期</span><input className="mt-2 h-10 w-full rounded-xl border border-border px-3 text-xs" defaultValue={`${month}-01`} name="effectiveFrom" required type="date" /></label>
-              <div className="sm:col-span-2 lg:col-span-3"><div className="text-[10px] font-medium">考核指标与目标</div><div className="mt-2 grid gap-3 md:grid-cols-3">
-                <label className="rounded-xl border border-border p-3 text-[10px]"><span className="flex items-center gap-2"><input defaultChecked name="metricCodes" type="checkbox" value="crm_sales_increment" />负责客户销售增量</span><input className="mt-3 h-9 w-full rounded-lg border border-border px-3" name="salesTarget" placeholder="目标值，可留空" step="0.01" type="number" /></label>
-                <label className="rounded-xl border border-border p-3 text-[10px]"><span className="flex items-center gap-2"><input defaultChecked name="metricCodes" type="checkbox" value="crm_profit_increment" />负责客户预计利润增量</span><input className="mt-3 h-9 w-full rounded-lg border border-border px-3" name="profitTarget" placeholder="目标值，可留空" step="0.01" type="number" /></label>
-                <label className="rounded-xl border border-border p-3 text-[10px]"><span className="flex items-center gap-2"><input name="metricCodes" type="checkbox" value="monthly_operating_revenue" />公司月度营业收入</span><input className="mt-3 h-9 w-full rounded-lg border border-border px-3" name="revenueTarget" placeholder="目标值，可留空" step="0.01" type="number" /></label>
+              <label className="block"><span className="text-xs font-medium">员工</span><select className="mt-2 h-10 w-full rounded-md border border-border bg-white px-3 text-xs" name="employeeId" required><option value="">请选择员工</option>{employeeOptions.map((employee) => { const department = Array.isArray(employee.departments) ? employee.departments[0] : employee.departments; return <option key={employee.id} value={employee.id}>{employee.name} · {department?.name ?? "未分配部门"}</option>; })}</select></label>
+              <label className="block"><span className="text-xs font-medium">方案名称</span><input className="mt-2 h-10 w-full rounded-md border border-border px-3 text-xs" maxLength={80} name="planName" placeholder="例如：客服客户经营绩效" required /></label>
+              <label className="block"><span className="text-xs font-medium">底薪（元，可留空）</span><input className="mt-2 h-10 w-full rounded-md border border-border px-3 text-xs" min="0" name="baseSalary" placeholder="未关联薪酬时留空" step="0.01" type="number" /></label>
+              <label className="block"><span className="text-xs font-medium">营收提成（万分之几）</span><input className="mt-2 h-10 w-full rounded-md border border-border px-3 text-xs" defaultValue="0" min="0" name="revenueCommissionWanfen" step="0.0001" type="number" /></label>
+              <label className="block"><span className="text-xs font-medium">生效日期</span><input className="mt-2 h-10 w-full rounded-md border border-border px-3 text-xs" defaultValue={`${month}-01`} name="effectiveFrom" required type="date" /></label>
+              <div className="sm:col-span-2 lg:col-span-3"><div className="text-xs font-medium">考核指标与目标</div><div className="mt-2 grid gap-3 md:grid-cols-3">
+                <label className="rounded-md border border-border p-3 text-xs"><span className="flex items-center gap-2"><input defaultChecked name="metricCodes" type="checkbox" value="crm_sales_increment" />负责客户销售增量</span><input className="mt-3 h-9 w-full rounded-lg border border-border px-3" name="salesTarget" placeholder="目标值，可留空" step="0.01" type="number" /></label>
+                <label className="rounded-md border border-border p-3 text-xs"><span className="flex items-center gap-2"><input defaultChecked name="metricCodes" type="checkbox" value="crm_profit_increment" />负责客户预计利润增量</span><input className="mt-3 h-9 w-full rounded-lg border border-border px-3" name="profitTarget" placeholder="目标值，可留空" step="0.01" type="number" /></label>
+                <label className="rounded-md border border-border p-3 text-xs"><span className="flex items-center gap-2"><input name="metricCodes" type="checkbox" value="monthly_operating_revenue" />公司月度营业收入</span><input className="mt-3 h-9 w-full rounded-lg border border-border px-3" name="revenueTarget" placeholder="目标值，可留空" step="0.01" type="number" /></label>
               </div></div>
-              <div className="flex items-end justify-between gap-4 border-t border-border/70 pt-5 sm:col-span-2 lg:col-span-4"><p className="max-w-3xl text-[9px] leading-5 text-muted-foreground">营业收入当前按财务中心“已确认收入流水”汇总；CRM 利润为报价预计毛利。正式计薪前必须由 HR 与财务复核。</p><button className="h-10 shrink-0 rounded-xl bg-[#0a385d] px-5 text-xs font-medium text-white" type="submit">保存方案</button></div>
+              <div className="flex items-end justify-between gap-4 border-t border-border/70 pt-5 sm:col-span-2 lg:col-span-4"><p className="max-w-3xl text-xs leading-5 text-muted-foreground">营业收入当前按财务中心“已确认收入流水”汇总；CRM 利润为报价预计毛利。正式计薪前必须由 HR 与财务复核。</p><button className="h-10 shrink-0 rounded-md bg-primary px-5 text-xs font-medium text-white" type="submit">保存方案</button></div>
             </form>
           </section>
         ) : null}
 
-        <section className="mt-5 flex items-start gap-3 rounded-[18px] border border-[#e6d6b8] bg-[#fff9ef] p-5">
-          <CircleAlert className="mt-0.5 size-5 shrink-0 text-[#94601f]" />
-          <div className="text-[10px] leading-6 text-[#805b29]">当前 CRM 利润指标按已接受报价减产品有效采购价测算，不含退货、运费、税费等最终结算差异；月度营业收入暂按已确认收入流水统计。以上数据用于经营绩效参考，不等同于会计利润、工资条或最终薪资。</div>
+        <section className="mt-5 flex items-start gap-3 rounded-md border border-border bg-muted p-5">
+          <CircleAlert className="mt-0.5 size-5 shrink-0 text-foreground" />
+          <div className="text-xs leading-6 text-foreground">当前 CRM 利润指标按已接受报价减产品有效采购价测算，不含退货、运费、税费等最终结算差异；月度营业收入暂按已确认收入流水统计。以上数据用于经营绩效参考，不等同于会计利润、工资条或最终薪资。</div>
         </section>
       </main>
     </WorkflowShell>

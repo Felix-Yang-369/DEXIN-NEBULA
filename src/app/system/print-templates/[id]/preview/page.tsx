@@ -26,7 +26,7 @@ export default async function Page({
         <PrintButton />
       </div>
       <article
-        className={`relative mx-auto min-h-[1120px] overflow-hidden bg-white p-12 shadow-xl print:shadow-none ${t.orientation === "landscape" ? "max-w-[1120px]" : "max-w-[794px]"}`}
+        className={`relative mx-auto min-h-[1120px] overflow-hidden bg-white p-12  print:shadow-none ${t.orientation === "landscape" ? "max-w-[1120px]" : "max-w-[794px]"}`}
       >
         {t.show_watermark && (
           <div className="pointer-events-none absolute inset-0 grid rotate-[-25deg] place-items-center text-6xl font-bold text-slate-100">

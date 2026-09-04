@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { DashboardClient } from "@/components/dashboard/DashboardClient";
 import { WorkflowShell } from "@/features/approvals/workflow-shell";
 import {
+  getAppBootstrap,
   requireCurrentEmployee,
 } from "@/features/auth/current-employee";
 import { getDashboardData } from "@/lib/api/dashboard";
-import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "企业经营驾驶舱",
@@ -32,16 +32,11 @@ function roleLabel(roleCodes: string[], title: string | null) {
 
 export default async function DashboardPage() {
   const employee = await requireCurrentEmployee();
-  const supabase = await createClient();
-  const [initialData, preferenceResult] = await Promise.all([
+  const [initialData, bootstrap] = await Promise.all([
     getDashboardData(employee),
-    supabase
-      .from("workspace_preferences")
-      .select("pinned_modules,hidden_widgets,density,default_workspace")
-      .eq("employee_id", employee.id)
-      .maybeSingle(),
+    getAppBootstrap(),
   ]);
-  const preference = preferenceResult.data;
+  const preference = bootstrap?.workspace;
 
   return (
     <WorkflowShell
@@ -56,10 +51,10 @@ export default async function DashboardPage() {
       initialData={initialData}
       identity={{ name: employee.name }}
       preferences={{
-        pinnedModules: preference?.pinned_modules ?? ["sales", "inventory", "approvals"],
-        hiddenWidgets: preference?.hidden_widgets ?? [],
-        density: preference?.density === "compact" ? "compact" : "comfortable",
-        defaultWorkspace: preference?.default_workspace ?? "dashboard",
+        pinnedModules: preference?.pinnedModules ?? ["sales", "inventory", "approvals"],
+        hiddenWidgets: preference?.hiddenWidgets ?? [],
+        density: "compact",
+        defaultWorkspace: preference?.defaultWorkspace ?? "dashboard",
       }}
       />
     </WorkflowShell>

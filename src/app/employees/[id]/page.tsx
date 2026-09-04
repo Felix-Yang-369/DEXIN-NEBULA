@@ -207,9 +207,9 @@ export default async function EmployeeDetailPage({
           roleLabel: currentEmployee.title ?? "内部员工",
         }}
       >
-        <main className="mx-auto max-w-[1000px] p-6">
-          <section className="rounded-[22px] border border-[#ead8d8] bg-white p-12 text-center">
-            <LockKeyhole className="mx-auto size-9 text-[#965151]" />
+        <main className="mx-auto max-w-[1200px] p-6">
+          <section className="rounded-md border border-border bg-white p-12 text-center">
+            <LockKeyhole className="mx-auto size-9 text-foreground" />
             <h1 className="mt-4 text-lg font-semibold">无权查看人事档案</h1>
             <p className="mt-2 text-xs text-muted-foreground">
               员工人事档案仅向人事、管理员和董事长只读开放。
@@ -314,16 +314,16 @@ export default async function EmployeeDetailPage({
         roleLabel: currentEmployee.title ?? "内部员工",
       }}
     >
-      <main className="mx-auto max-w-[1500px] p-4 sm:p-6 xl:p-8">
+      <main className="mx-auto max-w-[1440px] p-4 sm:p-6 xl:p-8">
         <Link
-          className="inline-flex items-center gap-2 text-[11px] text-muted-foreground hover:text-primary"
+          className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-primary"
           href="/employees"
         >
           <ArrowLeft className="size-4" />
           返回员工中心
         </Link>
 
-        <section className="mt-4 overflow-hidden rounded-[24px] bg-[#0a385d] px-6 py-7 text-white sm:px-8">
+        <section className="mt-4 overflow-hidden rounded-md bg-primary px-6 py-7 text-white sm:px-8">
           <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
             <div className="flex items-center gap-4">
               <EmployeeAvatar
@@ -332,7 +332,7 @@ export default async function EmployeeDetailPage({
                 src={signedAvatar?.signedUrl}
               />
               <div>
-                <div className="text-[10px] tracking-[0.14em] text-[#79d8d5]">
+                <div className="text-xs tracking-[0.14em] text-muted-foreground">
                   HRM · EMPLOYEE LIFECYCLE
                 </div>
                 <h1 className="mt-2 text-2xl font-semibold">
@@ -345,7 +345,7 @@ export default async function EmployeeDetailPage({
                 </p>
               </div>
             </div>
-            <div className="flex flex-wrap gap-2 text-[10px]">
+            <div className="flex flex-wrap gap-2 text-xs">
               <span className="rounded-full bg-white/10 px-3 py-2">
                 {statusLabels[employee.employment_status]}
               </span>
@@ -358,10 +358,10 @@ export default async function EmployeeDetailPage({
 
         {message && (
           <div
-            className={`mt-5 rounded-xl px-4 py-3 text-xs ${
+            className={`mt-5 rounded-md px-4 py-3 text-xs ${
               feedback.error
-                ? "border border-[#ead8d8] bg-[#f8eeee] text-[#965151]"
-                : "border border-[#d8e8ee] bg-[#eef4f8] text-primary"
+                ? "border border-border bg-muted text-foreground"
+                : "border border-border bg-muted text-primary"
             }`}
           >
             {message}
@@ -404,12 +404,12 @@ export default async function EmployeeDetailPage({
             const CardIcon = Icon as typeof BriefcaseBusiness;
             return (
               <article
-                className="rounded-[18px] border border-border/75 bg-white p-5"
+                className="rounded-md border border-border/75 bg-white p-5"
                 key={String(label)}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="text-[10px] text-muted-foreground">
+                    <div className="text-xs text-muted-foreground">
                       {String(label)}
                     </div>
                     <div className="mt-2 text-lg font-semibold">
@@ -418,7 +418,7 @@ export default async function EmployeeDetailPage({
                   </div>
                   <CardIcon className="size-5 text-primary/60" />
                 </div>
-                <div className="mt-3 text-[9px] text-muted-foreground">
+                <div className="mt-3 text-xs text-muted-foreground">
                   {String(note)}
                 </div>
               </article>
@@ -428,7 +428,7 @@ export default async function EmployeeDetailPage({
 
         <div className="mt-5 grid items-start gap-5 xl:grid-cols-[1.05fr_.95fr]">
           <div className="space-y-5">
-            <section className="rounded-[20px] border border-border/75 bg-white p-5 sm:p-6">
+            <section className="rounded-md border border-border/75 bg-white p-5 sm:p-6">
               <div className="flex items-center gap-2">
                 <UserRoundCheck className="size-5 text-primary" />
                 <h2 className="text-base font-semibold">人事补充档案</h2>
@@ -442,15 +442,15 @@ export default async function EmployeeDetailPage({
                   ["离职日期", profile?.departure_on ?? "不适用"],
                   ["直属负责人", manager?.name ?? "待设置"],
                 ].map(([label, value]) => (
-                  <div className="rounded-xl bg-[#f8fafc] p-3" key={label}>
-                    <dt className="text-[9px] text-muted-foreground">{label}</dt>
+                  <div className="rounded-md bg-muted p-3" key={label}>
+                    <dt className="text-xs text-muted-foreground">{label}</dt>
                     <dd className="mt-1 font-medium">{value}</dd>
                   </div>
                 ))}
               </dl>
               {canManage && (
-                <details className="mt-4 rounded-xl border border-border p-3">
-                  <summary className="cursor-pointer text-[10px] font-medium text-primary">
+                <details className="mt-4 rounded-md border border-border p-3">
+                  <summary className="cursor-pointer text-xs font-medium text-primary">
                     编辑人事补充档案
                   </summary>
                   <form
@@ -458,12 +458,12 @@ export default async function EmployeeDetailPage({
                     className="mt-4 grid gap-3 sm:grid-cols-2"
                   >
                     <input name="employeeId" type="hidden" value={employee.id} />
-                    <input className="h-10 rounded-xl border border-border px-3 text-xs" defaultValue={profile?.work_location ?? ""} name="workLocation" placeholder="办公地点" />
-                    <input className="h-10 rounded-xl border border-border px-3 text-xs" defaultValue={profile?.probation_end_on ?? ""} name="probationEndOn" type="date" />
-                    <input className="h-10 rounded-xl border border-border px-3 text-xs" defaultValue={profile?.regularized_on ?? ""} name="regularizedOn" type="date" />
-                    <input className="h-10 rounded-xl border border-border px-3 text-xs" defaultValue={profile?.departure_on ?? ""} name="departureOn" type="date" />
-                    <textarea className="min-h-20 rounded-xl border border-border px-3 py-2 text-xs sm:col-span-2" defaultValue={profile?.personnel_note ?? ""} name="personnelNote" placeholder="仅人事与管理层可见的内部备注" />
-                    <button className="h-10 rounded-xl bg-primary text-xs text-primary-foreground sm:col-span-2" type="submit">
+                    <input className="h-10 rounded-md border border-border px-3 text-xs" defaultValue={profile?.work_location ?? ""} name="workLocation" placeholder="办公地点" />
+                    <input className="h-10 rounded-md border border-border px-3 text-xs" defaultValue={profile?.probation_end_on ?? ""} name="probationEndOn" type="date" />
+                    <input className="h-10 rounded-md border border-border px-3 text-xs" defaultValue={profile?.regularized_on ?? ""} name="regularizedOn" type="date" />
+                    <input className="h-10 rounded-md border border-border px-3 text-xs" defaultValue={profile?.departure_on ?? ""} name="departureOn" type="date" />
+                    <textarea className="min-h-20 rounded-md border border-border px-3 py-2 text-xs sm:col-span-2" defaultValue={profile?.personnel_note ?? ""} name="personnelNote" placeholder="仅人事与管理层可见的内部备注" />
+                    <button className="h-10 rounded-md bg-primary text-xs text-primary-foreground sm:col-span-2" type="submit">
                       保存人事档案
                     </button>
                   </form>
@@ -471,54 +471,54 @@ export default async function EmployeeDetailPage({
               )}
             </section>
 
-            <section className="rounded-[20px] border border-border/75 bg-white p-5 sm:p-6">
+            <section className="rounded-md border border-border/75 bg-white p-5 sm:p-6">
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <h2 className="text-base font-semibold">合同台账</h2>
-                  <p className="mt-1 text-[10px] text-muted-foreground">
+                  <p className="mt-1 text-xs text-muted-foreground">
                     合同原件请上传至私有文件中心
                   </p>
                 </div>
-                <Link className="text-[10px] text-primary" href="/documents?category=contract">
+                <Link className="text-xs text-primary" href="/documents?category=contract">
                   文件中心
                 </Link>
               </div>
               <div className="mt-4 space-y-2">
                 {contracts.map((contract) => (
-                  <article className="rounded-xl bg-[#f8fafc] p-3" key={contract.id}>
+                  <article className="rounded-md bg-muted p-3" key={contract.id}>
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div>
                         <div className="text-xs font-medium">
                           {contractTypeLabels[contract.contract_type]}
                         </div>
-                        <div className="mt-1 font-mono text-[9px] text-muted-foreground">
+                        <div className="mt-1 font-mono text-xs text-muted-foreground">
                           {contract.contract_no}
                         </div>
                       </div>
-                      <span className="rounded-full bg-white px-2 py-1 text-[9px] text-primary">
+                      <span className="rounded-full bg-white px-2 py-1 text-xs text-primary">
                         {contractStatusLabels[contract.status]}
                       </span>
                     </div>
-                    <div className="mt-2 text-[9px] text-muted-foreground">
+                    <div className="mt-2 text-xs text-muted-foreground">
                       {contract.starts_on} — {contract.ends_on ?? "无固定期限"}
                     </div>
                   </article>
                 ))}
                 {!contracts.length && (
-                  <div className="rounded-xl bg-[#f8fafc] p-5 text-center text-[10px] text-muted-foreground">
+                  <div className="rounded-md bg-muted p-5 text-center text-xs text-muted-foreground">
                     暂无合同记录
                   </div>
                 )}
               </div>
               {canManage && (
-                <details className="mt-4 rounded-xl border border-border p-3">
-                  <summary className="cursor-pointer text-[10px] font-medium text-primary">
+                <details className="mt-4 rounded-md border border-border p-3">
+                  <summary className="cursor-pointer text-xs font-medium text-primary">
                     登记员工合同
                   </summary>
                   <form action={createEmployeeContractAction} className="mt-4 grid gap-3 sm:grid-cols-2">
                     <input name="employeeId" type="hidden" value={employee.id} />
-                    <input className="h-10 rounded-xl border border-border px-3 text-xs" name="contractNo" placeholder="合同编号" required />
-                    <select className="h-10 rounded-xl border border-border px-3 text-xs" name="contractType">
+                    <input className="h-10 rounded-md border border-border px-3 text-xs" name="contractNo" placeholder="合同编号" required />
+                    <select className="h-10 rounded-md border border-border px-3 text-xs" name="contractType">
                       <option value="fixed_term">固定期限劳动合同</option>
                       <option value="indefinite">无固定期限劳动合同</option>
                       <option value="intern">实习协议</option>
@@ -526,17 +526,17 @@ export default async function EmployeeDetailPage({
                       <option value="confidentiality">保密协议</option>
                       <option value="other">其他协议</option>
                     </select>
-                    <input className="h-10 rounded-xl border border-border px-3 text-xs" defaultValue={employee.hired_on ?? today()} name="startsOn" required type="date" />
-                    <input className="h-10 rounded-xl border border-border px-3 text-xs" name="endsOn" type="date" />
-                    <input className="h-10 rounded-xl border border-border px-3 text-xs" defaultValue={profile?.probation_end_on ?? ""} name="probationEndOn" type="date" />
-                    <select className="h-10 rounded-xl border border-border px-3 text-xs" name="status">
+                    <input className="h-10 rounded-md border border-border px-3 text-xs" defaultValue={employee.hired_on ?? today()} name="startsOn" required type="date" />
+                    <input className="h-10 rounded-md border border-border px-3 text-xs" name="endsOn" type="date" />
+                    <input className="h-10 rounded-md border border-border px-3 text-xs" defaultValue={profile?.probation_end_on ?? ""} name="probationEndOn" type="date" />
+                    <select className="h-10 rounded-md border border-border px-3 text-xs" name="status">
                       <option value="active">履行中</option>
                       <option value="draft">草稿</option>
                       <option value="expired">已到期</option>
                       <option value="terminated">已终止</option>
                     </select>
-                    <textarea className="min-h-16 rounded-xl border border-border px-3 py-2 text-xs sm:col-span-2" name="note" placeholder="合同备注（选填）" />
-                    <button className="h-10 rounded-xl bg-primary text-xs text-primary-foreground sm:col-span-2" type="submit">
+                    <textarea className="min-h-16 rounded-md border border-border px-3 py-2 text-xs sm:col-span-2" name="note" placeholder="合同备注（选填）" />
+                    <button className="h-10 rounded-md bg-primary text-xs text-primary-foreground sm:col-span-2" type="submit">
                       保存合同记录
                     </button>
                   </form>
@@ -546,7 +546,7 @@ export default async function EmployeeDetailPage({
           </div>
 
           <div className="space-y-5">
-            <section className="rounded-[20px] border border-border/75 bg-white p-5 sm:p-6">
+            <section className="rounded-md border border-border/75 bg-white p-5 sm:p-6">
               <div className="flex items-center gap-2">
                 <CalendarDays className="size-5 text-primary" />
                 <h2 className="text-base font-semibold">假期账户</h2>
@@ -558,32 +558,32 @@ export default async function EmployeeDetailPage({
                     ["调休剩余", `${compensatoryRemaining} 天`],
                     ["病假已用", `${currentBalance.sick_used} 天`],
                   ].map(([label, value]) => (
-                    <div className="rounded-xl bg-[#f8fafc] p-3 text-center" key={label}>
+                    <div className="rounded-md bg-muted p-3 text-center" key={label}>
                       <div className="text-sm font-semibold">{value}</div>
-                      <div className="mt-1 text-[9px] text-muted-foreground">{label}</div>
+                      <div className="mt-1 text-xs text-muted-foreground">{label}</div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="mt-4 rounded-xl bg-[#fff9ef] p-4 text-[10px] text-[#8a6633]">
+                <div className="mt-4 rounded-md bg-muted p-4 text-xs text-foreground">
                   {currentYear()} 年假期账户尚未配置。
                 </div>
               )}
               {canManage && (
-                <details className="mt-4 rounded-xl border border-border p-3">
-                  <summary className="cursor-pointer text-[10px] font-medium text-primary">
+                <details className="mt-4 rounded-md border border-border p-3">
+                  <summary className="cursor-pointer text-xs font-medium text-primary">
                     设置年度假期额度
                   </summary>
                   <form action={saveEmployeeLeaveBalanceAction} className="mt-4 grid grid-cols-2 gap-3">
                     <input name="employeeId" type="hidden" value={employee.id} />
-                    <input className="h-10 rounded-xl border border-border px-3 text-xs" defaultValue={currentYear()} max="2100" min="2020" name="balanceYear" required type="number" />
+                    <input className="h-10 rounded-md border border-border px-3 text-xs" defaultValue={currentYear()} max="2100" min="2020" name="balanceYear" required type="number" />
                     <div />
-                    <input className="h-10 rounded-xl border border-border px-3 text-xs" defaultValue={currentBalance?.annual_entitled ?? 0} min="0" name="annualEntitled" placeholder="年假额度" required step="0.5" type="number" />
-                    <input className="h-10 rounded-xl border border-border px-3 text-xs" defaultValue={currentBalance?.annual_used ?? 0} min="0" name="annualUsed" placeholder="年假已用" required step="0.5" type="number" />
-                    <input className="h-10 rounded-xl border border-border px-3 text-xs" defaultValue={currentBalance?.compensatory_entitled ?? 0} min="0" name="compensatoryEntitled" placeholder="调休额度" required step="0.5" type="number" />
-                    <input className="h-10 rounded-xl border border-border px-3 text-xs" defaultValue={currentBalance?.compensatory_used ?? 0} min="0" name="compensatoryUsed" placeholder="调休已用" required step="0.5" type="number" />
-                    <input className="h-10 rounded-xl border border-border px-3 text-xs" defaultValue={currentBalance?.sick_used ?? 0} min="0" name="sickUsed" placeholder="病假已用" required step="0.5" type="number" />
-                    <button className="h-10 rounded-xl bg-primary text-xs text-primary-foreground" type="submit">
+                    <input className="h-10 rounded-md border border-border px-3 text-xs" defaultValue={currentBalance?.annual_entitled ?? 0} min="0" name="annualEntitled" placeholder="年假额度" required step="0.5" type="number" />
+                    <input className="h-10 rounded-md border border-border px-3 text-xs" defaultValue={currentBalance?.annual_used ?? 0} min="0" name="annualUsed" placeholder="年假已用" required step="0.5" type="number" />
+                    <input className="h-10 rounded-md border border-border px-3 text-xs" defaultValue={currentBalance?.compensatory_entitled ?? 0} min="0" name="compensatoryEntitled" placeholder="调休额度" required step="0.5" type="number" />
+                    <input className="h-10 rounded-md border border-border px-3 text-xs" defaultValue={currentBalance?.compensatory_used ?? 0} min="0" name="compensatoryUsed" placeholder="调休已用" required step="0.5" type="number" />
+                    <input className="h-10 rounded-md border border-border px-3 text-xs" defaultValue={currentBalance?.sick_used ?? 0} min="0" name="sickUsed" placeholder="病假已用" required step="0.5" type="number" />
+                    <button className="h-10 rounded-md bg-primary text-xs text-primary-foreground" type="submit">
                       保存假期账户
                     </button>
                   </form>
@@ -591,47 +591,47 @@ export default async function EmployeeDetailPage({
               )}
             </section>
 
-            <section className="rounded-[20px] border border-border/75 bg-white p-5 sm:p-6">
+            <section className="rounded-md border border-border/75 bg-white p-5 sm:p-6">
               <div className="flex items-center gap-2">
                 <History className="size-5 text-primary" />
                 <h2 className="text-base font-semibold">员工异动历史</h2>
               </div>
               <div className="mt-4 space-y-3">
                 {changes.map((change) => (
-                  <article className="relative border-l border-[#bdd9ce] pl-4" key={change.id}>
+                  <article className="relative border-l border-border pl-4" key={change.id}>
                     <span className="absolute -left-1 top-1 size-2 rounded-full bg-primary" />
                     <div className="flex items-center justify-between gap-3">
                       <span className="text-xs font-medium">
                         {changeTypeLabels[change.change_type]}
                       </span>
-                      <span className="text-[9px] text-muted-foreground">
+                      <span className="text-xs text-muted-foreground">
                         {change.effective_on}
                       </span>
                     </div>
-                    <p className="mt-1 text-[10px] leading-5 text-muted-foreground">
+                    <p className="mt-1 text-xs leading-5 text-muted-foreground">
                       {relationOne(change.from_department)?.name ?? "未分部门"} →{" "}
                       {relationOne(change.to_department)?.name ?? "未分部门"}
                       {change.to_title ? ` · ${change.to_title}` : ""}
                     </p>
-                    <p className="mt-1 text-[9px] text-muted-foreground">
+                    <p className="mt-1 text-xs text-muted-foreground">
                       {change.reason}
                     </p>
                   </article>
                 ))}
                 {!changes.length && (
-                  <div className="rounded-xl bg-[#f8fafc] p-5 text-center text-[10px] text-muted-foreground">
+                  <div className="rounded-md bg-muted p-5 text-center text-xs text-muted-foreground">
                     暂无异动记录
                   </div>
                 )}
               </div>
               {canManage && (
-                <details className="mt-4 rounded-xl border border-border p-3">
-                  <summary className="cursor-pointer text-[10px] font-medium text-primary">
+                <details className="mt-4 rounded-md border border-border p-3">
+                  <summary className="cursor-pointer text-xs font-medium text-primary">
                     登记员工异动
                   </summary>
                   <form action={recordEmployeeChangeAction} className="mt-4 grid gap-3 sm:grid-cols-2">
                     <input name="employeeId" type="hidden" value={employee.id} />
-                    <select className="h-10 rounded-xl border border-border px-3 text-xs" name="changeType">
+                    <select className="h-10 rounded-md border border-border px-3 text-xs" name="changeType">
                       <option value="transfer">部门调动</option>
                       <option value="promotion">晋升</option>
                       <option value="regularization">转正</option>
@@ -640,23 +640,23 @@ export default async function EmployeeDetailPage({
                       <option value="hire">入职</option>
                       <option value="other">其他异动</option>
                     </select>
-                    <input className="h-10 rounded-xl border border-border px-3 text-xs" defaultValue={today()} name="effectiveOn" required type="date" />
-                    <select className="h-10 rounded-xl border border-border px-3 text-xs" defaultValue={employee.department_id ?? ""} name="toDepartmentId">
+                    <input className="h-10 rounded-md border border-border px-3 text-xs" defaultValue={today()} name="effectiveOn" required type="date" />
+                    <select className="h-10 rounded-md border border-border px-3 text-xs" defaultValue={employee.department_id ?? ""} name="toDepartmentId">
                       <option value="">不分配部门</option>
                       {departments.map((item) => (
                         <option key={item.id} value={item.id}>{item.name}</option>
                       ))}
                     </select>
-                    <input className="h-10 rounded-xl border border-border px-3 text-xs" defaultValue={employee.title ?? ""} name="toTitle" placeholder="变更后职位" />
-                    <select className="h-10 rounded-xl border border-border px-3 text-xs" defaultValue={employee.employment_status} name="toEmploymentStatus">
+                    <input className="h-10 rounded-md border border-border px-3 text-xs" defaultValue={employee.title ?? ""} name="toTitle" placeholder="变更后职位" />
+                    <select className="h-10 rounded-md border border-border px-3 text-xs" defaultValue={employee.employment_status} name="toEmploymentStatus">
                       <option value="active">在职</option>
                       <option value="probation">试用</option>
                       <option value="intern">实习</option>
                       <option value="part_time">兼职</option>
                       <option value="departed">已离职</option>
                     </select>
-                    <input className="h-10 rounded-xl border border-border px-3 text-xs" name="reason" placeholder="异动原因" required />
-                    <button className="h-10 rounded-xl bg-primary text-xs text-primary-foreground sm:col-span-2" type="submit">
+                    <input className="h-10 rounded-md border border-border px-3 text-xs" name="reason" placeholder="异动原因" required />
+                    <button className="h-10 rounded-md bg-primary text-xs text-primary-foreground sm:col-span-2" type="submit">
                       确认异动并更新任职信息
                     </button>
                   </form>

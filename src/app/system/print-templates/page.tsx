@@ -9,7 +9,7 @@ import { savePrintTemplateAction } from "@/features/experience/actions";
 import { createClient } from "@/lib/supabase/server";
 export const metadata: Metadata = { title: "打印模板中心" };
 export const dynamic = "force-dynamic";
-const input = "h-9 rounded-xl border border-border bg-white px-3 text-[10px]";
+const input = "h-9 rounded-md border border-border bg-white px-3 text-xs";
 export default async function Page({
   searchParams,
 }: {
@@ -29,7 +29,7 @@ export default async function Page({
       breadcrumb="系统 / 打印模板"
       currentUser={{ name: e.name, roleLabel: e.title ?? "内部员工" }}
     >
-      <main className="mx-auto max-w-[1300px] p-4 sm:p-6 xl:p-8">
+      <main className="mx-auto max-w-[1200px] p-4 sm:p-6 xl:p-8">
         <CapabilityHero
           eyebrow="PRINT · PDF · WATERMARK"
           title="打印模板中心"
@@ -37,14 +37,14 @@ export default async function Page({
           icon={Printer}
         />
         {(p.created || p.error) && (
-          <div className="mt-4 rounded-xl border p-3 text-[10px]">
+          <div className="mt-4 rounded-md border p-3 text-xs">
             {p.error ? "保存失败，请检查模板资料和权限。" : "打印模板已保存。"}
           </div>
         )}
         <div className="mt-5 grid gap-5 xl:grid-cols-[380px_1fr]">
           <form
             action={savePrintTemplateAction}
-            className="grid gap-3 rounded-[20px] border border-border bg-white p-5"
+            className="grid gap-3 rounded-md border border-border bg-white p-5"
           >
             <h2 className="text-sm font-semibold">新增模板</h2>
             <input
@@ -78,14 +78,14 @@ export default async function Page({
             </select>
             <input className={input} name="header" placeholder="页眉" />
             <input className={input} name="footer" placeholder="页脚" />
-            <label className="text-[10px]">
+            <label className="text-xs">
               <input defaultChecked name="showLogo" type="checkbox" /> 显示企业
               Logo
             </label>
-            <label className="text-[10px]">
+            <label className="text-xs">
               <input name="showWatermark" type="checkbox" /> 显示水印
             </label>
-            <button className="h-9 rounded-xl bg-primary text-[10px] text-white">
+            <button className="h-9 rounded-md bg-primary text-xs text-white">
               保存模板
             </button>
           </form>
@@ -102,7 +102,7 @@ export default async function Page({
               name: (
                 <div>
                   <b>{x.name}</b>
-                  <div className="font-mono text-[9px]">
+                  <div className="font-mono text-xs">
                     {x.code} · V{x.version}
                   </div>
                 </div>

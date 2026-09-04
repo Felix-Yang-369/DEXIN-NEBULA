@@ -31,6 +31,7 @@ import type {
   FinanceDocumentSource,
   FinanceDocumentUpdate,
 } from "@/features/finance/types";
+import { UnsavedChangesGuard } from "@/components/ui/unsaved-changes-guard";
 
 type EditableField =
   | "document_type"
@@ -65,10 +66,10 @@ const sourceLabels: Record<FinanceDocumentSource, string> = {
 };
 
 const inputClass =
-  "h-8 w-full min-w-0 rounded-md border border-transparent bg-transparent px-2 text-[11px] text-foreground outline-none transition hover:bg-[#f7faf8] focus:border-primary/30 focus:bg-white focus:shadow-[0_0_0_2px_rgba(22,101,82,.08)] disabled:cursor-default disabled:text-foreground disabled:opacity-100";
+  "h-8 w-full min-w-0 rounded-md border border-transparent bg-transparent px-2 text-xs text-foreground outline-none transition hover:bg-muted focus:border-primary/30 focus:bg-white focus: disabled:cursor-default disabled:text-foreground disabled:opacity-100";
 
 const cellClass =
-  "border-b border-r border-[#e7ece9] px-1.5 py-1.5 align-middle";
+  "border-b border-r border-border px-1.5 py-1.5 align-middle";
 
 function toUpdate(row: FinanceDocumentRow): FinanceDocumentUpdate {
   return {
@@ -189,8 +190,9 @@ export function EditableFinanceDocumentGrid({
 
   return (
     <div onKeyDown={handleShortcut}>
-      <div className="flex flex-col gap-3 border-b border-[#e7ece9] bg-[#fbfcfc] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-wrap items-center gap-3 text-[10px]">
+      <UnsavedChangesGuard dirty={dirtyIds.size > 0} onDiscard={resetChanges} />
+      <div className="flex flex-col gap-3 border-b border-border bg-muted px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-3 text-xs">
           <span className="inline-flex items-center gap-1.5 text-muted-foreground">
             {canManage ? (
               <PencilLine className="size-3.5 text-primary" />
@@ -202,14 +204,14 @@ export function EditableFinanceDocumentGrid({
               : "董事长只读视图，财务角色可编辑"}
           </span>
           {dirtyIds.size > 0 && (
-            <span className="rounded-full bg-[#fff4e7] px-2.5 py-1 font-medium text-[#94601f]">
+            <span className="rounded-full bg-muted px-2.5 py-1 font-medium text-foreground">
               {dirtyIds.size} 行待保存
             </span>
           )}
           {message && (
             <span
               className={`inline-flex items-center gap-1.5 ${
-                message.tone === "success" ? "text-[#0d7580]" : "text-[#a65548]"
+                message.tone === "success" ? "text-foreground" : "text-foreground"
               }`}
             >
               {message.tone === "success" && <CheckCircle2 className="size-3.5" />}
@@ -220,7 +222,7 @@ export function EditableFinanceDocumentGrid({
         {canManage && (
           <div className="flex items-center gap-2">
             <button
-              className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-border bg-white px-3 text-[10px] text-muted-foreground transition hover:text-foreground disabled:opacity-40"
+              className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-border bg-white px-3 text-xs text-muted-foreground transition hover:text-foreground disabled:opacity-40"
               disabled={dirtyIds.size === 0 || saving}
               onClick={resetChanges}
               type="button"
@@ -229,7 +231,7 @@ export function EditableFinanceDocumentGrid({
               撤销修改
             </button>
             <button
-              className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-primary px-3 text-[10px] font-medium text-primary-foreground transition hover:bg-primary/92 disabled:opacity-45"
+              className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-primary px-3 text-xs font-medium text-primary-foreground transition hover:bg-primary/92 disabled:opacity-45"
               disabled={dirtyIds.size === 0 || saving}
               onClick={() => void saveChanges()}
               type="button"
@@ -248,25 +250,25 @@ export function EditableFinanceDocumentGrid({
 
       <div className="max-h-[620px] overflow-auto">
         <table className="w-full min-w-[1900px] table-fixed border-separate border-spacing-0 text-left">
-          <thead className="sticky top-0 z-20 bg-[#f2f6f4] text-[9px] font-medium text-[#61716b]">
+          <thead className="sticky top-0 z-20 bg-muted text-xs font-medium text-foreground">
             <tr>
-              <th className="sticky left-0 z-30 w-10 border-b border-r border-[#dce6ed] bg-[#edf3f0] px-2 py-2.5 text-center">
+              <th className="sticky left-0 z-30 w-10 border-b border-r border-border bg-muted px-2 py-2.5 text-center">
                 #
               </th>
-              <th className="w-20 border-b border-r border-[#dce6ed] px-2 py-2.5">类型</th>
-              <th className="w-40 border-b border-r border-[#dce6ed] px-2 py-2.5">单据编号</th>
-              <th className="w-52 border-b border-r border-[#dce6ed] px-2 py-2.5">往来单位</th>
-              <th className="w-56 border-b border-r border-[#dce6ed] px-2 py-2.5">业务摘要</th>
-              <th className="w-52 border-b border-r border-[#dce6ed] px-2 py-2.5">来源 / 来源单号</th>
-              <th className="w-32 border-b border-r border-[#dce6ed] px-2 py-2.5">单据日期</th>
-              <th className="w-32 border-b border-r border-[#dce6ed] px-2 py-2.5">到期日期</th>
-              <th className="w-36 border-b border-r border-[#dce6ed] px-2 py-2.5 text-right">原始金额</th>
-              <th className="w-36 border-b border-r border-[#dce6ed] px-3 py-2.5 text-right">已核销</th>
-              <th className="w-36 border-b border-r border-[#dce6ed] px-3 py-2.5 text-right">未结余额</th>
-              <th className="w-40 border-b border-r border-[#dce6ed] px-2 py-2.5">发票号码</th>
-              <th className="w-28 border-b border-r border-[#dce6ed] px-2 py-2.5">状态</th>
-              <th className="w-56 border-b border-r border-[#dce6ed] px-2 py-2.5">备注</th>
-              <th className="w-28 border-b border-[#dce6ed] px-2 py-2.5">操作</th>
+              <th className="w-20 border-b border-r border-border px-2 py-2.5">类型</th>
+              <th className="w-40 border-b border-r border-border px-2 py-2.5">单据编号</th>
+              <th className="w-52 border-b border-r border-border px-2 py-2.5">往来单位</th>
+              <th className="w-56 border-b border-r border-border px-2 py-2.5">业务摘要</th>
+              <th className="w-52 border-b border-r border-border px-2 py-2.5">来源 / 来源单号</th>
+              <th className="w-32 border-b border-r border-border px-2 py-2.5">单据日期</th>
+              <th className="w-32 border-b border-r border-border px-2 py-2.5">到期日期</th>
+              <th className="w-36 border-b border-r border-border px-2 py-2.5 text-right">原始金额</th>
+              <th className="w-36 border-b border-r border-border px-3 py-2.5 text-right">已核销</th>
+              <th className="w-36 border-b border-r border-border px-3 py-2.5 text-right">未结余额</th>
+              <th className="w-40 border-b border-r border-border px-2 py-2.5">发票号码</th>
+              <th className="w-28 border-b border-r border-border px-2 py-2.5">状态</th>
+              <th className="w-56 border-b border-r border-border px-2 py-2.5">备注</th>
+              <th className="w-28 border-b border-border px-2 py-2.5">操作</th>
             </tr>
           </thead>
           <tbody className="bg-white">
@@ -281,14 +283,14 @@ export function EditableFinanceDocumentGrid({
 
               return (
                 <tr
-                  className={`group ${dirty ? "bg-[#fffdf7]" : "hover:bg-[#fbfcfc]"}`}
+                  className={`group ${dirty ? "bg-muted" : "hover:bg-muted"}`}
                   key={row.id}
                 >
                   <td
-                    className={`sticky left-0 z-10 border-b border-r border-[#e2e9e5] px-2 py-2 text-center font-mono text-[9px] ${
+                    className={`sticky left-0 z-10 border-b border-r border-border px-2 py-2 text-center font-mono text-xs ${
                       dirty
-                        ? "bg-[#fff7df] font-semibold text-[#94601f]"
-                        : "bg-[#f8fafc] text-muted-foreground"
+                        ? "bg-muted font-semibold text-foreground"
+                        : "bg-muted text-muted-foreground"
                     }`}
                   >
                     {rowIndex + 1}
@@ -308,7 +310,7 @@ export function EditableFinanceDocumentGrid({
                       <option value="payable">应付</option>
                     </select>
                   </td>
-                  <td className={`${cellClass} px-3 font-mono text-[9px] text-muted-foreground`}>
+                  <td className={`${cellClass} px-3 font-mono text-xs text-muted-foreground`}>
                     {row.document_no}
                   </td>
                   <td className={cellClass}>
@@ -428,10 +430,10 @@ export function EditableFinanceDocumentGrid({
                       value={row.total_amount}
                     />
                   </td>
-                  <td className={`${cellClass} px-3 text-right text-[10px] text-muted-foreground`}>
+                  <td className={`${cellClass} px-3 text-right text-xs text-muted-foreground`}>
                     {currency.format(Number(row.settled_amount))}
                   </td>
-                  <td className={`${cellClass} px-3 text-right text-[11px] font-semibold`}>
+                  <td className={`${cellClass} px-3 text-right text-xs font-semibold`}>
                     {currency.format(outstanding)}
                   </td>
                   <td className={cellClass}>
@@ -454,10 +456,10 @@ export function EditableFinanceDocumentGrid({
                   <td className={cellClass}>
                     {hasSettlement ? (
                       <div
-                        className={`rounded-md px-2 py-1.5 text-center text-[9px] ${
+                        className={`rounded-md px-2 py-1.5 text-center text-xs ${
                           row.status === "settled"
-                            ? "bg-[#edf4f7] text-[#0d7580]"
-                            : "bg-[#fff5e8] text-[#966320]"
+                            ? "bg-muted text-foreground"
+                            : "bg-muted text-foreground"
                         }`}
                       >
                         {statusText}
@@ -495,10 +497,10 @@ export function EditableFinanceDocumentGrid({
                       value={row.note ?? ""}
                     />
                   </td>
-                  <td className="border-b border-[#e7ece9] px-2 py-1.5">
+                  <td className="border-b border-border px-2 py-1.5">
                     {canManage && outstanding > 0 && row.status !== "void" ? (
                       <button
-                        className="inline-flex h-7 w-full items-center justify-center gap-1 rounded-md bg-[#eaf3f8] px-2 text-[9px] font-medium text-[#0d6c78] transition hover:bg-[#dcece5] disabled:cursor-not-allowed disabled:opacity-45"
+                        className="inline-flex h-7 w-full items-center justify-center gap-1 rounded-md bg-muted px-2 text-xs font-medium text-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-45"
                         disabled={dirty}
                         onClick={() => setSettlementId(row.id)}
                         title={dirty ? "请先保存本行修改" : "登记收付款并核销"}
@@ -508,7 +510,7 @@ export function EditableFinanceDocumentGrid({
                         核销
                       </button>
                     ) : (
-                      <span className="block text-center text-[9px] text-muted-foreground">
+                      <span className="block text-center text-xs text-muted-foreground">
                         {row.status === "void" ? "已作废" : "—"}
                       </span>
                     )}
@@ -520,7 +522,7 @@ export function EditableFinanceDocumentGrid({
         </table>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[#e7ece9] bg-[#fbfcfc] px-4 py-2.5 text-[9px] text-muted-foreground">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border bg-muted px-4 py-2.5 text-xs text-muted-foreground">
         <span>共 {draftRows.length} 行 · 金额与已核销数据按人民币显示</span>
         <span>已核销单据的类型和原始金额锁定，避免破坏凭证链路</span>
       </div>
@@ -529,13 +531,13 @@ export function EditableFinanceDocumentGrid({
         <div
           aria-label="收付款核销"
           aria-modal="true"
-          className="fixed inset-0 z-50 grid place-items-center bg-[#082f28]/35 p-4 backdrop-blur-[2px]"
+          className="fixed inset-0 z-50 grid place-items-center bg-foreground/40 p-4 backdrop-blur-[2px]"
           role="dialog"
         >
-          <section className="w-full max-w-xl rounded-[20px] border border-white/60 bg-white p-5 shadow-[0_24px_80px_-30px_rgba(5,45,37,.55)] sm:p-6">
+          <section className="w-full max-w-xl rounded-md border border-white/60 bg-white p-5  sm:p-6">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <div className="text-[10px] font-medium tracking-[0.12em] text-primary">
+                <div className="text-xs font-medium tracking-[0.12em] text-primary">
                   {settlementRow.document_type === "receivable"
                     ? "RECEIPT · 收款核销"
                     : "PAYMENT · 付款核销"}
@@ -543,7 +545,7 @@ export function EditableFinanceDocumentGrid({
                 <h3 className="mt-2 text-base font-semibold">
                   {settlementRow.counterparty_name}
                 </h3>
-                <p className="mt-1 text-[10px] text-muted-foreground">
+                <p className="mt-1 text-xs text-muted-foreground">
                   {settlementRow.document_no} · 未结余额{" "}
                   {currency.format(
                     outstandingAmount(
@@ -555,7 +557,7 @@ export function EditableFinanceDocumentGrid({
               </div>
               <button
                 aria-label="关闭核销窗口"
-                className="grid size-8 place-items-center rounded-lg bg-[#f3f6f4] text-muted-foreground hover:text-foreground"
+                className="grid size-8 place-items-center rounded-lg bg-muted text-muted-foreground hover:text-foreground"
                 onClick={() => setSettlementId(null)}
                 type="button"
               >
@@ -564,10 +566,10 @@ export function EditableFinanceDocumentGrid({
             </div>
             <form action={settleFinanceDocument} className="mt-5 grid gap-3 sm:grid-cols-2">
               <input name="documentId" type="hidden" value={settlementRow.id} />
-              <label className="text-[10px] text-muted-foreground">
+              <label className="text-xs text-muted-foreground">
                 核销金额
                 <input
-                  className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs text-foreground outline-none focus:border-primary/40"
+                  className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs text-foreground outline-none focus:border-primary/40"
                   defaultValue={outstandingAmount(
                     settlementRow.total_amount,
                     settlementRow.settled_amount,
@@ -583,26 +585,26 @@ export function EditableFinanceDocumentGrid({
                   type="number"
                 />
               </label>
-              <label className="text-[10px] text-muted-foreground">
+              <label className="text-xs text-muted-foreground">
                 收付款日期
                 <input
-                  className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs"
+                  className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs"
                   defaultValue={currentDate}
                   name="settledOn"
                   required
                   type="date"
                 />
               </label>
-              <select className="h-10 rounded-xl border border-border bg-white px-3 text-xs" name="paymentChannel">
+              <select className="h-10 rounded-md border border-border bg-white px-3 text-xs" name="paymentChannel">
                 <option value="bank">银行转账</option>
                 <option value="wechat">微信支付</option>
                 <option value="alipay">支付宝</option>
                 <option value="cash">现金</option>
                 <option value="other">其他</option>
               </select>
-              <input className="h-10 rounded-xl border border-border bg-white px-3 text-xs" name="accountName" placeholder="收付款账户" />
+              <input className="h-10 rounded-md border border-border bg-white px-3 text-xs" name="accountName" placeholder="收付款账户" />
               <input
-                className="h-10 rounded-xl border border-border bg-white px-3 text-xs"
+                className="h-10 rounded-md border border-border bg-white px-3 text-xs"
                 defaultValue={
                   settlementRow.document_type === "receivable"
                     ? "银行存款"
@@ -612,7 +614,7 @@ export function EditableFinanceDocumentGrid({
                 required
               />
               <input
-                className="h-10 rounded-xl border border-border bg-white px-3 text-xs"
+                className="h-10 rounded-md border border-border bg-white px-3 text-xs"
                 defaultValue={
                   settlementRow.document_type === "receivable"
                     ? "应收账款"
@@ -621,9 +623,9 @@ export function EditableFinanceDocumentGrid({
                 name="creditAccount"
                 required
               />
-              <input className="h-10 rounded-xl border border-border bg-white px-3 text-xs" min="0" name="attachmentCount" placeholder="附件张数" type="number" />
-              <input className="h-10 rounded-xl border border-border bg-white px-3 text-xs" name="note" placeholder="核销备注（选填）" />
-              <button className="h-10 rounded-xl bg-primary px-4 text-xs font-medium text-primary-foreground sm:col-span-2" type="submit">
+              <input className="h-10 rounded-md border border-border bg-white px-3 text-xs" min="0" name="attachmentCount" placeholder="附件张数" type="number" />
+              <input className="h-10 rounded-md border border-border bg-white px-3 text-xs" name="note" placeholder="核销备注（选填）" />
+              <button className="h-10 rounded-md bg-primary px-4 text-xs font-medium text-primary-foreground sm:col-span-2" type="submit">
                 确认核销并生成流水与凭证
               </button>
             </form>

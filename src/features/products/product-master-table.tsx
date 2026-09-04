@@ -56,20 +56,20 @@ export function ProductMasterTable({
   };
 
   const header =
-    "whitespace-nowrap border-b border-r border-[#e4ebe8] bg-[#f5f8fb] px-3 py-3 text-left text-[10px] font-medium text-[#61766e]";
+    "whitespace-nowrap border-b border-r border-border bg-muted px-3 py-3 text-left text-xs font-medium text-foreground";
   const cell =
-    "whitespace-nowrap border-b border-r border-[#eaf0f4] px-3 py-2.5 text-[11px] text-[#40564f]";
+    "whitespace-nowrap border-b border-r border-border px-3 py-2.5 text-xs text-foreground";
 
   return (
-    <section className="mt-5 overflow-hidden rounded-[22px] border border-border/75 bg-white shadow-[0_12px_38px_-30px_rgba(19,57,48,.42)]">
+    <section className="mt-5 overflow-hidden rounded-md border border-border/75 bg-white ">
       <div className="flex items-center justify-between border-b border-border/70 px-5 py-4">
         <div>
           <h2 className="text-sm font-semibold">产品主数据表</h2>
-          <p className="mt-1 text-[10px] text-muted-foreground">
+          <p className="mt-1 text-xs text-muted-foreground">
             横向浏览产品、价格和供货信息，点击任意行查看或编辑完整主档
           </p>
         </div>
-        <span className="rounded-full bg-[#eef6f2] px-3 py-1.5 text-[10px] text-[#176d78]">
+        <span className="rounded-full bg-muted px-3 py-1.5 text-xs text-foreground">
           {products.length} 条
         </span>
       </div>
@@ -106,14 +106,14 @@ export function ProductMasterTable({
                 : undefined;
               return (
                 <tr
-                  className={`transition-colors hover:bg-[#eff7f3] ${
-                    index % 2 ? "bg-[#fbfcfc]" : "bg-white"
+                  className={`transition-colors hover:bg-muted ${
+                    index % 2 ? "bg-muted" : "bg-white"
                   }`}
                   key={product.id}
                 >
                   <td className={`${cell} sticky left-0 z-10 bg-inherit`}>
                     <Link
-                      className="grid size-10 place-items-center overflow-hidden rounded-xl bg-[#f1f5f3]"
+                      className="grid size-10 place-items-center overflow-hidden rounded-md bg-muted"
                       href={hrefFor(product.id)}
                     >
                       {imageUrl ? (
@@ -132,7 +132,7 @@ export function ProductMasterTable({
                   </td>
                   <td className={`${cell} sticky left-20 z-10 bg-inherit`}>
                     <Link
-                      className="font-semibold text-[#235d4e] hover:underline"
+                      className="font-semibold text-foreground hover:underline"
                       href={hrefFor(product.id)}
                     >
                       {product.code}
@@ -164,7 +164,7 @@ export function ProductMasterTable({
                   <td className={cell}>{product.is_recommended ? "是" : "否"}</td>
                   <td className={cell}>
                     <span
-                      className={`rounded-full px-2 py-1 text-[9px] ${
+                      className={`rounded-full px-2 py-1 text-xs ${
                         product.status === "active"
                           ? "bg-emerald-50 text-emerald-700"
                           : product.status === "draft"

@@ -180,7 +180,7 @@ function MetricCard({
   tone: string;
 }) {
   return (
-    <article className="rounded-[20px] border border-border/75 bg-white p-5 shadow-[0_8px_30px_-24px_rgba(23,57,50,.35)]">
+    <article className="rounded-md border border-border/75 bg-white p-5 ">
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="text-xs text-muted-foreground">{label}</div>
@@ -188,11 +188,11 @@ function MetricCard({
             {value}
           </div>
         </div>
-        <div className={`grid size-10 place-items-center rounded-xl ${tone}`}>
+        <div className={`grid size-10 place-items-center rounded-md ${tone}`}>
           {icon}
         </div>
       </div>
-      <div className="mt-4 border-t border-border/70 pt-3 text-[10px] text-muted-foreground">
+      <div className="mt-4 border-t border-border/70 pt-3 text-xs text-muted-foreground">
         {note}
       </div>
     </article>
@@ -264,7 +264,7 @@ export default async function FinancePage({
       )
       .order("issue_date", { ascending: false })
       .order("due_date", { ascending: true })
-      .limit(1000);
+      .limit(100);
 
     const [
       transactionResult,
@@ -288,12 +288,12 @@ export default async function FinancePage({
           .from("bank_statement_lines")
           .select("id, amount, reconciled_amount, status")
           .order("transaction_date", { ascending: false })
-          .limit(500),
+          .limit(100),
         supabase
           .from("finance_invoices")
           .select("id, status")
           .order("issued_on", { ascending: false })
-          .limit(500),
+          .limit(100),
         supabase
           .from("customer_legal_entities")
           .select(
@@ -436,7 +436,7 @@ export default async function FinancePage({
       value: `${overdueReceivableRows.length} 笔`,
       detail: compactCurrency.format(overdueReceivable),
       href: "/finance?book=receivable#documents",
-      tone: "border-[#efcfbf] bg-[#fff8f4] text-[#9d553d]",
+      tone: "border-border bg-muted text-foreground",
       icon: <CircleAlert className="size-4" />,
     },
     {
@@ -444,7 +444,7 @@ export default async function FinancePage({
       value: `${overduePayableRows.length} 笔`,
       detail: "核对付款计划与资金账户",
       href: "/finance?book=payable#documents",
-      tone: "border-[#eadcaf] bg-[#fffaf0] text-[#8c681f]",
+      tone: "border-border bg-muted text-foreground",
       icon: <CalendarClock className="size-4" />,
     },
     {
@@ -452,7 +452,7 @@ export default async function FinancePage({
       value: `${unmatchedBankLines.length} 笔`,
       detail: compactCurrency.format(unmatchedBankAmount),
       href: "/finance/bank-reconciliation#reconcile",
-      tone: "border-[#c7e2df] bg-[#f3fbfa] text-[#087c78]",
+      tone: "border-border bg-muted text-foreground",
       icon: <Landmark className="size-4" />,
     },
     {
@@ -460,7 +460,7 @@ export default async function FinancePage({
       value: `${unverifiedInvoiceCount} 张`,
       detail: "完成票据台账复核",
       href: "/finance/invoices",
-      tone: "border-[#d6dfeb] bg-[#f7f9fc] text-[#47647d]",
+      tone: "border-border bg-muted text-foreground",
       icon: <ReceiptText className="size-4" />,
     },
   ];
@@ -478,15 +478,15 @@ export default async function FinancePage({
           : undefined
       }
     >
-      <main className="mx-auto max-w-[1600px] p-4 sm:p-6 xl:p-8">
-        <div className="mb-4 flex justify-end"><Link className="rounded-xl bg-[#0a385d] px-4 py-2 text-[10px] text-white" href="/finance/automation">进入业财自动化</Link></div>
-        <section className="relative overflow-hidden rounded-[24px] bg-[#0a385d] px-6 py-7 text-white shadow-[0_18px_50px_-32px_rgba(12,47,41,.75)] sm:px-8 lg:px-10">
+      <main className="mx-auto max-w-[1440px] p-4 sm:p-6 xl:p-8">
+        <div className="mb-4 flex justify-end"><Link className="rounded-md bg-primary px-4 py-2 text-xs text-white" href="/finance/automation">进入业财自动化</Link></div>
+        <section className="ui-page-header">
           <div className="absolute -right-16 -top-28 size-80 rounded-full border border-white/8" />
           <div className="absolute right-24 top-14 size-28 rounded-full border border-white/8" />
           <ChartNoAxesCombined className="pointer-events-none absolute right-12 top-1/2 hidden size-40 -translate-y-1/2 text-white/[0.055] sm:block" />
           <div className="relative flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
             <div>
-              <div className="text-xs font-medium tracking-[0.12em] text-[#79d8d5]">
+              <div className="text-xs font-medium tracking-[0.12em] text-muted-foreground">
                 FMS · FINANCE MANAGEMENT SYSTEM
               </div>
               <h1 className="mt-3 text-2xl font-semibold tracking-[-0.035em] sm:text-[30px]">
@@ -499,7 +499,7 @@ export default async function FinancePage({
             <div className="flex flex-wrap items-center gap-2 self-start lg:self-auto">
               {canView ? (
                 <Link
-                  className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/18 bg-white/8 px-4 text-xs font-medium text-white transition-colors hover:bg-white/14"
+                  className="inline-flex h-10 items-center gap-2 rounded-md border border-white/18 bg-white/8 px-4 text-xs font-medium text-white transition-colors hover:bg-white/14"
                   href="/finance/accounting"
                 >
                   <Scale className="size-4" />
@@ -508,7 +508,7 @@ export default async function FinancePage({
               ) : null}
               {canView ? (
                 <Link
-                  className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/18 bg-white/8 px-4 text-xs font-medium text-white transition-colors hover:bg-white/14"
+                  className="inline-flex h-10 items-center gap-2 rounded-md border border-white/18 bg-white/8 px-4 text-xs font-medium text-white transition-colors hover:bg-white/14"
                   href="/finance/receivables"
                 >
                   <FileSpreadsheet className="size-4" />
@@ -517,14 +517,14 @@ export default async function FinancePage({
               ) : null}
               {canManage ? (
                 <a
-                  className="inline-flex h-10 items-center gap-2 rounded-xl bg-white px-4 text-xs font-medium text-[#0b3a5d] transition-colors hover:bg-[#eaf3f8]"
+                  className="inline-flex h-10 items-center gap-2 rounded-md bg-white px-4 text-xs font-medium text-foreground transition-colors hover:bg-muted"
                   href="#documents"
                 >
                   <Plus className="size-4" />
                   新建往来单据
                 </a>
               ) : (
-                <div className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/12 bg-white/8 px-4 text-[11px] text-white/66">
+                <div className="inline-flex h-10 items-center gap-2 rounded-md border border-white/12 bg-white/8 px-4 text-xs text-white/66">
                   <LockKeyhole className="size-4" />
                   董事长经营只读视图
                 </div>
@@ -534,14 +534,14 @@ export default async function FinancePage({
         </section>
 
         {!canView ? (
-          <section className="mt-5 rounded-[20px] border border-border/75 bg-white px-6 py-16 text-center">
+          <section className="mt-5 rounded-md border border-border/75 bg-white px-6 py-16 text-center">
             <LockKeyhole className="mx-auto size-10 text-muted-foreground/60" />
             <h2 className="mt-4 text-base font-semibold">暂无财务数据访问权限</h2>
             <p className="mt-2 text-xs text-muted-foreground">
               财务中心仅向财务角色和董事长开放，系统管理员默认不能读取敏感财务数据。
             </p>
             <Link
-              className="mt-5 inline-flex h-9 items-center rounded-xl bg-primary px-4 text-xs text-primary-foreground"
+              className="mt-5 inline-flex h-9 items-center rounded-md bg-primary px-4 text-xs text-primary-foreground"
               href="/dashboard"
             >
               返回工作台
@@ -550,50 +550,50 @@ export default async function FinancePage({
         ) : (
           <>
             {!dataAvailable && configured && (
-              <div className="mt-5 rounded-2xl border border-[#ead7b8] bg-[#fff9ef] px-4 py-3 text-xs text-[#8a6633]">
+              <div className="mt-5 rounded-lg border border-border bg-muted px-4 py-3 text-xs text-foreground">
                 财务数据表尚未初始化，请执行最新 Supabase 数据库迁移。
               </div>
             )}
 
             {feedback.created && (
-              <div className="mt-5 rounded-2xl border border-[#cfe8ec] bg-[#edf7f2] px-4 py-3 text-xs text-[#0d6c78]">
+              <div className="mt-5 rounded-lg border border-border bg-muted px-4 py-3 text-xs text-foreground">
                 已登记财务流水：{feedback.created}
               </div>
             )}
             {feedback.documentCreated && (
-              <div className="mt-5 rounded-2xl border border-[#cfe8ec] bg-[#edf7f2] px-4 py-3 text-xs text-[#0d6c78]">
+              <div className="mt-5 rounded-lg border border-border bg-muted px-4 py-3 text-xs text-foreground">
                 已创建往来单据：{feedback.documentCreated}
               </div>
             )}
             {feedback.settled && (
-              <div className="mt-5 rounded-2xl border border-[#cfe8ec] bg-[#edf7f2] px-4 py-3 text-xs text-[#0d6c78]">
+              <div className="mt-5 rounded-lg border border-border bg-muted px-4 py-3 text-xs text-foreground">
                 核销完成：{feedback.settled}，现金流水与记账凭证已同步生成。
               </div>
             )}
             {feedback.voucherCreated && (
-              <div className="mt-5 rounded-2xl border border-[#cfe8ec] bg-[#edf7f2] px-4 py-3 text-xs text-[#0d6c78]">
+              <div className="mt-5 rounded-lg border border-border bg-muted px-4 py-3 text-xs text-foreground">
                 已登记凭证：{feedback.voucherCreated}
               </div>
             )}
             {feedback.error && (
-              <div className="mt-5 rounded-2xl border border-[#eed3cd] bg-[#fff4f1] px-4 py-3 text-xs text-[#985846]">
+              <div className="mt-5 rounded-lg border border-border bg-muted px-4 py-3 text-xs text-foreground">
                 {feedback.error}
               </div>
             )}
 
             <section className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(330px,.55fr)]">
-              <article className="overflow-hidden rounded-[22px] border border-border/75 bg-white">
+              <article className="overflow-hidden rounded-md border border-border/75 bg-white">
                 <div className="flex flex-col gap-3 border-b border-border/70 px-5 py-5 sm:flex-row sm:items-end sm:justify-between sm:px-6">
                   <div>
-                    <div className="text-[10px] font-semibold tracking-[0.16em] text-[#087c78]">
+                    <div className="text-xs font-semibold tracking-[0.16em] text-foreground">
                       TODAY · FINANCE DESK
                     </div>
                     <h2 className="mt-2 text-base font-semibold">财务待办工作台</h2>
-                    <p className="mt-1 text-[11px] text-muted-foreground">
+                    <p className="mt-1 text-xs text-muted-foreground">
                       按风险和处理顺序汇总真实业务数据，点击即可进入对应台账。
                     </p>
                   </div>
-                  <span className="w-fit rounded-full bg-[#edf7f5] px-3 py-1.5 text-[10px] font-medium text-[#087c78]">
+                  <span className="w-fit rounded-full bg-muted px-3 py-1.5 text-xs font-medium text-foreground">
                     {financeTasks.reduce(
                       (sum, item) => sum + Number.parseInt(item.value, 10),
                       0,
@@ -604,21 +604,21 @@ export default async function FinancePage({
                 <div className="grid gap-3 p-4 sm:grid-cols-2 sm:p-5">
                   {financeTasks.map((task) => (
                     <Link
-                      className={`group flex min-h-28 items-start gap-3 rounded-[18px] border p-4 transition hover:-translate-y-0.5 hover:shadow-sm ${task.tone}`}
+                      className={`group flex min-h-28 items-start gap-3 rounded-md border p-4 transition   ${task.tone}`}
                       href={task.href}
                       key={task.label}
                     >
-                      <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-white/80 shadow-sm">
+                      <span className="grid size-9 shrink-0 place-items-center rounded-md bg-white/80 ">
                         {task.icon}
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block text-[11px] font-medium opacity-80">
+                        <span className="block text-xs font-medium opacity-80">
                           {task.label}
                         </span>
                         <span className="mt-2 block text-xl font-semibold tracking-[-0.03em]">
                           {task.value}
                         </span>
-                        <span className="mt-1 block truncate text-[10px] opacity-65">
+                        <span className="mt-1 block truncate text-xs opacity-65">
                           {task.detail}
                         </span>
                       </span>
@@ -628,17 +628,14 @@ export default async function FinancePage({
                 </div>
               </article>
 
-              <article className="rounded-[22px] border border-border/75 bg-[linear-gradient(160deg,#0c3554,#0b4b61)] p-5 text-white sm:p-6">
+              <article className="rounded-md border border-border bg-card p-5 text-foreground sm:p-6">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <div className="text-[10px] font-semibold tracking-[0.16em] text-[#79d8d5]">
-                      PERIOD READINESS
-                    </div>
-                    <h2 className="mt-2 text-base font-semibold">
+                    <h2 className="text-base font-semibold">
                       {monthLabel(startOfCurrentMonth().slice(0, 7))}月结准备
                     </h2>
                   </div>
-                  <FileClock className="size-5 text-white/55" />
+                  <FileClock className="size-5 text-primary" />
                 </div>
                 <div className="mt-5 space-y-2.5">
                   {[
@@ -656,19 +653,19 @@ export default async function FinancePage({
                     const ready = step.pending === 0;
                     return (
                       <div
-                        className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.055] px-3 py-3"
+                        className="flex items-center gap-3 border-b border-border px-1 py-3 last:border-b-0"
                         key={step.label}
                       >
                         {ready ? (
-                          <CheckCircle2 className="size-4 shrink-0 text-[#79d8d5]" />
+                          <CheckCircle2 className="size-4 shrink-0 text-muted-foreground" />
                         ) : (
-                          <CircleDashed className="size-4 shrink-0 text-[#f0c66b]" />
+                          <CircleDashed className="size-4 shrink-0 text-muted-foreground" />
                         )}
-                        <span className="min-w-0 flex-1 text-[11px] text-white/75">
+                        <span className="min-w-0 flex-1 text-xs text-foreground">
                           {step.label}
                         </span>
                         <span
-                          className={`text-[10px] font-medium ${ready ? "text-[#79d8d5]" : "text-[#f0c66b]"}`}
+                          className={`text-xs font-medium ${ready ? "text-muted-foreground" : "text-muted-foreground"}`}
                         >
                           {ready ? "已就绪" : `${step.pending} 项`}
                         </span>
@@ -676,21 +673,21 @@ export default async function FinancePage({
                     );
                   })}
                 </div>
-                <p className="mt-4 text-[9px] leading-5 text-white/42">
+                <p className="mt-4 text-xs leading-5 text-muted-foreground">
                   当前为月结前检查清单，不执行正式会计结账；总账、法定报表和反结账将在会计科目体系完成后接入。
                 </p>
               </article>
             </section>
 
-            <section className="mt-5 rounded-[20px] border border-border/75 bg-white p-4 sm:p-5">
+            <section className="mt-5 rounded-md border border-border/75 bg-white p-4 sm:p-5">
               <div className="mb-4 flex items-end justify-between gap-4">
                 <div>
                   <h2 className="text-sm font-semibold">财务业务导航</h2>
-                  <p className="mt-1 text-[11px] text-muted-foreground">
+                  <p className="mt-1 text-xs text-muted-foreground">
                     按财务工作流组织应收、应付、资金、核销与凭证
                   </p>
                 </div>
-                <span className="rounded-full bg-[#eaf3f8] px-2.5 py-1 text-[10px] font-medium text-[#0d6c78]">
+                <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-foreground">
                   FMS
                 </span>
               </div>
@@ -752,17 +749,17 @@ export default async function FinancePage({
                   },
                 ].map((item) => (
                   <Link
-                    className="group rounded-2xl border border-[#e2e9e6] bg-[#fafcfe] p-3 transition hover:-translate-y-0.5 hover:border-[#a9c9bd] hover:bg-[#f4faf7]"
+                    className="group rounded-lg border border-border bg-muted p-3 transition  hover:border-border hover:bg-muted"
                     href={item.href}
                     key={item.label}
                   >
-                    <span className="grid size-8 place-items-center rounded-lg bg-[#e8f4ef] text-[#256355]">
+                    <span className="grid size-8 place-items-center rounded-lg bg-muted text-foreground">
                       {item.icon}
                     </span>
-                    <span className="mt-3 block text-xs font-medium text-[#0a385d]">
+                    <span className="mt-3 block text-xs font-medium text-foreground">
                       {item.label}
                     </span>
-                    <span className="mt-1 block text-[10px] text-muted-foreground">
+                    <span className="mt-1 block text-xs text-muted-foreground">
                       {item.note}
                     </span>
                   </Link>
@@ -775,41 +772,41 @@ export default async function FinancePage({
                 icon={<ArrowDownLeft className="size-5" />}
                 label="应收余额"
                 note={`${activeDocuments.filter((row) => row.document_type === "receivable").length} 笔待收款单据`}
-                tone="bg-[#eaf3f8] text-[#0d6c78]"
+                tone="bg-muted text-foreground"
                 value={compactCurrency.format(receivableOutstanding)}
               />
               <MetricCard
                 icon={<ArrowUpRight className="size-5" />}
                 label="应付余额"
                 note={`${activeDocuments.filter((row) => row.document_type === "payable").length} 笔待付款单据`}
-                tone="bg-[#fff0eb] text-[#a55b45]"
+                tone="bg-muted text-foreground"
                 value={compactCurrency.format(payableOutstanding)}
               />
               <MetricCard
                 icon={<CalendarClock className="size-5" />}
                 label="逾期应收"
                 note="已过到期日且尚未全部核销"
-                tone="bg-[#fff4e7] text-[#9a6321]"
+                tone="bg-muted text-foreground"
                 value={compactCurrency.format(overdueReceivable)}
               />
               <MetricCard
                 icon={<FileCheck2 className="size-5" />}
                 label="待记账凭证"
                 note={`${vouchers.filter((row) => row.status === "posted").length} 张已记账凭证`}
-                tone="bg-[#edf2f7] text-[#42647a]"
+                tone="bg-muted text-foreground"
                 value={`${vouchers.filter((row) => row.status === "draft").length} 张`}
               />
             </section>
 
             <section className="mt-5 grid gap-5 lg:grid-cols-[1.2fr_.8fr]">
               <article
-                className="rounded-[20px] border border-border/75 bg-white p-5 sm:p-6"
+                className="rounded-md border border-border/75 bg-white p-5 sm:p-6"
                 id="aging"
               >
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-base font-semibold">账龄结构</h2>
-                    <p className="mt-1 text-[11px] text-muted-foreground">
+                    <p className="mt-1 text-xs text-muted-foreground">
                       按未核销余额与到期日自动归档
                     </p>
                   </div>
@@ -829,22 +826,22 @@ export default async function FinancePage({
                           : `${bucket}天`;
                     return (
                       <div className="text-center" key={bucket}>
-                        <div className="text-[9px] font-medium">
+                        <div className="text-xs font-medium">
                           {compactCurrency.format(agingTotals[bucket])}
                         </div>
-                        <div className="mt-2 flex h-24 items-end rounded-lg bg-[#f5f8f6] px-2">
+                        <div className="mt-2 flex h-24 items-end rounded-lg bg-muted px-2">
                           <div
                             className={`w-full rounded-t-md ${
                               bucket === "current"
-                                ? "bg-[#5ea58c]"
+                                ? "bg-muted"
                                 : bucket === "90+"
-                                  ? "bg-[#d87a68]"
-                                  : "bg-[#d6ab5c]"
+                                  ? "bg-muted"
+                                  : "bg-muted"
                             }`}
                             style={{ height }}
                           />
                         </div>
-                        <div className="mt-2 text-[9px] text-muted-foreground">
+                        <div className="mt-2 text-xs text-muted-foreground">
                           {label}
                         </div>
                       </div>
@@ -852,33 +849,33 @@ export default async function FinancePage({
                   })}
                 </div>
               </article>
-              <article className="rounded-[20px] border border-border/75 bg-[#eef4f8] p-5 sm:p-6">
+              <article className="rounded-md border border-border/75 bg-muted p-5 sm:p-6">
                 <div className="flex items-center gap-3">
-                  <div className="grid size-10 place-items-center rounded-xl bg-white text-primary shadow-sm">
+                  <div className="grid size-10 place-items-center rounded-md bg-white text-primary ">
                     <Landmark className="size-5" />
                   </div>
                   <div>
                     <h2 className="text-sm font-semibold">本月资金概览</h2>
-                    <p className="mt-1 text-[10px] text-muted-foreground">
+                    <p className="mt-1 text-xs text-muted-foreground">
                       来自已确认现金收支
                     </p>
                   </div>
                 </div>
                 <dl className="mt-5 grid grid-cols-2 gap-3">
-                  <div className="rounded-xl bg-white p-3">
-                    <dt className="text-[9px] text-muted-foreground">本月收入</dt>
-                    <dd className="mt-1 text-sm font-semibold text-[#0d7580]">
+                  <div className="rounded-md bg-white p-3">
+                    <dt className="text-xs text-muted-foreground">本月收入</dt>
+                    <dd className="mt-1 text-sm font-semibold text-foreground">
                       {compactCurrency.format(monthlyIncome)}
                     </dd>
                   </div>
-                  <div className="rounded-xl bg-white p-3">
-                    <dt className="text-[9px] text-muted-foreground">本月支出</dt>
-                    <dd className="mt-1 text-sm font-semibold text-[#a55b45]">
+                  <div className="rounded-md bg-white p-3">
+                    <dt className="text-xs text-muted-foreground">本月支出</dt>
+                    <dd className="mt-1 text-sm font-semibold text-foreground">
                       {compactCurrency.format(monthlyExpense)}
                     </dd>
                   </div>
-                  <div className="col-span-2 rounded-xl bg-white p-3">
-                    <dt className="text-[9px] text-muted-foreground">本月净额</dt>
+                  <div className="col-span-2 rounded-md bg-white p-3">
+                    <dt className="text-xs text-muted-foreground">本月净额</dt>
                     <dd className="mt-1 text-lg font-semibold">
                       {currency.format(monthlyNet)}
                     </dd>
@@ -891,15 +888,15 @@ export default async function FinancePage({
               className="mt-5 grid items-start gap-5 xl:grid-cols-[minmax(0,1.5fr)_minmax(360px,.5fr)]"
               id="documents"
             >
-              <section className="overflow-hidden rounded-[20px] border border-border/75 bg-white">
+              <section className="overflow-hidden rounded-md border border-border/75 bg-white">
                 <div className="flex flex-col gap-4 border-b border-border/70 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
                   <div>
                     <h2 className="text-base font-semibold">应收应付台账</h2>
-                    <p className="mt-1 text-[11px] text-muted-foreground">
+                    <p className="mt-1 text-xs text-muted-foreground">
                       按开单月份分类；类 Excel 批量编辑，核销后自动更新余额、现金流水和凭证
                     </p>
                   </div>
-                  <div className="flex rounded-xl bg-[#f2f5f4] p-1 text-[10px]">
+                  <div className="flex rounded-md bg-muted p-1 text-xs">
                     {[
                       ["all", "全部"],
                       ["receivable", "应收"],
@@ -908,7 +905,7 @@ export default async function FinancePage({
                       <Link
                         className={`rounded-lg px-3 py-2 ${
                           bookFilter === value
-                            ? "bg-white font-medium text-primary shadow-sm"
+                            ? "bg-white font-medium text-primary "
                             : "text-muted-foreground"
                         }`}
                         href={ledgerHref(value, monthFilter)}
@@ -919,13 +916,13 @@ export default async function FinancePage({
                     ))}
                   </div>
                 </div>
-                <div className="border-b border-[#e7ece9] bg-[#fbfcfc] px-5 py-3 sm:px-6">
+                <div className="border-b border-border bg-muted px-5 py-3 sm:px-6">
                   <div className="flex items-center gap-2 overflow-x-auto pb-1">
                     <Link
-                      className={`shrink-0 rounded-xl border px-3 py-2 text-[10px] transition ${
+                      className={`shrink-0 rounded-md border px-3 py-2 text-xs transition ${
                         monthFilter === "all"
-                          ? "border-[#9bc2b4] bg-[#eaf3f8] font-medium text-[#215f51]"
-                          : "border-[#e1e8e5] bg-white text-muted-foreground hover:border-[#b7cec5]"
+                          ? "border-border bg-muted font-medium text-foreground"
+                          : "border-border bg-white text-muted-foreground hover:border-border"
                       }`}
                       href={ledgerHref(bookFilter, "all")}
                     >
@@ -933,18 +930,18 @@ export default async function FinancePage({
                     </Link>
                     {monthStats.map((stat) => (
                       <Link
-                        className={`shrink-0 rounded-xl border px-3 py-2 transition ${
+                        className={`shrink-0 rounded-md border px-3 py-2 transition ${
                           monthFilter === stat.month
-                            ? "border-[#9bc2b4] bg-[#eaf3f8] text-[#215f51]"
-                            : "border-[#e1e8e5] bg-white text-muted-foreground hover:border-[#b7cec5]"
+                            ? "border-border bg-muted text-foreground"
+                            : "border-border bg-white text-muted-foreground hover:border-border"
                         }`}
                         href={ledgerHref(bookFilter, stat.month)}
                         key={stat.month}
                       >
-                        <span className="block text-[10px] font-medium">
+                        <span className="block text-xs font-medium">
                           {monthLabel(stat.month)} · {stat.count} 笔
                         </span>
-                        <span className="mt-1 block text-[9px] opacity-75">
+                        <span className="mt-1 block text-xs opacity-75">
                           应收 {compactCurrency.format(stat.receivable)} · 应付{" "}
                           {compactCurrency.format(stat.payable)}
                         </span>
@@ -970,19 +967,19 @@ export default async function FinancePage({
                 )}
               </section>
 
-              <section className="rounded-[20px] border border-border/75 bg-white p-5 sm:p-6">
+              <section className="rounded-md border border-border/75 bg-white p-5 sm:p-6">
                 <h2 className="text-base font-semibold">新建往来单据</h2>
-                <p className="mt-1 text-[11px] text-muted-foreground">
+                <p className="mt-1 text-xs text-muted-foreground">
                   业务发生时先建立债权或债务
                 </p>
                 {canManage ? (
                   <form action={createFinanceDocument} className="mt-5 space-y-3">
                     <div className="grid grid-cols-2 gap-3">
-                      <select className="h-10 rounded-xl border border-border bg-white px-3 text-xs" name="documentType">
+                      <select className="h-10 rounded-md border border-border bg-white px-3 text-xs" name="documentType">
                         <option value="receivable">应收款</option>
                         <option value="payable">应付款</option>
                       </select>
-                      <select className="h-10 rounded-xl border border-border bg-white px-3 text-xs" name="sourceType">
+                      <select className="h-10 rounded-md border border-border bg-white px-3 text-xs" name="sourceType">
                         <option value="manual">手工登记</option>
                         <option value="order">销售订单</option>
                         <option value="purchase">采购订单</option>
@@ -990,7 +987,7 @@ export default async function FinancePage({
                         <option value="other">其他</option>
                       </select>
                     </div>
-                    <select className="h-10 w-full rounded-xl border border-border bg-white px-3 text-xs" defaultValue="" name="legalEntityId">
+                    <select className="h-10 w-full rounded-md border border-border bg-white px-3 text-xs" defaultValue="" name="legalEntityId">
                       <option value="">选择客户法律实体（客户往来必选）</option>
                       {legalEntityOptions.map((entity) => {
                         const customer = relatedOne(entity.customers);
@@ -1002,27 +999,27 @@ export default async function FinancePage({
                         );
                       })}
                     </select>
-                    <input className="h-10 w-full rounded-xl border border-border bg-white px-3 text-xs" maxLength={100} name="counterpartyName" placeholder="非客户往来单位（如供应商，可手工填写）" />
-                    <p className="text-[9px] leading-4 text-muted-foreground">
+                    <input className="h-10 w-full rounded-md border border-border bg-white px-3 text-xs" maxLength={100} name="counterpartyName" placeholder="非客户往来单位（如供应商，可手工填写）" />
+                    <p className="text-xs leading-4 text-muted-foreground">
                       选择法律实体后，系统会自动带入其工商全称并归属对应客户；供应商等非客户往来可直接填写名称。
                     </p>
-                    <input className="h-10 w-full rounded-xl border border-border bg-white px-3 text-xs" maxLength={160} name="summary" placeholder="业务摘要" required />
+                    <input className="h-10 w-full rounded-md border border-border bg-white px-3 text-xs" maxLength={160} name="summary" placeholder="业务摘要" required />
                     <div className="grid grid-cols-2 gap-3">
-                      <input className="h-10 rounded-xl border border-border bg-white px-3 text-xs" defaultValue={today()} name="issueDate" required type="date" />
-                      <input className="h-10 rounded-xl border border-border bg-white px-3 text-xs" defaultValue={today()} name="dueDate" required type="date" />
+                      <input className="h-10 rounded-md border border-border bg-white px-3 text-xs" defaultValue={today()} name="issueDate" required type="date" />
+                      <input className="h-10 rounded-md border border-border bg-white px-3 text-xs" defaultValue={today()} name="dueDate" required type="date" />
                     </div>
-                    <input className="h-10 w-full rounded-xl border border-border bg-white px-3 text-xs" min="0.01" name="totalAmount" placeholder="单据金额" required step="0.01" type="number" />
+                    <input className="h-10 w-full rounded-md border border-border bg-white px-3 text-xs" min="0.01" name="totalAmount" placeholder="单据金额" required step="0.01" type="number" />
                     <div className="grid grid-cols-2 gap-3">
-                      <input className="h-10 rounded-xl border border-border bg-white px-3 text-xs" name="sourceNo" placeholder="来源单号" />
-                      <input className="h-10 rounded-xl border border-border bg-white px-3 text-xs" name="invoiceNo" placeholder="发票号码" />
+                      <input className="h-10 rounded-md border border-border bg-white px-3 text-xs" name="sourceNo" placeholder="来源单号" />
+                      <input className="h-10 rounded-md border border-border bg-white px-3 text-xs" name="invoiceNo" placeholder="发票号码" />
                     </div>
-                    <textarea className="min-h-16 w-full rounded-xl border border-border bg-white px-3 py-2 text-xs" name="note" placeholder="备注（选填）" />
-                    <button className="h-10 w-full rounded-xl bg-primary px-4 text-xs font-medium text-primary-foreground" type="submit">
+                    <textarea className="min-h-16 w-full rounded-md border border-border bg-white px-3 py-2 text-xs" name="note" placeholder="备注（选填）" />
+                    <button className="h-10 w-full rounded-md bg-primary px-4 text-xs font-medium text-primary-foreground" type="submit">
                       创建应收应付单
                     </button>
                   </form>
                 ) : (
-                  <p className="mt-5 rounded-xl bg-[#f8fafc] p-4 text-[10px] text-muted-foreground">
+                  <p className="mt-5 rounded-md bg-muted p-4 text-xs text-muted-foreground">
                     当前为董事长只读视图。
                   </p>
                 )}
@@ -1030,17 +1027,17 @@ export default async function FinancePage({
             </div>
 
             <div className="mt-5 grid items-start gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(340px,.55fr)]">
-              <section className="overflow-hidden rounded-[20px] border border-border/75 bg-white">
+              <section className="overflow-hidden rounded-md border border-border/75 bg-white">
                 <div className="flex flex-col gap-4 border-b border-border/70 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
                   <div>
                     <h2 className="text-base font-semibold tracking-[-0.02em]">
                       收支台账
                     </h2>
-                    <p className="mt-1 text-[11px] text-muted-foreground">
+                    <p className="mt-1 text-xs text-muted-foreground">
                       最近 100 笔业务流水，按业务日期倒序排列
                     </p>
                   </div>
-                  <div className="flex rounded-xl bg-[#f2f5f4] p-1 text-[10px]">
+                  <div className="flex rounded-md bg-muted p-1 text-xs">
                     {[
                       ["all", "全部"],
                       ["income", "收入"],
@@ -1049,7 +1046,7 @@ export default async function FinancePage({
                       <Link
                         className={`rounded-lg px-3 py-2 ${
                           typeFilter === value
-                            ? "bg-white font-medium text-primary shadow-sm"
+                            ? "bg-white font-medium text-primary "
                             : "text-muted-foreground"
                         }`}
                         href={value === "all" ? "/finance" : `/finance?type=${value}`}
@@ -1064,7 +1061,7 @@ export default async function FinancePage({
                 {transactions.length ? (
                   <div className="overflow-x-auto">
                     <table className="w-full min-w-[760px] text-left">
-                      <thead className="bg-[#f8fafc] text-[10px] text-muted-foreground">
+                      <thead className="bg-muted text-xs text-muted-foreground">
                         <tr>
                           <th className="px-6 py-3 font-medium">业务日期 / 流水号</th>
                           <th className="px-4 py-3 font-medium">分类与往来方</th>
@@ -1075,33 +1072,33 @@ export default async function FinancePage({
                       </thead>
                       <tbody className="divide-y divide-border/65">
                         {transactions.map((row) => (
-                          <tr className="text-xs hover:bg-[#fbfcfc]" key={row.id}>
+                          <tr className="text-xs hover:bg-muted" key={row.id}>
                             <td className="px-6 py-4">
                               <div className="font-medium">{row.occurred_on}</div>
-                              <div className="mt-1 font-mono text-[9px] text-muted-foreground">
+                              <div className="mt-1 font-mono text-xs text-muted-foreground">
                                 {row.transaction_no}
                               </div>
                             </td>
                             <td className="px-4 py-4">
                               <div className="font-medium">{row.category}</div>
-                              <div className="mt-1 text-[10px] text-muted-foreground">
+                              <div className="mt-1 text-xs text-muted-foreground">
                                 {row.counterparty || "未填写往来方"}
                               </div>
                             </td>
                             <td className="px-4 py-4">
                               <div>{channelLabels[row.payment_channel]}</div>
-                              <div className="mt-1 text-[10px] text-muted-foreground">
+                              <div className="mt-1 text-xs text-muted-foreground">
                                 {row.account_name || "默认账户"}
                               </div>
                             </td>
                             <td className="px-4 py-4">
                               <span
-                                className={`rounded-full px-2.5 py-1 text-[9px] ${
+                                className={`rounded-full px-2.5 py-1 text-xs ${
                                   row.status === "confirmed"
-                                    ? "bg-[#eaf3f8] text-[#0d6c78]"
+                                    ? "bg-muted text-foreground"
                                     : row.status === "void"
-                                      ? "bg-[#f5eeee] text-[#965151]"
-                                      : "bg-[#fff4e7] text-[#9a6321]"
+                                      ? "bg-muted text-foreground"
+                                      : "bg-muted text-foreground"
                                 }`}
                               >
                                 {statusLabels[row.status]}
@@ -1110,8 +1107,8 @@ export default async function FinancePage({
                             <td
                               className={`px-6 py-4 text-right font-semibold ${
                                 row.transaction_type === "income"
-                                  ? "text-[#0d7580]"
-                                  : "text-[#a55b45]"
+                                  ? "text-foreground"
+                                  : "text-foreground"
                               }`}
                             >
                               {row.transaction_type === "income" ? "+" : "-"}
@@ -1126,7 +1123,7 @@ export default async function FinancePage({
                   <div className="px-6 py-16 text-center">
                     <ReceiptText className="mx-auto size-10 text-muted-foreground/45" />
                     <h3 className="mt-4 text-sm font-medium">还没有财务流水</h3>
-                    <p className="mt-2 text-[11px] text-muted-foreground">
+                    <p className="mt-2 text-xs text-muted-foreground">
                       财务人员登记第一笔收支后，经营数据会自动汇总到这里。
                     </p>
                   </div>
@@ -1135,7 +1132,7 @@ export default async function FinancePage({
 
               <div className="space-y-5">
                 <section
-                  className="rounded-[20px] border border-border/75 bg-white p-5 sm:p-6"
+                  className="rounded-md border border-border/75 bg-white p-5 sm:p-6"
                   id="entry"
                 >
                   <div className="flex items-start justify-between">
@@ -1143,7 +1140,7 @@ export default async function FinancePage({
                       <h2 className="text-base font-semibold tracking-[-0.02em]">
                         登记收支
                       </h2>
-                      <p className="mt-1 text-[11px] text-muted-foreground">
+                      <p className="mt-1 text-xs text-muted-foreground">
                         仅财务角色可写入正式台账
                       </p>
                     </div>
@@ -1153,10 +1150,10 @@ export default async function FinancePage({
                   {canManage ? (
                     <form action={createFinanceTransaction} className="mt-5 space-y-4">
                       <div className="grid grid-cols-2 gap-3">
-                        <label className="text-[10px] text-muted-foreground">
+                        <label className="text-xs text-muted-foreground">
                           收支类型
                           <select
-                            className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs text-foreground outline-none focus:border-primary/40"
+                            className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs text-foreground outline-none focus:border-primary/40"
                             defaultValue="expense"
                             name="transactionType"
                           >
@@ -1164,10 +1161,10 @@ export default async function FinancePage({
                             <option value="expense">支出</option>
                           </select>
                         </label>
-                        <label className="text-[10px] text-muted-foreground">
+                        <label className="text-xs text-muted-foreground">
                           单据状态
                           <select
-                            className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs text-foreground outline-none focus:border-primary/40"
+                            className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs text-foreground outline-none focus:border-primary/40"
                             defaultValue="confirmed"
                             name="status"
                           >
@@ -1177,20 +1174,20 @@ export default async function FinancePage({
                         </label>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
-                        <label className="text-[10px] text-muted-foreground">
+                        <label className="text-xs text-muted-foreground">
                           分类
                           <input
-                            className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary/40"
+                            className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary/40"
                             maxLength={40}
                             name="category"
                             placeholder="如：货款、物流费"
                             required
                           />
                         </label>
-                        <label className="text-[10px] text-muted-foreground">
+                        <label className="text-xs text-muted-foreground">
                           金额
                           <input
-                            className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary/40"
+                            className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary/40"
                             min="0.01"
                             name="amount"
                             placeholder="0.00"
@@ -1201,20 +1198,20 @@ export default async function FinancePage({
                         </label>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
-                        <label className="text-[10px] text-muted-foreground">
+                        <label className="text-xs text-muted-foreground">
                           业务日期
                           <input
-                            className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs text-foreground outline-none focus:border-primary/40"
+                            className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs text-foreground outline-none focus:border-primary/40"
                             defaultValue={today()}
                             name="occurredOn"
                             required
                             type="date"
                           />
                         </label>
-                        <label className="text-[10px] text-muted-foreground">
+                        <label className="text-xs text-muted-foreground">
                           收付款方式
                           <select
-                            className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs text-foreground outline-none focus:border-primary/40"
+                            className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs text-foreground outline-none focus:border-primary/40"
                             defaultValue="bank"
                             name="paymentChannel"
                           >
@@ -1226,46 +1223,46 @@ export default async function FinancePage({
                           </select>
                         </label>
                       </div>
-                      <label className="block text-[10px] text-muted-foreground">
+                      <label className="block text-xs text-muted-foreground">
                         往来方
                         <input
-                          className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary/40"
+                          className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary/40"
                           maxLength={100}
                           name="counterparty"
                           placeholder="客户或供应商名称"
                         />
                       </label>
                       <div className="grid grid-cols-2 gap-3">
-                        <label className="text-[10px] text-muted-foreground">
+                        <label className="text-xs text-muted-foreground">
                           收付款账户
                           <input
-                            className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary/40"
+                            className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary/40"
                             maxLength={80}
                             name="accountName"
                             placeholder="公司基本户"
                           />
                         </label>
-                        <label className="text-[10px] text-muted-foreground">
+                        <label className="text-xs text-muted-foreground">
                           凭证号
                           <input
-                            className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary/40"
+                            className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary/40"
                             maxLength={50}
                             name="voucherNo"
                             placeholder="选填"
                           />
                         </label>
                       </div>
-                      <label className="block text-[10px] text-muted-foreground">
+                      <label className="block text-xs text-muted-foreground">
                         摘要备注
                         <textarea
-                          className="mt-1.5 min-h-20 w-full resize-y rounded-xl border border-border bg-white px-3 py-2.5 text-xs text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary/40"
+                          className="mt-1.5 min-h-20 w-full resize-y rounded-md border border-border bg-white px-3 py-2.5 text-xs text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-primary/40"
                           maxLength={300}
                           name="note"
                           placeholder="填写业务背景或付款说明"
                         />
                       </label>
                       <button
-                        className="flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/92"
+                        className="flex h-10 w-full items-center justify-center gap-2 rounded-md bg-primary px-4 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/92"
                         type="submit"
                       >
                         <BanknoteArrowDown className="size-4" />
@@ -1273,10 +1270,10 @@ export default async function FinancePage({
                       </button>
                     </form>
                   ) : (
-                    <div className="mt-5 rounded-2xl border border-dashed border-border bg-[#fafcfe] px-4 py-8 text-center">
+                    <div className="mt-5 rounded-lg border border-dashed border-border bg-muted px-4 py-8 text-center">
                       <LockKeyhole className="mx-auto size-7 text-muted-foreground/55" />
                       <div className="mt-3 text-xs font-medium">当前为只读经营视图</div>
-                      <p className="mt-1 text-[10px] leading-5 text-muted-foreground">
+                      <p className="mt-1 text-xs leading-5 text-muted-foreground">
                         收支登记、编辑与作废操作由财务角色负责。
                       </p>
                     </div>
@@ -1284,32 +1281,32 @@ export default async function FinancePage({
                 </section>
 
                 <section
-                  className="rounded-[20px] border border-border/75 bg-[#eef4f8] p-5 sm:p-6"
+                  className="rounded-md border border-border/75 bg-muted p-5 sm:p-6"
                   id="vouchers"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="grid size-10 place-items-center rounded-xl bg-white text-primary shadow-sm">
+                    <div className="grid size-10 place-items-center rounded-md bg-white text-primary ">
                       <FileClock className="size-5" />
                     </div>
                     <div>
                       <h2 className="text-sm font-semibold">记账凭证</h2>
-                      <p className="mt-1 text-[10px] text-muted-foreground">
+                      <p className="mt-1 text-xs text-muted-foreground">
                         核销自动生成，也可手工登记
                       </p>
                     </div>
                   </div>
                   <div className="mt-4 space-y-2">
                     {vouchers.slice(0, 4).map((voucher) => (
-                      <div className="rounded-xl bg-white p-3" key={voucher.id}>
+                      <div className="rounded-md bg-white p-3" key={voucher.id}>
                         <div className="flex items-center justify-between gap-3">
-                          <span className="truncate text-[10px] font-medium">
+                          <span className="truncate text-xs font-medium">
                             {voucher.summary}
                           </span>
-                          <span className="shrink-0 text-[10px] font-semibold">
+                          <span className="shrink-0 text-xs font-semibold">
                             {currency.format(Number(voucher.amount))}
                           </span>
                         </div>
-                        <div className="mt-1 flex justify-between text-[9px] text-muted-foreground">
+                        <div className="mt-1 flex justify-between text-xs text-muted-foreground">
                           <span>{voucher.voucher_no}</span>
                           <span>
                             {voucher.status === "posted" ? "已记账" : "草稿"} ·
@@ -1319,14 +1316,14 @@ export default async function FinancePage({
                       </div>
                     ))}
                     {!vouchers.length && (
-                      <div className="rounded-xl bg-white p-4 text-center text-[10px] text-muted-foreground">
+                      <div className="rounded-md bg-white p-4 text-center text-xs text-muted-foreground">
                         暂无凭证
                       </div>
                     )}
                   </div>
                   {canManage && (
-                    <details className="mt-4 rounded-xl bg-white p-3">
-                      <summary className="cursor-pointer text-[10px] font-medium text-primary">
+                    <details className="mt-4 rounded-md bg-white p-3">
+                      <summary className="cursor-pointer text-xs font-medium text-primary">
                         手工登记凭证
                       </summary>
                       <form action={createFinanceVoucher} className="mt-3 space-y-2">

@@ -35,12 +35,12 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 const permissionTone: Record<PermissionLevel, string> = {
-  full: "border-[#b9dbce] bg-[#eaf3f8] text-[#0d6c78]",
-  department: "border-[#cbd9e3] bg-[#edf2f7] text-[#42647a]",
-  self: "border-[#d8d1e4] bg-[#f3eef8] text-[#77518e]",
-  limited: "border-[#f0dec5] bg-[#fff4e7] text-[#9a6321]",
-  configure: "border-[#c8d9d4] bg-[#eef4f8] text-[#285f53]",
-  none: "border-[#ead8d8] bg-[#f8eeee] text-[#965151]",
+  full: "border-border bg-muted text-foreground",
+  department: "border-border bg-muted text-foreground",
+  self: "border-border bg-muted text-foreground",
+  limited: "border-border bg-muted text-foreground",
+  configure: "border-border bg-muted text-foreground",
+  none: "border-border bg-muted text-foreground",
 };
 
 type TemplateVersion = {
@@ -113,7 +113,7 @@ function employeeRoleCodes(employee: EmployeeOption) {
 function PermissionPill({ permission }: { permission: PermissionCell }) {
   return (
     <span
-      className={`inline-flex min-h-7 items-center whitespace-nowrap rounded-lg border px-2.5 py-1 text-[10px] font-medium ${permissionTone[permission.level]}`}
+      className={`inline-flex min-h-7 items-center whitespace-nowrap rounded-lg border px-2.5 py-1 text-xs font-medium ${permissionTone[permission.level]}`}
     >
       {permission.label}
     </span>
@@ -126,12 +126,12 @@ function MatrixTable({ rows }: { rows: typeof pagePermissionRows }) {
       <table className="w-full min-w-[1120px] border-separate border-spacing-0 text-left">
         <thead>
           <tr>
-            <th className="sticky left-0 z-10 w-[220px] border-b border-border bg-[#fafcfe] px-4 py-3 text-[10px] font-medium text-muted-foreground">
+            <th className="sticky left-0 z-10 w-[220px] border-b border-border bg-muted px-4 py-3 text-xs font-medium text-muted-foreground">
               权限对象
             </th>
             {roles.map((role) => (
               <th
-                className="border-b border-border bg-[#fafcfe] px-3 py-3 text-[10px] font-medium text-muted-foreground"
+                className="border-b border-border bg-muted px-3 py-3 text-xs font-medium text-muted-foreground"
                 key={role.id}
               >
                 {role.name}
@@ -146,7 +146,7 @@ function MatrixTable({ rows }: { rows: typeof pagePermissionRows }) {
                 <div className="text-xs font-semibold text-foreground">
                   {row.name}
                 </div>
-                <div className="mt-1 text-[10px] leading-4 text-muted-foreground">
+                <div className="mt-1 text-xs leading-4 text-muted-foreground">
                   {row.description}
                 </div>
               </td>
@@ -267,11 +267,11 @@ export default async function RolesPage({
       breadcrumb="系统管理 / 角色与权限"
       currentUser={{ name: employee.name, roleLabel }}
     >
-      <main className="mx-auto max-w-[1600px] p-4 sm:p-6 xl:p-8">
-        <section className="relative overflow-hidden rounded-[24px] bg-[#0a385d] px-6 py-7 text-white sm:px-8 lg:px-10">
+      <main className="mx-auto max-w-[1440px] p-4 sm:p-6 xl:p-8">
+        <section className="ui-page-header">
           <ShieldCheck className="pointer-events-none absolute right-12 top-1/2 hidden size-40 -translate-y-1/2 text-white/[0.055] sm:block" />
           <div className="relative max-w-3xl">
-            <div className="text-xs font-medium tracking-[0.12em] text-[#79d8d5]">
+            <div className="text-xs font-medium tracking-[0.12em] text-muted-foreground">
               ACCESS CONTROL · V3.0
             </div>
             <h1 className="mt-3 text-2xl font-semibold tracking-[-0.035em] sm:text-[30px]">
@@ -285,8 +285,8 @@ export default async function RolesPage({
         </section>
 
         {!canView ? (
-          <section className="mt-5 rounded-[22px] border border-[#ead8d8] bg-white p-10 text-center">
-            <LockKeyhole className="mx-auto size-7 text-[#965151]" />
+          <section className="mt-5 rounded-md border border-border bg-white p-10 text-center">
+            <LockKeyhole className="mx-auto size-7 text-foreground" />
             <h2 className="mt-4 text-base font-semibold">无权查看角色权限</h2>
             <p className="mt-2 text-xs text-muted-foreground">
               该页面仅向系统管理员和董事长开放。
@@ -297,19 +297,19 @@ export default async function RolesPage({
             <section className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
               {roles.map((role) => (
                 <article
-                  className="rounded-[20px] border border-border/80 bg-white p-5"
+                  className="rounded-md border border-border/80 bg-white p-5"
                   key={role.id}
                 >
                   <span
-                    className={`grid size-10 place-items-center rounded-xl text-xs font-semibold ${role.accent}`}
+                    className={`grid size-10 place-items-center rounded-md text-xs font-semibold ${role.accent}`}
                   >
                     {role.mark}
                   </span>
                   <h2 className="mt-4 text-sm font-semibold">{role.name}</h2>
-                  <p className="mt-2 min-h-10 text-[10px] leading-5 text-muted-foreground">
+                  <p className="mt-2 min-h-10 text-xs leading-5 text-muted-foreground">
                     {role.summary}
                   </p>
-                  <div className="mt-4 border-t border-border/80 pt-3 text-[10px] text-primary">
+                  <div className="mt-4 border-t border-border/80 pt-3 text-xs text-primary">
                     {role.dataScope}
                   </div>
                 </article>
@@ -317,7 +317,7 @@ export default async function RolesPage({
             </section>
 
             <section
-              className="mt-5 rounded-[22px] border border-border/80 bg-white p-5 sm:p-6"
+              className="mt-5 rounded-md border border-border/80 bg-white p-5 sm:p-6"
               id="employee-permissions"
             >
               <div className="flex flex-wrap items-start justify-between gap-4">
@@ -326,21 +326,21 @@ export default async function RolesPage({
                     <UserRoundCheck className="size-4 text-primary" />
                     <h2 className="text-base font-semibold">员工权限分配</h2>
                   </div>
-                  <p className="mt-2 text-[11px] leading-5 text-muted-foreground">
+                  <p className="mt-2 text-xs leading-5 text-muted-foreground">
                     按员工分配长期角色权限。普通员工为基础角色；选择董事长后，系统会自动授予全部角色和权限。
                   </p>
                 </div>
-                <span className="rounded-full bg-[#eef8f5] px-3 py-1.5 text-[10px] text-[#285f53]">
+                <span className="rounded-full bg-muted px-3 py-1.5 text-xs text-foreground">
                   在职员工 {employeeOptions.length}
                 </span>
               </div>
 
               {roleAssignmentFeedback && (
                 <div
-                  className={`mt-4 rounded-xl px-4 py-3 text-[10px] ${
+                  className={`mt-4 rounded-md px-4 py-3 text-xs ${
                     feedback.rolesError
-                      ? "border border-[#ead8d8] bg-[#f8eeee] text-[#965151]"
-                      : "border border-[#b9dbce] bg-[#eef8f5] text-[#285f53]"
+                      ? "border border-border bg-muted text-foreground"
+                      : "border border-border bg-muted text-foreground"
                   }`}
                 >
                   {roleAssignmentFeedback}
@@ -348,11 +348,11 @@ export default async function RolesPage({
               )}
 
               {!canManage ? (
-                <div className="mt-5 rounded-xl bg-[#f8fafb] px-4 py-6 text-center text-xs text-muted-foreground">
+                <div className="mt-5 rounded-md bg-muted px-4 py-6 text-center text-xs text-muted-foreground">
                   只有系统管理员或董事长可以分配员工权限。
                 </div>
               ) : employeeOptions.length === 0 ? (
-                <div className="mt-5 rounded-xl bg-[#f8fafb] px-4 py-6 text-center text-xs text-muted-foreground">
+                <div className="mt-5 rounded-md bg-muted px-4 py-6 text-center text-xs text-muted-foreground">
                   当前没有可分配权限的在职员工。
                 </div>
               ) : (
@@ -365,22 +365,22 @@ export default async function RolesPage({
 
                     return (
                       <details
-                        className="rounded-2xl border border-border/80 bg-[#fafcfe] open:bg-white"
+                        className="rounded-lg border border-border/80 bg-muted open:bg-white"
                         key={target.id}
                       >
                         <summary className="flex cursor-pointer list-none flex-wrap items-center gap-3 px-4 py-4">
-                          <span className="grid size-9 place-items-center rounded-xl bg-[#eaf3f8] text-xs font-semibold text-primary">
+                          <span className="grid size-9 place-items-center rounded-md bg-muted text-xs font-semibold text-primary">
                             {target.name.slice(0, 1)}
                           </span>
                           <span className="min-w-[160px] flex-1">
                             <span className="block text-xs font-semibold">
                               {target.name}
                             </span>
-                            <span className="mt-1 block text-[9px] text-muted-foreground">
+                            <span className="mt-1 block text-xs text-muted-foreground">
                               {target.employee_no} · {target.title ?? "未设置职位"}
                             </span>
                           </span>
-                          <span className="text-[9px] text-muted-foreground">
+                          <span className="text-xs text-muted-foreground">
                             {assignedNames.length > 0
                               ? assignedNames.join("、")
                               : "尚未分配"}
@@ -398,7 +398,7 @@ export default async function RolesPage({
                             {roles.map((role) =>
                               role.id === "employee" ? (
                                 <div
-                                  className="flex items-center gap-2 rounded-xl border border-[#b9dbce] bg-[#eef8f5] px-3 py-3 text-[10px] text-[#285f53]"
+                                  className="flex items-center gap-2 rounded-md border border-border bg-muted px-3 py-3 text-xs text-foreground"
                                   key={role.id}
                                 >
                                   <input checked readOnly type="checkbox" />
@@ -406,7 +406,7 @@ export default async function RolesPage({
                                 </div>
                               ) : (
                                 <label
-                                  className="flex cursor-pointer items-center gap-2 rounded-xl border border-border bg-white px-3 py-3 text-[10px]"
+                                  className="flex cursor-pointer items-center gap-2 rounded-md border border-border bg-white px-3 py-3 text-xs"
                                   key={role.id}
                                 >
                                   <input
@@ -422,22 +422,22 @@ export default async function RolesPage({
                           </div>
 
                           <div className="mt-3 grid gap-3 lg:grid-cols-[1fr_auto] lg:items-end">
-                            <label className="rounded-xl border border-[#f0dec5] bg-[#fff9ef] p-3">
-                              <span className="block text-[9px] font-medium text-[#9a6321]">
+                            <label className="rounded-md border border-border bg-muted p-3">
+                              <span className="block text-xs font-medium text-foreground">
                                 高风险变更确认
                               </span>
-                              <span className="mt-1 block text-[9px] leading-4 text-muted-foreground">
+                              <span className="mt-1 block text-xs leading-4 text-muted-foreground">
                                 新增或移除系统管理员、董事长时，请输入“{target.name}”。
                               </span>
                               <input
                                 autoComplete="off"
-                                className="mt-2 h-8 w-full rounded-lg border border-[#ead8b8] bg-white px-2.5 text-[9px] outline-none focus:border-[#c89a52]"
+                                className="mt-2 h-8 w-full rounded-lg border border-border bg-white px-2.5 text-xs outline-none focus:border-border"
                                 name="highRiskConfirmation"
                                 placeholder={`输入 ${target.name} 确认`}
                               />
                             </label>
                             <button
-                              className="h-9 rounded-xl bg-primary px-5 text-[10px] font-medium text-white"
+                              className="h-9 rounded-md bg-primary px-5 text-xs font-medium text-white"
                               type="submit"
                             >
                               保存该员工权限
@@ -452,7 +452,7 @@ export default async function RolesPage({
             </section>
 
             <section
-              className="mt-5 rounded-[22px] border border-border/80 bg-white p-5 sm:p-6"
+              className="mt-5 rounded-md border border-border/80 bg-white p-5 sm:p-6"
               id="temporary-grants"
             >
               <div className="flex flex-wrap items-start justify-between gap-4">
@@ -461,15 +461,15 @@ export default async function RolesPage({
                     <Clock3 className="size-4 text-primary" />
                     <h2 className="text-base font-semibold">临时角色授权</h2>
                   </div>
-                  <p className="mt-2 text-[11px] text-muted-foreground">
+                  <p className="mt-2 text-xs text-muted-foreground">
                     仅支持部门负责人、人事和财务角色，最长 30 天，到期即时失效。
                   </p>
                 </div>
-                <div className="flex gap-2 text-[10px]">
-                  <span className="rounded-full bg-[#eaf3f8] px-3 py-1.5 text-primary">
+                <div className="flex gap-2 text-xs">
+                  <span className="rounded-full bg-muted px-3 py-1.5 text-primary">
                     生效中 {temporaryGrants.length}
                   </span>
-                  <span className="rounded-full bg-[#fff4e7] px-3 py-1.5 text-[#9a6321]">
+                  <span className="rounded-full bg-muted px-3 py-1.5 text-foreground">
                     24 小时内到期 {expiringSoon}
                   </span>
                 </div>
@@ -477,10 +477,10 @@ export default async function RolesPage({
 
               {temporaryFeedback && (
                 <div
-                  className={`mt-4 rounded-xl px-4 py-3 text-[10px] ${
+                  className={`mt-4 rounded-md px-4 py-3 text-xs ${
                     feedback.temporaryError
-                      ? "border border-[#ead8d8] bg-[#f8eeee] text-[#965151]"
-                      : "border border-[#b9dbce] bg-[#eef8f5] text-[#285f53]"
+                      ? "border border-border bg-muted text-foreground"
+                      : "border border-border bg-muted text-foreground"
                   }`}
                 >
                   {temporaryFeedback}
@@ -490,12 +490,12 @@ export default async function RolesPage({
               {canManage && (
                 <form
                   action={grantTemporaryRoleAction}
-                  className="mt-5 grid gap-3 rounded-2xl border border-border/80 bg-[#fafcfe] p-4 lg:grid-cols-[1.2fr_1fr_.8fr_1.6fr_auto] lg:items-end"
+                  className="mt-5 grid gap-3 rounded-lg border border-border/80 bg-muted p-4 lg:grid-cols-[1.2fr_1fr_.8fr_1.6fr_auto] lg:items-end"
                 >
-                  <label className="text-[10px]">
+                  <label className="text-xs">
                     <span className="font-medium">目标员工</span>
                     <select
-                      className="mt-2 h-9 w-full rounded-lg border border-border bg-white px-2 text-[10px]"
+                      className="mt-2 h-9 w-full rounded-lg border border-border bg-white px-2 text-xs"
                       name="employeeId"
                       required
                     >
@@ -507,10 +507,10 @@ export default async function RolesPage({
                       ))}
                     </select>
                   </label>
-                  <label className="text-[10px]">
+                  <label className="text-xs">
                     <span className="font-medium">临时角色</span>
                     <select
-                      className="mt-2 h-9 w-full rounded-lg border border-border bg-white px-2 text-[10px]"
+                      className="mt-2 h-9 w-full rounded-lg border border-border bg-white px-2 text-xs"
                       name="roleCode"
                       required
                     >
@@ -519,10 +519,10 @@ export default async function RolesPage({
                       <option value="finance">财务</option>
                     </select>
                   </label>
-                  <label className="text-[10px]">
+                  <label className="text-xs">
                     <span className="font-medium">有效期</span>
                     <select
-                      className="mt-2 h-9 w-full rounded-lg border border-border bg-white px-2 text-[10px]"
+                      className="mt-2 h-9 w-full rounded-lg border border-border bg-white px-2 text-xs"
                       name="durationHours"
                       required
                     >
@@ -533,10 +533,10 @@ export default async function RolesPage({
                       <option value="720">30 天</option>
                     </select>
                   </label>
-                  <label className="text-[10px]">
+                  <label className="text-xs">
                     <span className="font-medium">授权原因</span>
                     <input
-                      className="mt-2 h-9 w-full rounded-lg border border-border bg-white px-3 text-[10px]"
+                      className="mt-2 h-9 w-full rounded-lg border border-border bg-white px-3 text-xs"
                       maxLength={200}
                       minLength={5}
                       name="reason"
@@ -545,7 +545,7 @@ export default async function RolesPage({
                     />
                   </label>
                   <button
-                    className="h-9 rounded-lg bg-primary px-4 text-[10px] font-medium text-white"
+                    className="h-9 rounded-lg bg-primary px-4 text-xs font-medium text-white"
                     type="submit"
                   >
                     授予
@@ -553,7 +553,7 @@ export default async function RolesPage({
                 </form>
               )}
 
-              <div className="mt-5 overflow-hidden rounded-xl border border-border/80">
+              <div className="mt-5 overflow-hidden rounded-md border border-border/80">
                 {temporaryGrants.length === 0 ? (
                   <div className="py-10 text-center text-xs text-muted-foreground">
                     当前没有生效中的临时授权
@@ -568,17 +568,17 @@ export default async function RolesPage({
                         className="flex flex-wrap items-center gap-4 border-b border-border/70 px-4 py-4 last:border-b-0"
                         key={grant.id}
                       >
-                        <span className="grid size-9 place-items-center rounded-xl bg-[#fff4e7] text-[#9a6321]">
+                        <span className="grid size-9 place-items-center rounded-md bg-muted text-foreground">
                           <ShieldAlert className="size-4" />
                         </span>
                         <div className="min-w-[180px] flex-1">
                           <div className="text-xs font-semibold">
                             {target?.name ?? "未知员工"} · {role?.name ?? role?.code}
                           </div>
-                          <div className="mt-1 text-[9px] text-muted-foreground">
+                          <div className="mt-1 text-xs text-muted-foreground">
                             授权人 {granter?.name ?? "系统"} · 到期 {formatDateTime(grant.expires_at)}
                           </div>
-                          <div className="mt-1 text-[9px] text-muted-foreground">
+                          <div className="mt-1 text-xs text-muted-foreground">
                             原因：{grant.reason}
                           </div>
                         </div>
@@ -589,7 +589,7 @@ export default async function RolesPage({
                           >
                             <input name="grantId" type="hidden" value={grant.id} />
                             <input
-                              className="h-8 w-48 rounded-lg border border-border px-2 text-[9px]"
+                              className="h-8 w-48 rounded-lg border border-border px-2 text-xs"
                               maxLength={200}
                               minLength={5}
                               name="reason"
@@ -597,7 +597,7 @@ export default async function RolesPage({
                               required
                             />
                             <button
-                              className="h-8 rounded-lg border border-[#ead8d8] px-3 text-[9px] text-[#965151]"
+                              className="h-8 rounded-lg border border-border px-3 text-xs text-foreground"
                               type="submit"
                             >
                               立即撤销
@@ -611,14 +611,14 @@ export default async function RolesPage({
               </div>
             </section>
 
-            <section className="mt-5 rounded-[22px] border border-border/80 bg-white p-5 sm:p-6">
+            <section className="mt-5 rounded-md border border-border/80 bg-white p-5 sm:p-6">
               <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
                 <div>
                   <div className="flex items-center gap-2">
                     <KeyRound className="size-4 text-primary" />
                     <h2 className="text-base font-semibold">页面访问权限</h2>
                   </div>
-                  <p className="mt-2 text-[11px] text-muted-foreground">
+                  <p className="mt-2 text-xs text-muted-foreground">
                     同一页面会根据角色呈现不同的数据范围。
                   </p>
                 </div>
@@ -634,55 +634,55 @@ export default async function RolesPage({
               <MatrixTable rows={pagePermissionRows} />
             </section>
 
-            <section className="mt-5 rounded-[22px] border border-border/80 bg-white p-5 sm:p-6">
+            <section className="mt-5 rounded-md border border-border/80 bg-white p-5 sm:p-6">
               <div className="flex items-center gap-2">
                 <UserRoundCheck className="size-4 text-primary" />
                 <h2 className="text-base font-semibold">操作权限</h2>
               </div>
-              <p className="mt-2 text-[11px] text-muted-foreground">
+              <p className="mt-2 text-xs text-muted-foreground">
                 页面可见不代表可以编辑、审批、导出或删除。
               </p>
               <MatrixTable rows={operationPermissionRows} />
             </section>
 
-            <section className="mt-5 rounded-[22px] border border-border/80 bg-white p-5 sm:p-6">
+            <section className="mt-5 rounded-md border border-border/80 bg-white p-5 sm:p-6">
               <div className="flex items-center gap-2">
                 <EyeOff className="size-4 text-primary" />
                 <h2 className="text-base font-semibold">敏感字段权限</h2>
               </div>
-              <p className="mt-2 text-[11px] text-muted-foreground">
+              <p className="mt-2 text-xs text-muted-foreground">
                 敏感字段单独授权，不随管理员身份自动开放。
               </p>
               <MatrixTable rows={sensitiveFieldRows} />
             </section>
 
-            <section className="mt-5 rounded-[22px] border border-border/80 bg-white p-5 sm:p-6">
+            <section className="mt-5 rounded-md border border-border/80 bg-white p-5 sm:p-6">
               <div className="flex items-center gap-2">
                 <History className="size-4 text-primary" />
                 <h2 className="text-base font-semibold">权限模板版本</h2>
               </div>
-              <p className="mt-2 text-[11px] text-muted-foreground">
+              <p className="mt-2 text-xs text-muted-foreground">
                 每次权限模型发布都会保留组织级快照，便于审计和回溯。
               </p>
               {templateVersions.length === 0 ? (
-                <div className="mt-5 rounded-xl bg-[#f8fafb] px-4 py-6 text-center text-xs text-muted-foreground">
+                <div className="mt-5 rounded-md bg-muted px-4 py-6 text-center text-xs text-muted-foreground">
                   暂无权限模板版本
                 </div>
               ) : (
-                <div className="mt-5 overflow-hidden rounded-xl border border-border/80">
+                <div className="mt-5 overflow-hidden rounded-md border border-border/80">
                   {templateVersions.map((version, index) => (
                     <div
                       className="flex flex-wrap items-center gap-3 border-b border-border/70 px-4 py-3 last:border-b-0"
                       key={version.id}
                     >
-                      <span className="rounded-lg bg-[#eaf3f8] px-2.5 py-1 text-[10px] font-semibold text-primary">
+                      <span className="rounded-lg bg-muted px-2.5 py-1 text-xs font-semibold text-primary">
                         v{version.version}
                       </span>
                       <div className="min-w-[200px] flex-1">
                         <div className="text-xs font-medium">
                           {version.change_note}
                         </div>
-                        <div className="mt-1 text-[9px] text-muted-foreground">
+                        <div className="mt-1 text-xs text-muted-foreground">
                           {creatorName(version)} · {new Intl.DateTimeFormat("zh-CN", {
                             timeZone: "Asia/Shanghai",
                             year: "numeric",
@@ -692,7 +692,7 @@ export default async function RolesPage({
                         </div>
                       </div>
                       {index === 0 && (
-                        <span className="rounded-full bg-[#eef8f5] px-2.5 py-1 text-[9px] text-[#285f53]">
+                        <span className="rounded-full bg-muted px-2.5 py-1 text-xs text-foreground">
                           当前版本
                         </span>
                       )}
@@ -702,7 +702,7 @@ export default async function RolesPage({
               )}
             </section>
 
-            <section className="mt-5 rounded-[20px] border border-[#b9dbce] bg-[#eef8f5] p-5 text-xs leading-6 text-[#285f53]">
+            <section className="mt-5 rounded-md border border-border bg-muted p-5 text-xs leading-6 text-foreground">
               当前状态：账号角色绑定、服务端授权函数和数据库 RLS
               已接入；临时授权、自动到期、主动撤销和全链路审计已启用。
             </section>

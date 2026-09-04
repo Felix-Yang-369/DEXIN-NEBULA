@@ -36,18 +36,18 @@ export function DynamicForm({
       <input name="formId" type="hidden" value={formId} />
       <input name="payload" ref={payload} type="hidden" />
       {fields.map((field) => (
-        <label className="text-[11px] text-[#526b7d]" key={field.key}>
+        <label className="text-xs text-foreground" key={field.key}>
           {field.label}
           {field.required && <span className="ml-1 text-red-500">*</span>}
           {field.type === "textarea" ? (
             <textarea
-              className="mt-1 min-h-28 w-full rounded-xl border border-border p-3 text-xs"
+              className="mt-1 min-h-28 w-full rounded-md border border-border p-3 text-xs"
               name={field.key}
               required={field.required}
             />
           ) : field.type === "select" ? (
             <select
-              className="mt-1 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs"
+              className="mt-1 h-10 w-full rounded-md border border-border bg-white px-3 text-xs"
               name={field.key}
               required={field.required}
             >
@@ -60,7 +60,7 @@ export function DynamicForm({
             <input className="ml-3" name={field.key} type="checkbox" />
           ) : (
             <input
-              className="mt-1 h-10 w-full rounded-xl border border-border px-3 text-xs"
+              className="mt-1 h-10 w-full rounded-md border border-border px-3 text-xs"
               name={field.key}
               required={field.required}
               type={field.type}
@@ -68,7 +68,7 @@ export function DynamicForm({
           )}
         </label>
       ))}
-      <button className="h-10 rounded-xl bg-primary text-xs font-medium text-white">
+      <button className="h-10 rounded-md bg-primary text-xs font-medium text-white">
         提交表单
       </button>
     </form>

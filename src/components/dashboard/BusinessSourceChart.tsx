@@ -35,22 +35,22 @@ export function BusinessSourceChart({
   summary: BusinessSummary[];
 }) {
   return (
-    <Card className="min-w-0 overflow-hidden bg-[linear-gradient(145deg,#ffffff_0%,#ffffff_68%,#f7fbf9_100%)] transition duration-200 hover:-translate-y-0.5 hover:border-[#d9e5ed] hover:shadow-[0_16px_42px_rgba(10,69,55,.07)]">
+    <Card className="min-w-0 overflow-hidden bg-card transition duration-200  hover:border-border ">
       <CardHeader>
         <div>
           <div className="flex items-center gap-2">
             <h2 className="text-[15px] font-semibold tracking-[-0.02em]">
               业务结构概览
             </h2>
-            <span className="rounded-full bg-[#fff4e3] px-2 py-0.5 text-[8px] font-medium text-[#a8752c]">
+            <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-foreground">
               订单价型
             </span>
           </div>
-          <p className="mt-1 text-[10px] text-[#8293a1]">
+          <p className="mt-1 text-xs text-foreground">
             客户数量为实时数据，其余指标待销售模块接入
           </p>
         </div>
-        <span className="rounded-full border border-[#e4ebe8] bg-[#f8fafc] px-3 py-1.5 text-[10px] text-[#596862]">
+        <span className="rounded-full border border-border bg-muted px-3 py-1.5 text-xs text-foreground">
           本月
         </span>
       </CardHeader>
@@ -76,10 +76,10 @@ export function BusinessSourceChart({
                 </Pie>
                 <Tooltip
                   contentStyle={{
-                    border: "1px solid #dce6ed",
-                    borderRadius: 14,
-                    boxShadow: "0 12px 30px rgba(0,0,0,.08)",
-                    fontSize: 11,
+                    border: "1px solid var(--border)",
+                    borderRadius: 8,
+                    boxShadow: "var(--overlay-shadow)",
+                    fontSize: 12,
                   }}
                   formatter={(value) => [`${value}%`, "占比"]}
                 />
@@ -87,25 +87,25 @@ export function BusinessSourceChart({
             </ResponsiveContainer>
             <div className="pointer-events-none absolute inset-0 grid place-items-center text-center">
               <div>
-                <div className="text-sm font-semibold text-[#173c35]">
+                <div className="text-sm font-semibold text-foreground">
                   订单来源
                 </div>
-                <div className="mt-1 text-[9px] text-[#8a9793]">本月占比</div>
+                <div className="mt-1 text-xs text-muted-foreground">本月占比</div>
               </div>
             </div>
           </div>
           <div className="space-y-3">
             {data.map((item) => (
               <div
-                className="grid grid-cols-[10px_1fr_auto] items-center gap-2 rounded-lg px-2 py-1.5 text-[11px] transition-colors hover:bg-[#f5f8fb]"
+                className="grid grid-cols-[10px_1fr_auto] items-center gap-2 rounded-md px-2 py-1.5 text-xs transition-colors hover:bg-muted"
                 key={item.name}
               >
                 <span
-                  className="size-2.5 rounded-[3px]"
+                  className="size-2.5 rounded-sm"
                   style={{ backgroundColor: item.color }}
                 />
-                <span className="text-[#53625d]">{item.name}</span>
-                <span className="font-medium tabular-nums text-[#233a34]">
+                <span className="text-foreground">{item.name}</span>
+                <span className="font-medium tabular-nums text-foreground">
                   {item.value}%
                 </span>
               </div>
@@ -113,13 +113,13 @@ export function BusinessSourceChart({
           </div>
         </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-3 border-t border-[#eaf0f4] pt-5 sm:grid-cols-4">
+        <div className="mt-4 grid grid-cols-2 gap-3 border-t border-border pt-5 sm:grid-cols-4">
           {summary.map((item) => (
             <div key={item.label}>
-              <div className="flex items-center gap-1.5 text-[9px] text-[#8a9793]">
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 {item.label}
                 {item.source === "demo" && (
-                  <span className="rounded bg-[#fff4e3] px-1 text-[7px] text-[#a8752c]">
+                  <span className="rounded bg-muted px-1 text-xs text-foreground">
                     演示
                   </span>
                 )}
@@ -128,7 +128,7 @@ export function BusinessSourceChart({
                 {summaryValue(item)}
               </div>
               {item.trend !== null && (
-                <div className="mt-1 text-[9px] font-medium text-[#0b8c6e]">
+                <div className="mt-1 text-xs font-medium text-foreground">
                   较上月 ↑ {item.trend}%
                 </div>
               )}

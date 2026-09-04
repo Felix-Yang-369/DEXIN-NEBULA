@@ -1,10 +1,19 @@
+"use client";
+
 import Link from "next/link";
-import { ChevronDown } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { SidebarIcon } from "@/components/icons/sidebar-icons";
 import {
   isPlatformItemActive,
   type PlatformNavigationGroup,
+  type PlatformNavigationItem,
 } from "@/config/platform-navigation";
+
+function itemIsActive(item: PlatformNavigationItem, activeItem: string) {
+  return isPlatformItemActive(item, activeItem);
+}
 
 export function PlatformNavigationList({
   groups,
@@ -19,114 +28,257 @@ export function PlatformNavigationList({
   compact?: boolean;
   onNavigate?: () => void;
 }) {
-  return groups.map((group) => {
+  const router = useRouter();
+  const activeGroup = useMemo(
+    () =>
+      groups.find((group) =>
+        group.items.some((item) => itemIsActive(item, activeItem)),
+      )?.label ?? groups[0]?.label,
+    [activeItem, groups],
+  );
+  const [openGroup, setOpenGroup] = useState(activeGroup);
+  const [compactOpenGroup, setCompactOpenGroup] = useState<string | null>(null);
+
+  useEffect(() => {
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setCompactOpenGroup(null);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, []);
+
+  const preload = (href: string) => router.prefetch(href);
+
+  if (compact) {
     return (
-      <section className={compact ? "mb-3" : "mb-5"} key={group.label}>
-        <div className={`mb-2 items-center gap-2 px-3 text-[9px] font-semibold tracking-[0.14em] text-[#79d8d5]/52 ${compact ? "hidden" : "flex"}`}>
-          <span>{group.label}</span>
-          <span className="ml-auto text-[7px] tracking-[0.12em] text-white/20">
-            {group.english}
-          </span>
-        </div>
+      <div className="space-y-1.5">
+        {groups.map((group) => {
+          const groupActive = group.items.some((item) =>
+            itemIsActive(item, activeItem),
+          );
+          const flyoutOpen = compactOpenGroup === group.label;
+          const groupIcon = group.items[0]?.icon ?? "dashboard";
 
-        <div className="space-y-1">
-          {group.items.map((item) => {
-            const active = isPlatformItemActive(item, activeItem);
-            const hasChildren = Boolean(item.children?.length);
-
-            return (
-              <div className="group/compact relative" key={`${group.label}-${item.label}`}>
-                <Link
-                  aria-current={active ? "page" : undefined}
-                  className={`group/item relative flex min-h-10 items-center overflow-hidden rounded-[13px] py-2 text-[13px] transition-all duration-200 ${
-                    compact ? "justify-center px-1" : `gap-3 pl-3 ${hasChildren ? "pr-10" : "pr-3"}`
-                  } ${
-                    active
-                      ? "bg-[linear-gradient(90deg,rgba(24,175,179,.22),rgba(255,255,255,.08))] text-white shadow-[inset_0_0_0_1px_rgba(107,215,212,.16),0_8px_20px_rgba(0,0,0,.1)]"
-                      : "text-white/58 hover:translate-x-0.5 hover:bg-white/[0.07] hover:text-white"
-                  }`}
-                  href={item.href}
-                  onClick={onNavigate}
-                  title={compact ? item.label : undefined}
-                >
-                  {active ? (
-                    <span className="absolute inset-y-2 left-0 w-0.5 rounded-full bg-[#e1a72d]" />
-                  ) : null}
-                  <span
-                    className={`grid size-7 shrink-0 place-items-center rounded-[9px] transition ${
-                      active
-                        ? "bg-[#6bd7d4] text-[#071d34] shadow-[0_5px_14px_rgba(24,175,179,.22)]"
-                        : "bg-white/[0.055] text-white/64 group-hover/item:bg-white/10 group-hover/item:text-white/90"
-                    }`}
-                  >
-                    <SidebarIcon name={item.icon} />
-                  </span>
-                  {!compact ? <span className="min-w-0 flex-1 truncate">{item.label}</span> : null}
-                  {!compact && typeof item.countBadge === "number" && item.countBadge > 0 ? (
-                    <span className="rounded-full bg-[#6bd7d4]/16 px-2 py-0.5 text-[9px] tabular-nums text-[#9be5e2]">
-                      {item.countBadge}
-                    </span>
-                  ) : null}
-                  {!compact && item.badge ? (
-                    <span className="rounded-full bg-[#e1a72d]/18 px-2 py-0.5 text-[8px] font-semibold text-[#f0c66b]">
-                      {item.badge}
-                    </span>
-                  ) : null}
-                </Link>
-
-                {hasChildren && compact ? (
-                  <div className="invisible absolute left-[calc(100%+8px)] top-0 z-50 w-52 translate-x-1 rounded-xl border border-white/10 bg-[#0a2b4b] p-2 opacity-0 shadow-2xl transition group-hover/compact:visible group-hover/compact:translate-x-0 group-hover/compact:opacity-100 group-focus-within/compact:visible group-focus-within/compact:translate-x-0 group-focus-within/compact:opacity-100">
-                    <div className="px-2 pb-2 pt-1 text-[10px] font-semibold text-white/80">{item.label}</div>
-                    {item.children?.map((child) => (
-                      <Link
-                        className="block rounded-lg px-2 py-2 text-[10px] text-white/55 hover:bg-white/10 hover:text-white"
-                        href={child.href}
-                        key={`${item.label}-${child.label}`}
-                        onClick={onNavigate}
-                      >
-                        {child.label}
-                      </Link>
-                    ))}
-                  </div>
-                ) : hasChildren ? (
-                  <details className="group/nav" open={active}>
-                    <summary
-                      aria-label={`展开或收起${item.label}`}
-                      className="absolute right-2 top-1 grid size-8 cursor-pointer list-none place-items-center rounded-lg text-white/35 transition hover:bg-white/10 hover:text-white [&::-webkit-details-marker]:hidden"
-                    >
-                      <ChevronDown className="size-3.5 transition-transform group-open/nav:rotate-180" />
-                    </summary>
-                    <div className="ml-6 mt-1 space-y-0.5 border-l border-white/10 pb-1 pl-3">
-                      {item.children?.map((child) => {
-                        const current = Boolean(
-                          active &&
-                            child.activeMatch &&
-                            breadcrumb.includes(child.activeMatch),
-                        );
-                        return (
-                          <Link
-                            aria-current={current ? "page" : undefined}
-                            className={`block rounded-lg px-3 py-2 text-[11px] leading-4 transition ${
-                              current
-                                ? "bg-white/[0.09] font-medium text-[#8ce2df]"
-                                : "text-white/42 hover:bg-white/[0.055] hover:text-white/78"
-                            }`}
-                            href={child.href}
-                            key={`${item.label}-${child.label}`}
-                            onClick={onNavigate}
-                          >
-                            {child.label}
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  </details>
+          return (
+            <div
+              className="group/rail relative"
+              data-open={flyoutOpen}
+              key={group.label}
+              onMouseLeave={() => setCompactOpenGroup(null)}
+            >
+              <button
+                aria-expanded={flyoutOpen}
+                aria-haspopup="menu"
+                aria-label={group.label}
+                className={`relative grid size-10 w-full place-items-center rounded-md transition-colors ${
+                  groupActive
+                    ? "bg-white/12 text-white"
+                    : "text-white/60 hover:bg-white/[0.08] hover:text-white"
+                }`}
+                onClick={() =>
+                  setCompactOpenGroup((current) =>
+                    current === group.label ? null : group.label,
+                  )
+                }
+                title={group.label}
+                type="button"
+              >
+                {groupActive ? (
+                  <span className="absolute inset-y-2 left-0 w-0.5 rounded-full bg-sidebar-primary" />
                 ) : null}
+                <SidebarIcon className="size-4" name={groupIcon} />
+              </button>
+
+              <div
+                className={`ui-overlay absolute left-[calc(100%+8px)] top-0 z-50 w-60 border-white/10 bg-sidebar p-2 transition duration-150 ${
+                  flyoutOpen
+                    ? "visible translate-x-0 opacity-100"
+                    : "invisible translate-x-1 opacity-0 group-hover/rail:visible group-hover/rail:translate-x-0 group-hover/rail:opacity-100 group-focus-within/rail:visible group-focus-within/rail:translate-x-0 group-focus-within/rail:opacity-100"
+                }`}
+                role="menu"
+              >
+                <div className="flex items-center justify-between px-2 pb-2 pt-1 text-xs font-semibold text-white/80">
+                  <span>{group.label}</span>
+                  <ChevronRight className="size-3.5 text-white/30" />
+                </div>
+                <div className="space-y-0.5">
+                  {group.items.map((item) => {
+                    const active = itemIsActive(item, activeItem);
+                    return (
+                      <div key={`${group.label}-${item.label}`}>
+                        <Link
+                          aria-current={active ? "page" : undefined}
+                          className={`flex min-h-9 items-center gap-2.5 rounded-md px-2 text-xs transition ${
+                            active
+                              ? "bg-white/10 text-white"
+                              : "text-white/62 hover:bg-white/[0.07] hover:text-white"
+                          }`}
+                          href={item.href}
+                          onClick={() => {
+                            setCompactOpenGroup(null);
+                            onNavigate?.();
+                          }}
+                          onFocus={() => preload(item.href)}
+                          onMouseEnter={() => preload(item.href)}
+                          prefetch={false}
+                          role="menuitem"
+                        >
+                          <span className="grid size-6 shrink-0 place-items-center">
+                            <SidebarIcon name={item.icon} />
+                          </span>
+                          <span className="min-w-0 flex-1 truncate">{item.label}</span>
+                          {item.countBadge ? (
+                            <span className="text-xs tabular-nums text-white/45">
+                              {item.countBadge}
+                            </span>
+                          ) : null}
+                        </Link>
+                        {item.children?.length ? (
+                          <div className="ml-8 border-l border-white/10 pl-2">
+                            {item.children.map((child) => (
+                              <Link
+                                className="block truncate rounded px-2 py-1.5 text-xs text-white/42 hover:bg-white/[0.06] hover:text-white/80"
+                                href={child.href}
+                                key={`${item.label}-${child.label}`}
+                                onClick={() => {
+                                  setCompactOpenGroup(null);
+                                  onNavigate?.();
+                                }}
+                                onFocus={() => preload(child.href)}
+                                onMouseEnter={() => preload(child.href)}
+                                prefetch={false}
+                                role="menuitem"
+                              >
+                                {child.label}
+                              </Link>
+                            ))}
+                          </div>
+                        ) : null}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            );
-          })}
-        </div>
-      </section>
+            </div>
+          );
+        })}
+      </div>
     );
-  });
+  }
+
+  return (
+    <div className="space-y-1">
+      {groups.map((group) => {
+        const groupActive = group.items.some((item) =>
+          itemIsActive(item, activeItem),
+        );
+        const expanded = openGroup === group.label;
+
+        return (
+          <section key={group.label}>
+            <button
+              aria-expanded={expanded}
+              className={`flex h-8 w-full items-center gap-2 rounded-md px-2.5 text-left text-xs font-semibold transition ${
+                groupActive
+                  ? "text-white"
+                  : "text-white/45 hover:bg-white/[0.05] hover:text-white/75"
+              }`}
+              onClick={() => setOpenGroup(group.label)}
+              type="button"
+            >
+              <span className="min-w-0 flex-1 truncate">{group.label}</span>
+              <ChevronDown
+                className={`size-3.5 transition-transform ${expanded ? "rotate-180" : ""}`}
+              />
+            </button>
+
+            {expanded ? (
+              <div className="mt-1 space-y-0.5 pb-1">
+                {group.items.map((item) => {
+                  const active = itemIsActive(item, activeItem);
+                  const hasChildren = Boolean(item.children?.length);
+
+                  return (
+                    <div className="relative" key={`${group.label}-${item.label}`}>
+                      <Link
+                        aria-current={active ? "page" : undefined}
+                        className={`group/item relative flex h-9 items-center overflow-hidden rounded-md text-[13px] transition-colors gap-2.5 pl-2.5 ${
+                          hasChildren ? "pr-9" : "pr-2.5"
+                        } ${
+                          active
+                            ? "bg-white/10 text-white"
+                            : "text-white/62 hover:bg-white/[0.07] hover:text-white"
+                        }`}
+                        href={item.href}
+                        onClick={onNavigate}
+                        onFocus={() => preload(item.href)}
+                        onMouseEnter={() => preload(item.href)}
+                        prefetch={false}
+                      >
+                        {active ? (
+                          <span className="absolute inset-y-2 left-0 w-0.5 rounded-full bg-sidebar-primary" />
+                        ) : null}
+                        <span className="grid size-6 shrink-0 place-items-center text-white/70 group-hover/item:text-white">
+                          <SidebarIcon name={item.icon} />
+                        </span>
+                        <span className="min-w-0 flex-1 truncate">{item.label}</span>
+                        {typeof item.countBadge === "number" && item.countBadge > 0 ? (
+                          <span className="rounded-full bg-white/10 px-1.5 py-0.5 text-xs tabular-nums text-white/70">
+                            {item.countBadge}
+                          </span>
+                        ) : null}
+                        {item.badge ? (
+                          <span className="rounded-full bg-white/10 px-1.5 py-0.5 text-xs text-white/70">
+                            {item.badge}
+                          </span>
+                        ) : null}
+                      </Link>
+
+                      {hasChildren ? (
+                        <details className="group/nav" open={active}>
+                          <summary
+                            aria-label={`展开或收起${item.label}`}
+                            className="absolute right-1 top-0.5 grid size-8 cursor-pointer list-none place-items-center rounded-md text-white/35 transition hover:bg-white/10 hover:text-white [&::-webkit-details-marker]:hidden"
+                          >
+                            <ChevronDown className="size-3.5 transition-transform group-open/nav:rotate-180" />
+                          </summary>
+                          <div className="ml-5 mt-0.5 space-y-0.5 border-l border-white/10 pb-1 pl-3">
+                            {item.children?.map((child) => {
+                              const current = Boolean(
+                                active &&
+                                  child.activeMatch &&
+                                  breadcrumb.includes(child.activeMatch),
+                              );
+                              return (
+                                <Link
+                                  aria-current={current ? "page" : undefined}
+                                  className={`block min-h-8 rounded-md px-2.5 py-1.5 text-xs leading-5 transition ${
+                                    current
+                                      ? "bg-white/[0.09] font-medium text-white"
+                                      : "text-white/42 hover:bg-white/[0.055] hover:text-white/78"
+                                  }`}
+                                  href={child.href}
+                                  key={`${item.label}-${child.label}`}
+                                  onClick={onNavigate}
+                                  onFocus={() => preload(child.href)}
+                                  onMouseEnter={() => preload(child.href)}
+                                  prefetch={false}
+                                >
+                                  {child.label}
+                                </Link>
+                              );
+                            })}
+                          </div>
+                        </details>
+                      ) : null}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : null}
+          </section>
+        );
+      })}
+    </div>
+  );
 }

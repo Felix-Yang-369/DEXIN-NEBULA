@@ -181,9 +181,9 @@ export default async function EmployeeLifecyclePage({
         roleLabel: currentEmployee.title ?? "内部员工",
       }}
     >
-      <main className="mx-auto max-w-[1500px] p-4 sm:p-6 xl:p-8">
+      <main className="mx-auto max-w-[1440px] p-4 sm:p-6 xl:p-8">
         <Link
-          className="inline-flex items-center gap-2 text-[11px] text-muted-foreground hover:text-primary"
+          className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-primary"
           href="/hr"
         >
           <ArrowLeft className="size-4" />
@@ -191,8 +191,8 @@ export default async function EmployeeLifecyclePage({
         </Link>
 
         {!canView ? (
-          <section className="mt-5 rounded-[22px] border border-[#ead8d8] bg-white p-12 text-center">
-            <LockKeyhole className="mx-auto size-9 text-[#965151]" />
+          <section className="mt-5 rounded-md border border-border bg-white p-12 text-center">
+            <LockKeyhole className="mx-auto size-9 text-foreground" />
             <h1 className="mt-4 text-lg font-semibold">暂无模块访问权限</h1>
             <p className="mt-2 text-xs text-muted-foreground">
               入职离职清单包含人事和账号信息，仅向人事、管理员及董事长开放。
@@ -200,11 +200,11 @@ export default async function EmployeeLifecyclePage({
           </section>
         ) : (
           <>
-            <section className="relative mt-5 overflow-hidden rounded-[24px] bg-[#0a385d] px-6 py-8 text-white sm:px-8">
+            <section className="relative mt-5 overflow-hidden rounded-md bg-primary px-6 py-8 text-white sm:px-8">
               <div className="absolute -right-16 -top-20 size-72 rounded-full border border-white/10" />
               <ClipboardCheck className="absolute right-10 top-1/2 hidden size-36 -translate-y-1/2 text-white/[0.06] md:block" />
               <div className="relative max-w-2xl">
-                <div className="text-[10px] tracking-[0.16em] text-[#79d8d5]">
+                <div className="text-xs tracking-[0.16em] text-muted-foreground">
                   HRM · ONBOARDING & OFFBOARDING
                 </div>
                 <h1 className="mt-3 text-2xl font-semibold tracking-[-0.03em] sm:text-[30px]">
@@ -218,10 +218,10 @@ export default async function EmployeeLifecyclePage({
 
             {message && (
               <div
-                className={`mt-4 rounded-xl border px-4 py-3 text-xs ${
+                className={`mt-4 rounded-md border px-4 py-3 text-xs ${
                   feedback.error
-                    ? "border-[#ead3d3] bg-[#fff7f7] text-[#914949]"
-                    : "border-[#cfe6dc] bg-[#f1f8f5] text-primary"
+                    ? "border-border bg-muted text-foreground"
+                    : "border-border bg-muted text-primary"
                 }`}
               >
                 {message}
@@ -229,7 +229,7 @@ export default async function EmployeeLifecyclePage({
             )}
 
             {loadError && (
-              <div className="mt-4 rounded-xl border border-[#ead3d3] bg-[#fff7f7] px-4 py-3 text-xs text-[#914949]">
+              <div className="mt-4 rounded-md border border-border bg-muted px-4 py-3 text-xs text-foreground">
                 无法读取入离职数据，请确认第三阶段 HRM 数据库迁移已经执行。
               </div>
             )}
@@ -261,12 +261,12 @@ export default async function EmployeeLifecyclePage({
               ].map(({ value, label, icon: MetricIcon }) => {
                 return (
                   <article
-                    className="rounded-[18px] border border-border/75 bg-white p-5"
+                    className="rounded-md border border-border/75 bg-white p-5"
                     key={String(label)}
                   >
                     <div className="flex items-center justify-between">
                       <div className="text-2xl font-semibold">{value}</div>
-                      <span className="grid size-9 place-items-center rounded-xl bg-[#edf4f7] text-primary">
+                      <span className="grid size-9 place-items-center rounded-md bg-muted text-primary">
                         <MetricIcon className="size-4" />
                       </span>
                     </div>
@@ -277,7 +277,7 @@ export default async function EmployeeLifecyclePage({
             </section>
 
             {canManage && (
-              <details className="mt-5 rounded-[20px] border border-border/75 bg-white p-5 open:shadow-[0_16px_40px_-34px_rgba(16,62,53,.45)]">
+              <details className="mt-5 rounded-md border border-border/75 bg-white p-5 open:">
                 <summary className="cursor-pointer list-none text-sm font-semibold">
                   + 创建入职或离职流程
                 </summary>
@@ -285,10 +285,10 @@ export default async function EmployeeLifecyclePage({
                   action={createEmployeeLifecycleCaseAction}
                   className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-5"
                 >
-                  <label className="grid gap-2 text-[10px] text-muted-foreground xl:col-span-2">
+                  <label className="grid gap-2 text-xs text-muted-foreground xl:col-span-2">
                     办理员工
                     <select
-                      className="h-11 rounded-xl border border-border bg-white px-3 text-xs text-foreground"
+                      className="h-11 rounded-md border border-border bg-white px-3 text-xs text-foreground"
                       name="employeeId"
                       required
                     >
@@ -301,30 +301,30 @@ export default async function EmployeeLifecyclePage({
                       ))}
                     </select>
                   </label>
-                  <label className="grid gap-2 text-[10px] text-muted-foreground">
+                  <label className="grid gap-2 text-xs text-muted-foreground">
                     流程类型
                     <select
-                      className="h-11 rounded-xl border border-border bg-white px-3 text-xs text-foreground"
+                      className="h-11 rounded-md border border-border bg-white px-3 text-xs text-foreground"
                       name="processType"
                     >
                       <option value="onboarding">入职办理</option>
                       <option value="offboarding">离职办理</option>
                     </select>
                   </label>
-                  <label className="grid gap-2 text-[10px] text-muted-foreground">
+                  <label className="grid gap-2 text-xs text-muted-foreground">
                     入职 / 离职日期
                     <input
-                      className="h-11 rounded-xl border border-border px-3 text-xs text-foreground"
+                      className="h-11 rounded-md border border-border px-3 text-xs text-foreground"
                       defaultValue={today()}
                       name="effectiveOn"
                       required
                       type="date"
                     />
                   </label>
-                  <label className="grid gap-2 text-[10px] text-muted-foreground">
+                  <label className="grid gap-2 text-xs text-muted-foreground">
                     流程负责人
                     <select
-                      className="h-11 rounded-xl border border-border bg-white px-3 text-xs text-foreground"
+                      className="h-11 rounded-md border border-border bg-white px-3 text-xs text-foreground"
                       defaultValue={currentEmployee.id}
                       name="ownerEmployeeId"
                       required
@@ -338,17 +338,17 @@ export default async function EmployeeLifecyclePage({
                         ))}
                     </select>
                   </label>
-                  <label className="grid gap-2 text-[10px] text-muted-foreground md:col-span-2 xl:col-span-4">
+                  <label className="grid gap-2 text-xs text-muted-foreground md:col-span-2 xl:col-span-4">
                     办理说明（选填）
                     <input
-                      className="h-11 rounded-xl border border-border px-3 text-xs text-foreground"
+                      className="h-11 rounded-md border border-border px-3 text-xs text-foreground"
                       maxLength={1000}
                       name="note"
                       placeholder="例如：销售部新员工，需在到岗前完成账号开通"
                     />
                   </label>
                   <button
-                    className="h-11 self-end rounded-xl bg-primary px-5 text-xs font-medium text-white hover:bg-[#0c5247]"
+                    className="h-11 self-end rounded-md bg-primary px-5 text-xs font-medium text-white hover:bg-muted"
                     type="submit"
                   >
                     生成标准清单
@@ -360,11 +360,11 @@ export default async function EmployeeLifecyclePage({
             <div className="mt-7 flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h2 className="text-base font-semibold">办理清单</h2>
-                <p className="mt-1 text-[10px] text-muted-foreground">
+                <p className="mt-1 text-xs text-muted-foreground">
                   共 {visibleCases.length} 个流程，完成全部事项后流程自动完结
                 </p>
               </div>
-              <div className="flex rounded-xl bg-[#edf3f0] p-1 text-[10px]">
+              <div className="flex rounded-md bg-muted p-1 text-xs">
                 {[
                   ["all", "全部"],
                   ["onboarding", "入职"],
@@ -373,7 +373,7 @@ export default async function EmployeeLifecyclePage({
                   <Link
                     className={`rounded-lg px-3 py-2 ${
                       filter === value
-                        ? "bg-white font-medium text-primary shadow-sm"
+                        ? "bg-white font-medium text-primary "
                         : "text-muted-foreground"
                     }`}
                     href={
@@ -391,10 +391,10 @@ export default async function EmployeeLifecyclePage({
 
             <section className="mt-4 space-y-4">
               {visibleCases.length === 0 ? (
-                <div className="rounded-[20px] border border-dashed border-border bg-white p-12 text-center">
+                <div className="rounded-md border border-dashed border-border bg-white p-12 text-center">
                   <CircleDashed className="mx-auto size-8 text-muted-foreground/50" />
                   <h3 className="mt-3 text-sm font-semibold">暂无办理流程</h3>
-                  <p className="mt-2 text-[10px] text-muted-foreground">
+                  <p className="mt-2 text-xs text-muted-foreground">
                     人事或管理员可在上方创建第一份标准清单。
                   </p>
                 </div>
@@ -409,16 +409,16 @@ export default async function EmployeeLifecyclePage({
                       : UserRoundX;
                   return (
                     <article
-                      className="overflow-hidden rounded-[20px] border border-border/75 bg-white"
+                      className="overflow-hidden rounded-md border border-border/75 bg-white"
                       key={item.id}
                     >
                       <header className="grid gap-4 border-b border-border/70 p-5 lg:grid-cols-[1fr_auto] lg:items-center">
                         <div className="flex min-w-0 items-center gap-4">
                           <span
-                            className={`grid size-11 shrink-0 place-items-center rounded-xl ${
+                            className={`grid size-11 shrink-0 place-items-center rounded-md ${
                               item.process_type === "onboarding"
-                                ? "bg-[#e9f5ef] text-primary"
-                                : "bg-[#fff2ec] text-[#9d5b40]"
+                                ? "bg-muted text-primary"
+                                : "bg-muted text-foreground"
                             }`}
                           >
                             <ProcessIcon className="size-5" />
@@ -432,12 +432,12 @@ export default async function EmployeeLifecyclePage({
                                   : "离职办理"}
                               </h3>
                               <span
-                                className={`rounded-full px-2 py-1 text-[9px] ${
+                                className={`rounded-full px-2 py-1 text-xs ${
                                   item.status === "completed"
-                                    ? "bg-[#e8f6ef] text-primary"
+                                    ? "bg-muted text-primary"
                                     : item.status === "cancelled"
-                                      ? "bg-[#f3f3f3] text-muted-foreground"
-                                      : "bg-[#fff4db] text-[#8a6216]"
+                                      ? "bg-muted text-muted-foreground"
+                                      : "bg-muted text-foreground"
                                 }`}
                               >
                                 {item.status === "completed"
@@ -447,7 +447,7 @@ export default async function EmployeeLifecyclePage({
                                     : "进行中"}
                               </span>
                             </div>
-                            <p className="mt-1 text-[10px] text-muted-foreground">
+                            <p className="mt-1 text-xs text-muted-foreground">
                               {item.case_no} · {employee?.employee_no} ·
                               生效日期 {item.effective_on} · 负责人{" "}
                               {owner?.name ?? "未分配"}
@@ -455,16 +455,16 @@ export default async function EmployeeLifecyclePage({
                           </div>
                         </div>
                         <div className="w-full min-w-[210px] lg:w-[260px]">
-                          <div className="flex items-center justify-between text-[10px]">
+                          <div className="flex items-center justify-between text-xs">
                             <span className="text-muted-foreground">清单进度</span>
                             <strong>
                               {progress.completed}/{progress.total} ·{" "}
                               {progress.percent}%
                             </strong>
                           </div>
-                          <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#eaf0f4]">
+                          <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
                             <div
-                              className="h-full rounded-full bg-[#4f9a82] transition-all"
+                              className="h-full rounded-full bg-muted transition-colors"
                               style={{ width: `${progress.percent}%` }}
                             />
                           </div>
@@ -472,7 +472,7 @@ export default async function EmployeeLifecyclePage({
                       </header>
 
                       {item.note && (
-                        <div className="border-b border-border/60 bg-[#fafcfe] px-5 py-3 text-[10px] text-muted-foreground">
+                        <div className="border-b border-border/60 bg-muted px-5 py-3 text-xs text-muted-foreground">
                           说明：{item.note}
                         </div>
                       )}
@@ -497,12 +497,12 @@ export default async function EmployeeLifecyclePage({
                                   <span
                                     className={`grid size-7 shrink-0 place-items-center rounded-full ${
                                       task.status === "completed"
-                                        ? "bg-[#e8f6ef] text-primary"
+                                        ? "bg-muted text-primary"
                                         : task.status === "not_applicable"
-                                          ? "bg-[#f1f2f2] text-muted-foreground"
+                                          ? "bg-muted text-muted-foreground"
                                           : overdue
-                                            ? "bg-[#fff0f0] text-[#a84d4d]"
-                                            : "bg-[#f2f6f4] text-muted-foreground"
+                                            ? "bg-muted text-foreground"
+                                            : "bg-muted text-muted-foreground"
                                     }`}
                                   >
                                     {task.status === "completed" ? (
@@ -518,21 +518,21 @@ export default async function EmployeeLifecyclePage({
                                       {task.title}
                                     </div>
                                     {task.note && (
-                                      <div className="mt-1 text-[9px] text-muted-foreground">
+                                      <div className="mt-1 text-xs text-muted-foreground">
                                         {task.note}
                                       </div>
                                     )}
                                   </div>
                                 </div>
-                                <span className="w-fit rounded-lg bg-[#f2f6f4] px-2 py-1 text-[9px] text-muted-foreground">
+                                <span className="w-fit rounded-lg bg-muted px-2 py-1 text-xs text-muted-foreground">
                                   {categoryLabels[task.category] ??
                                     task.category}
                                 </span>
-                                <div className="text-[10px] text-muted-foreground">
+                                <div className="text-xs text-muted-foreground">
                                   <div>{responsible?.name ?? "未分配"}</div>
                                   <div
                                     className={`mt-1 flex items-center gap-1 ${
-                                      overdue ? "text-[#a84d4d]" : ""
+                                      overdue ? "text-foreground" : ""
                                     }`}
                                   >
                                     <CalendarDays className="size-3" />
@@ -556,7 +556,7 @@ export default async function EmployeeLifecyclePage({
                                       {task.status === "pending" ? (
                                         <>
                                           <button
-                                            className="rounded-lg bg-primary px-3 py-2 text-[9px] font-medium text-white"
+                                            className="rounded-lg bg-primary px-3 py-2 text-xs font-medium text-white"
                                             name="action"
                                             type="submit"
                                             value="complete"
@@ -564,7 +564,7 @@ export default async function EmployeeLifecyclePage({
                                             完成
                                           </button>
                                           <button
-                                            className="rounded-lg border border-border px-3 py-2 text-[9px]"
+                                            className="rounded-lg border border-border px-3 py-2 text-xs"
                                             name="action"
                                             type="submit"
                                             value="skip"
@@ -574,7 +574,7 @@ export default async function EmployeeLifecyclePage({
                                         </>
                                       ) : (
                                         <button
-                                          className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-2 text-[9px]"
+                                          className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-2 text-xs"
                                           name="action"
                                           type="submit"
                                           value="reopen"
@@ -591,8 +591,8 @@ export default async function EmployeeLifecyclePage({
                       </div>
 
                       {canManage && item.status === "in_progress" && (
-                        <details className="border-t border-border/60 bg-[#fafcfe] px-5 py-3">
-                          <summary className="cursor-pointer list-none text-right text-[9px] text-muted-foreground hover:text-[#965151]">
+                        <details className="border-t border-border/60 bg-muted px-5 py-3">
+                          <summary className="cursor-pointer list-none text-right text-xs text-muted-foreground hover:text-foreground">
                             取消此流程
                           </summary>
                           <form
@@ -605,14 +605,14 @@ export default async function EmployeeLifecyclePage({
                               value={item.id}
                             />
                             <input
-                              className="h-9 min-w-[280px] rounded-lg border border-border bg-white px-3 text-[10px]"
+                              className="h-9 min-w-[280px] rounded-lg border border-border bg-white px-3 text-xs"
                               maxLength={500}
                               name="reason"
                               placeholder="填写取消原因"
                               required
                             />
                             <button
-                              className="h-9 rounded-lg border border-[#dfc7c7] px-3 text-[10px] text-[#8a4b4b]"
+                              className="h-9 rounded-lg border border-border px-3 text-xs text-foreground"
                               type="submit"
                             >
                               确认取消
@@ -626,7 +626,7 @@ export default async function EmployeeLifecyclePage({
               )}
             </section>
 
-            <div className="mt-5 rounded-[18px] border border-[#dce8e3] bg-[#f5f8fb] px-5 py-4 text-[10px] leading-5 text-muted-foreground">
+            <div className="mt-5 rounded-md border border-border bg-muted px-5 py-4 text-xs leading-5 text-muted-foreground">
               安全说明：完成离职清单不会自动停用员工账号或修改员工状态，避免误操作造成访问中断。人事确认交接完成后，仍需进入员工档案执行“已离职”和账号停用操作。
             </div>
           </>

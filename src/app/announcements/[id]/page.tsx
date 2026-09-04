@@ -93,9 +93,9 @@ export default async function AnnouncementDetailPage({
       }}
     >
       <AnnouncementReadReceipt announcementId={announcement.id} />
-      <main className="mx-auto max-w-[1180px] p-4 sm:p-6 xl:p-8">
+      <main className="mx-auto max-w-[1200px] p-4 sm:p-6 xl:p-8">
         <Link
-          className="inline-flex h-9 items-center gap-2 rounded-xl border border-border bg-white px-3 text-[10px] font-medium text-muted-foreground"
+          className="inline-flex h-9 items-center gap-2 rounded-md border border-border bg-white px-3 text-xs font-medium text-muted-foreground"
           href="/announcements"
         >
           <ArrowLeft className="size-3.5" />
@@ -103,23 +103,23 @@ export default async function AnnouncementDetailPage({
         </Link>
 
         {feedback.published === "1" && (
-          <div className="mt-4 rounded-xl border border-[#d8e8ee] bg-[#eef4f8] px-4 py-3 text-xs text-primary">
+          <div className="mt-4 rounded-md border border-border bg-muted px-4 py-3 text-xs text-primary">
             公告已正式发布，站内通知已经按可见范围生成。
           </div>
         )}
 
-        <article className="mt-4 overflow-hidden rounded-[24px] border border-border/80 bg-white shadow-[0_18px_50px_-36px_rgba(12,47,41,.28)]">
-          <header className="relative overflow-hidden bg-[#0a385d] px-6 py-8 text-white sm:px-10 sm:py-10">
+        <article className="mt-4 overflow-hidden rounded-md border border-border/80 bg-white ">
+          <header className="relative overflow-hidden bg-primary px-6 py-8 text-white sm:px-10 sm:py-10">
             <Megaphone className="pointer-events-none absolute right-10 top-1/2 hidden size-40 -translate-y-1/2 text-white/[0.05] sm:block" />
             <div className="relative max-w-3xl">
               <div className="flex flex-wrap items-center gap-2">
                 {announcement.is_pinned && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-[#fff0ec] px-3 py-1.5 text-[9px] font-medium text-[#955241]">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1.5 text-xs font-medium text-foreground">
                     <Pin className="size-3" />
                     置顶公告
                   </span>
                 )}
-                <span className={`rounded-full px-3 py-1.5 text-[9px] font-medium ${meta.tone}`}>
+                <span className={`rounded-full px-3 py-1.5 text-xs font-medium ${meta.tone}`}>
                   {meta.label}
                 </span>
               </div>
@@ -140,7 +140,7 @@ export default async function AnnouncementDetailPage({
                 .filter(Boolean)
                 .map((paragraph, index) => (
                   <p
-                    className="mt-0 mb-5 whitespace-pre-wrap text-[13px] leading-8 text-[#52655f] sm:text-sm"
+                    className="mt-0 mb-5 whitespace-pre-wrap text-[13px] leading-8 text-foreground sm:text-sm"
                     key={`${index}-${paragraph.slice(0, 18)}`}
                   >
                     {renderTextWithLinks(paragraph)}
@@ -162,12 +162,12 @@ export default async function AnnouncementDetailPage({
                 const MetaIcon = Icon as typeof UserRound;
                 return (
                   <div className="flex gap-3" key={String(label)}>
-                    <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-[#eef4f8] text-primary">
+                    <span className="grid size-8 shrink-0 place-items-center rounded-md bg-muted text-primary">
                       <MetaIcon className="size-3.5" />
                     </span>
                     <div>
-                      <div className="text-[9px] text-muted-foreground">{String(label)}</div>
-                      <div className="mt-1 text-[11px] font-medium text-[#294b65]">
+                      <div className="text-xs text-muted-foreground">{String(label)}</div>
+                      <div className="mt-1 text-xs font-medium text-foreground">
                         {String(value)}
                       </div>
                     </div>

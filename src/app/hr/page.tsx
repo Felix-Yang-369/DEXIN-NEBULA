@@ -247,12 +247,12 @@ export default async function HrPage() {
         roleLabel: currentEmployee.title ?? "内部员工",
       }}
     >
-      <main className="mx-auto max-w-[1600px] p-4 sm:p-6 xl:p-8">
-        <section className="relative overflow-hidden rounded-[24px] bg-[#0a385d] px-6 py-8 text-white sm:px-8 lg:px-10">
+      <main className="mx-auto max-w-[1440px] p-4 sm:p-6 xl:p-8">
+        <section className="ui-page-header">
           <div className="absolute -right-20 -top-24 size-80 rounded-full border border-white/8" />
           <Building2 className="absolute right-12 top-1/2 hidden size-40 -translate-y-1/2 text-white/[0.05] sm:block" />
           <div className="relative">
-            <div className="text-[10px] font-medium tracking-[0.16em] text-[#79d8d5]">
+            <div className="text-xs font-medium tracking-[0.16em] text-muted-foreground">
               HRM · HUMAN RESOURCE MANAGEMENT
             </div>
             <h1 className="mt-3 text-2xl font-semibold tracking-[-0.035em] sm:text-[30px]">
@@ -275,17 +275,17 @@ export default async function HrPage() {
               [leaveRequestCount, "本月请假", "申请单数量"],
             ].map(([value, label, note]) => (
               <article
-                className="rounded-[18px] border border-border/75 bg-white p-5"
+                className="rounded-md border border-border/75 bg-white p-5"
                 key={String(label)}
               >
                 <div className="text-2xl font-semibold">{value}</div>
                 <div className="mt-2 text-xs font-medium">{label}</div>
-                <div className="mt-1 text-[9px] text-muted-foreground">{note}</div>
+                <div className="mt-1 text-xs text-muted-foreground">{note}</div>
               </article>
             ))}
           </section>
         ) : (
-          <div className="mt-5 rounded-[18px] border border-border bg-white px-5 py-4 text-xs text-muted-foreground">
+          <div className="mt-5 rounded-md border border-border bg-white px-5 py-4 text-xs text-muted-foreground">
             当前为员工自助视图。你可以发起请假、查看制度与培训资料；组织经营指标仅向人事和管理层开放。
           </div>
         )}
@@ -299,32 +299,32 @@ export default async function HrPage() {
                   const Icon = module.icon;
                   return (
                     <Link
-                      className="group rounded-[20px] border border-border/75 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-[0_14px_35px_-28px_rgba(16,62,53,.55)]"
+                      className="group rounded-md border border-border/75 bg-white p-5 transition-colors  hover:border-primary/20 "
                       href={module.href}
                       key={module.title}
                     >
                       <div className="flex items-start justify-between gap-3">
-                        <span className="grid size-10 place-items-center rounded-xl bg-[#eaf3f8] text-primary">
+                        <span className="grid size-10 place-items-center rounded-md bg-muted text-primary">
                           <Icon className="size-5" />
                         </span>
                         <span
-                          className={`rounded-full px-2 py-1 text-[9px] ${
+                          className={`rounded-full px-2 py-1 text-xs ${
                             module.status.includes("规划")
-                              ? "bg-[#f3f6f5] text-muted-foreground"
-                              : "bg-[#eef6f2] text-primary"
+                              ? "bg-muted text-muted-foreground"
+                              : "bg-muted text-primary"
                           }`}
                         >
                           {module.status}
                         </span>
                       </div>
-                      <div className="mt-4 text-[9px] font-medium tracking-[0.12em] text-primary/55">
+                      <div className="mt-4 text-xs font-medium tracking-[0.12em] text-primary/55">
                         {module.english}
                       </div>
                       <h3 className="mt-1 text-sm font-semibold">{module.title}</h3>
-                      <p className="mt-2 min-h-10 text-[10px] leading-5 text-muted-foreground">
+                      <p className="mt-2 min-h-10 text-xs leading-5 text-muted-foreground">
                         {module.description}
                       </p>
-                      <div className="mt-4 flex items-center gap-1 text-[10px] font-medium text-primary">
+                      <div className="mt-4 flex items-center gap-1 text-xs font-medium text-primary">
                         进入模块
                         <ChevronRight className="size-3 transition-transform group-hover:translate-x-0.5" />
                       </div>
@@ -341,12 +341,12 @@ export default async function HrPage() {
             className="mt-7 grid gap-5 xl:grid-cols-[1.2fr_.8fr]"
             id="analytics"
           >
-            <article className="rounded-[20px] border border-border/75 bg-white p-5 sm:p-6">
+            <article className="rounded-md border border-border/75 bg-white p-5 sm:p-6">
               <div className="flex items-center gap-2">
                 <BarChart3 className="size-5 text-primary" />
                 <div>
                   <h2 className="text-base font-semibold">部门人数结构</h2>
-                  <p className="mt-1 text-[10px] text-muted-foreground">
+                  <p className="mt-1 text-xs text-muted-foreground">
                     当前在职员工口径
                   </p>
                 </div>
@@ -354,15 +354,15 @@ export default async function HrPage() {
               <div className="mt-5 space-y-3">
                 {departmentCounts.map((item) => (
                   <div
-                    className="grid grid-cols-[90px_1fr_28px] items-center gap-3 text-[10px]"
+                    className="grid grid-cols-[90px_1fr_28px] items-center gap-3 text-xs"
                     key={item.name}
                   >
                     <span className="truncate text-muted-foreground">
                       {item.name}
                     </span>
-                    <div className="h-2 overflow-hidden rounded-full bg-[#eaf0f4]">
+                    <div className="h-2 overflow-hidden rounded-full bg-muted">
                       <div
-                        className="h-full rounded-full bg-[#4f9a82]"
+                        className="h-full rounded-full bg-muted"
                         style={{
                           width: `${(item.count / maxDepartmentCount) * 100}%`,
                         }}
@@ -373,7 +373,7 @@ export default async function HrPage() {
                 ))}
               </div>
             </article>
-            <article className="rounded-[20px] border border-border/75 bg-[#eef4f8] p-5 sm:p-6">
+            <article className="rounded-md border border-border/75 bg-muted p-5 sm:p-6">
               <div className="flex items-center gap-2">
                 <BookOpenCheck className="size-5 text-primary" />
                 <h2 className="text-base font-semibold">组织基础完整度</h2>
@@ -385,8 +385,8 @@ export default async function HrPage() {
                   [levelCount, "已配置职级"],
                   [activeEmployees.length, "在职员工"],
                 ].map(([value, label]) => (
-                  <div className="rounded-xl bg-white p-4" key={String(label)}>
-                    <dt className="text-[9px] text-muted-foreground">{label}</dt>
+                  <div className="rounded-md bg-white p-4" key={String(label)}>
+                    <dt className="text-xs text-muted-foreground">{label}</dt>
                     <dd className="mt-1 text-lg font-semibold">{value}</dd>
                   </div>
                 ))}

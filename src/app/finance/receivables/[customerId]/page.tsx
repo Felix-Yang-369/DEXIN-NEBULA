@@ -115,8 +115,8 @@ export default async function CustomerStatementPage({
         roleLabel: roleLabel(employee.roleCodes),
       }}
     >
-      <main className="mx-auto max-w-[1500px] p-4 sm:p-6 xl:p-8">
-        <section className="rounded-[24px] bg-[#0a385d] px-6 py-7 text-white shadow-[0_18px_50px_-32px_rgba(12,47,41,.75)] sm:px-8">
+      <main className="mx-auto max-w-[1440px] p-4 sm:p-6 xl:p-8">
+        <section className="rounded-md bg-primary px-6 py-7 text-white  sm:px-8">
           <Link
             className="inline-flex items-center gap-1.5 text-xs text-white/55 transition hover:text-white"
             href={`/finance/receivables?${backParams.toString()}`}
@@ -124,7 +124,7 @@ export default async function CustomerStatementPage({
             <ArrowLeft className="size-3.5" />
             返回应收汇总账
           </Link>
-          <div className="mt-5 text-xs font-medium tracking-[0.14em] text-[#79d8d5]">
+          <div className="mt-5 text-xs font-medium tracking-[0.14em] text-muted-foreground">
             CUSTOMER STATEMENT
           </div>
           <div className="mt-2 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
@@ -137,24 +137,24 @@ export default async function CustomerStatementPage({
                 {salespersonName ?? "未分配"} · {startDate} 至 {endDate}
               </p>
             </div>
-            <div className="rounded-2xl border border-white/12 bg-white/8 px-5 py-3">
-              <div className="text-[10px] text-white/45">期末应收余额</div>
+            <div className="rounded-lg border border-white/12 bg-white/8 px-5 py-3">
+              <div className="text-xs text-white/45">期末应收余额</div>
               <div className="mt-1 text-xl font-semibold">{currency.format(endingBalance)}</div>
             </div>
           </div>
         </section>
 
         {!canView ? (
-          <section className="mt-5 rounded-[20px] border border-border bg-white px-6 py-16 text-center text-sm text-muted-foreground">
+          <section className="mt-5 rounded-md border border-border bg-white px-6 py-16 text-center text-sm text-muted-foreground">
             当前账号无权查看客户财务对账单。
           </section>
         ) : customerResult.error || !customerResult.data ? (
-          <section className="mt-5 rounded-[20px] border border-[#f0ced1] bg-[#fff7f8] px-6 py-12 text-center text-sm text-[#9e3f48]">
+          <section className="mt-5 rounded-md border border-border bg-muted px-6 py-12 text-center text-sm text-foreground">
             客户不存在或当前账号无权读取。
           </section>
         ) : (
           <>
-            <form className="mt-5 rounded-[20px] border border-[#dce6ed] bg-white p-4">
+            <form className="mt-5 rounded-md border border-border bg-white p-4">
               <div className="grid gap-3 sm:grid-cols-[190px_190px_auto] sm:items-end">
                 {[
                   { name: "startDate", label: "开始日期", value: startDate },
@@ -165,7 +165,7 @@ export default async function CustomerStatementPage({
                     <span className="relative">
                       <CalendarRange className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2" />
                       <input
-                        className="h-10 w-full rounded-xl border border-[#dce6ed] bg-[#fafcfe] pl-9 pr-3 text-sm text-foreground outline-none focus:border-[#6ba18f]"
+                        className="h-10 w-full rounded-md border border-border bg-muted pl-9 pr-3 text-sm text-foreground outline-none focus:border-border"
                         defaultValue={field.value}
                         name={field.name}
                         type="date"
@@ -174,7 +174,7 @@ export default async function CustomerStatementPage({
                   </label>
                 ))}
                 <button
-                  className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[#0d7580] px-5 text-xs font-medium text-white"
+                  className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-primary px-5 text-xs font-medium text-white"
                   type="submit"
                 >
                   <Search className="size-4" />
@@ -184,23 +184,23 @@ export default async function CustomerStatementPage({
             </form>
 
             {statementResult.error ? (
-              <div className="mt-5 rounded-[18px] border border-[#f0ced1] bg-[#fff7f8] p-5 text-sm text-[#9e3f48]">
+              <div className="mt-5 rounded-md border border-border bg-muted p-5 text-sm text-foreground">
                 对账单读取失败，请确认最新数据库迁移已执行。
               </div>
             ) : (
-              <section className="mt-5 overflow-hidden rounded-[20px] border border-[#dbe5e1] bg-white">
-                <div className="flex items-center justify-between border-b border-[#dfe8ef] px-5 py-4">
+              <section className="mt-5 overflow-hidden rounded-md border border-border bg-white">
+                <div className="flex items-center justify-between border-b border-border px-5 py-4">
                   <div>
-                    <h2 className="text-sm font-semibold text-[#0a385d]">应收往来明细</h2>
-                    <p className="mt-1 text-[11px] text-muted-foreground">
+                    <h2 className="text-sm font-semibold text-foreground">应收往来明细</h2>
+                    <p className="mt-1 text-xs text-muted-foreground">
                       借方为新增应收，贷方为收款核销
                     </p>
                   </div>
-                  <ReceiptText className="size-5 text-[#4d7f71]" />
+                  <ReceiptText className="size-5 text-foreground" />
                 </div>
                 <div className="overflow-x-auto">
                   <table className="min-w-[980px] w-full text-xs">
-                    <thead className="bg-[#256355] text-white/90">
+                    <thead className="bg-primary text-white/90">
                       <tr>
                         {["日期", "类型", "单据编号", "关联单据", "摘要", "借方（应收）", "贷方（已收）", "余额"].map((label) => (
                           <th className="whitespace-nowrap px-3 py-3 text-left font-medium" key={label}>
@@ -211,29 +211,29 @@ export default async function CustomerStatementPage({
                     </thead>
                     <tbody>
                       {rows.map((row, index) => (
-                        <tr className="border-b border-[#e8eeeb] hover:bg-[#f5faf7]" key={`${row.document_no}-${index}`}>
+                        <tr className="border-b border-border hover:bg-muted" key={`${row.document_no}-${index}`}>
                           <td className="whitespace-nowrap px-3 py-3">{row.entry_date}</td>
                           <td className="px-3 py-3">
-                            <span className={`rounded-full px-2 py-1 text-[10px] ${
+                            <span className={`rounded-full px-2 py-1 text-xs ${
                               row.entry_type === "receipt"
-                                ? "bg-[#eaf3f8] text-[#0d6c78]"
+                                ? "bg-muted text-foreground"
                                 : row.entry_type === "opening"
-                                  ? "bg-[#edf2f7] text-[#526b7a]"
-                                  : "bg-[#fff4e7] text-[#916126]"
+                                  ? "bg-muted text-foreground"
+                                  : "bg-muted text-foreground"
                             }`}>
                               {typeLabel(row.entry_type)}
                             </span>
                           </td>
-                          <td className="whitespace-nowrap px-3 py-3 font-mono text-[11px]">{row.document_no}</td>
-                          <td className="whitespace-nowrap px-3 py-3 font-mono text-[11px] text-muted-foreground">{row.source_no || "—"}</td>
+                          <td className="whitespace-nowrap px-3 py-3 font-mono text-xs">{row.document_no}</td>
+                          <td className="whitespace-nowrap px-3 py-3 font-mono text-xs text-muted-foreground">{row.source_no || "—"}</td>
                           <td className="max-w-[300px] px-3 py-3">{row.summary}</td>
                           <td className="whitespace-nowrap px-3 py-3 text-right tabular-nums">{row.debit_amount ? currency.format(row.debit_amount) : "—"}</td>
-                          <td className="whitespace-nowrap px-3 py-3 text-right tabular-nums text-[#0d7580]">{row.credit_amount ? currency.format(row.credit_amount) : "—"}</td>
+                          <td className="whitespace-nowrap px-3 py-3 text-right tabular-nums text-foreground">{row.credit_amount ? currency.format(row.credit_amount) : "—"}</td>
                           <td className="whitespace-nowrap px-3 py-3 text-right font-medium tabular-nums">{currency.format(row.running_balance)}</td>
                         </tr>
                       ))}
                     </tbody>
-                    <tfoot className="bg-[#f8f0df] font-semibold text-[#0a385d]">
+                    <tfoot className="bg-muted font-semibold text-foreground">
                       <tr>
                         <td className="px-3 py-3" colSpan={5}>本期合计</td>
                         <td className="whitespace-nowrap px-3 py-3 text-right">{currency.format(debitTotal)}</td>

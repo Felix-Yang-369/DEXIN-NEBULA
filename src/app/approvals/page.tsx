@@ -57,13 +57,13 @@ export default async function ApprovalsPage({
           : undefined
       }
     >
-      <main className="mx-auto max-w-[1600px] p-4 sm:p-6 xl:p-8">
-        <section className="relative overflow-hidden rounded-[24px] bg-[#0a385d] px-6 py-7 text-white shadow-[0_18px_50px_-32px_rgba(12,47,41,.75)] sm:px-8 lg:px-10">
+      <main className="mx-auto max-w-[1440px] p-4 sm:p-6 xl:p-8">
+        <section className="ui-page-header">
           <div className="absolute -right-16 -top-24 size-72 rounded-full border border-white/8" />
           <ClipboardCheck className="pointer-events-none absolute right-12 top-1/2 hidden size-40 -translate-y-1/2 text-white/[0.055] sm:block" />
           <div className="relative flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
             <div>
-              <div className="text-xs font-medium tracking-[0.12em] text-[#79d8d5]">
+              <div className="text-xs font-medium tracking-[0.12em] text-muted-foreground">
                 UNIFIED APPROVAL · CONNECTED
               </div>
               <h1 className="mt-3 text-2xl font-semibold tracking-[-0.035em] sm:text-[30px]">
@@ -75,21 +75,21 @@ export default async function ApprovalsPage({
             </div>
             <div className="flex flex-wrap gap-2">
               <Link
-                className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/14 bg-white/8 px-4 text-xs text-white/75 transition-colors hover:bg-white/12"
+                className="inline-flex h-10 items-center gap-2 rounded-md border border-white/14 bg-white/8 px-4 text-xs text-white/75 transition-colors hover:bg-white/12"
                 href="/requests/leave"
               >
                 <FilePlus2 className="size-3.5" />
                 请假申请
               </Link>
               <Link
-                className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/14 bg-white/8 px-4 text-xs text-white/75 transition-colors hover:bg-white/12"
+                className="inline-flex h-10 items-center gap-2 rounded-md border border-white/14 bg-white/8 px-4 text-xs text-white/75 transition-colors hover:bg-white/12"
                 href="/requests/expense"
               >
                 <ReceiptText className="size-3.5" />
                 费用报销
               </Link>
               <Link
-                className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#6bd7d4] px-4 text-xs font-medium text-[#0b3152] transition-colors hover:bg-[#a3e2ca]"
+                className="inline-flex h-10 items-center gap-2 rounded-md bg-muted px-4 text-xs font-medium text-foreground transition-colors hover:bg-muted"
                 href="/requests/seal"
               >
                 <Stamp className="size-3.5" />

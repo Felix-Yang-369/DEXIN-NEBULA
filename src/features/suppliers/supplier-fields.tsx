@@ -22,13 +22,13 @@ export function SupplierFields({
   employees: Array<{ id: string; name: string; employee_no: string }>;
 }) {
   const inputClass =
-    "h-10 rounded-xl border border-border bg-white px-3 text-xs text-foreground outline-none focus:border-primary/35";
+    "h-10 rounded-md border border-border bg-white px-3 text-xs text-foreground outline-none focus:border-primary/35";
   return (
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
       {supplier?.id && (
         <input name="supplierId" type="hidden" value={supplier.id} />
       )}
-      <label className="grid gap-2 text-[10px] text-muted-foreground sm:col-span-2">
+      <label className="grid gap-2 text-xs text-muted-foreground sm:col-span-2">
         供应商全称 *
         <input
           className={inputClass}
@@ -38,7 +38,7 @@ export function SupplierFields({
           required
         />
       </label>
-      <label className="grid gap-2 text-[10px] text-muted-foreground">
+      <label className="grid gap-2 text-xs text-muted-foreground">
         简称
         <input
           className={inputClass}
@@ -47,7 +47,7 @@ export function SupplierFields({
           name="shortName"
         />
       </label>
-      <label className="grid gap-2 text-[10px] text-muted-foreground">
+      <label className="grid gap-2 text-xs text-muted-foreground">
         统一社会信用代码
         <input
           className={inputClass}
@@ -56,7 +56,7 @@ export function SupplierFields({
           name="unifiedCreditCode"
         />
       </label>
-      <label className="grid gap-2 text-[10px] text-muted-foreground">
+      <label className="grid gap-2 text-xs text-muted-foreground">
         供应品类 *
         <select
           className={inputClass}
@@ -72,7 +72,7 @@ export function SupplierFields({
           <option value="other">其他</option>
         </select>
       </label>
-      <label className="grid gap-2 text-[10px] text-muted-foreground">
+      <label className="grid gap-2 text-xs text-muted-foreground">
         合作等级 *
         <select
           className={inputClass}
@@ -85,7 +85,7 @@ export function SupplierFields({
           <option value="backup">备选</option>
         </select>
       </label>
-      <label className="grid gap-2 text-[10px] text-muted-foreground">
+      <label className="grid gap-2 text-xs text-muted-foreground">
         合作状态 *
         <select
           className={inputClass}
@@ -98,7 +98,7 @@ export function SupplierFields({
           <option value="inactive">已终止</option>
         </select>
       </label>
-      <label className="grid gap-2 text-[10px] text-muted-foreground">
+      <label className="grid gap-2 text-xs text-muted-foreground">
         内部负责人
         <select
           className={inputClass}
@@ -113,7 +113,7 @@ export function SupplierFields({
           ))}
         </select>
       </label>
-      <label className="grid gap-2 text-[10px] text-muted-foreground">
+      <label className="grid gap-2 text-xs text-muted-foreground">
         法定代表人
         <input
           className={inputClass}
@@ -122,7 +122,7 @@ export function SupplierFields({
           name="legalRepresentative"
         />
       </label>
-      <label className="grid gap-2 text-[10px] text-muted-foreground sm:col-span-2">
+      <label className="grid gap-2 text-xs text-muted-foreground sm:col-span-2">
         结算约定
         <input
           className={inputClass}
@@ -132,7 +132,7 @@ export function SupplierFields({
           placeholder="例如：月结 30 天；具体以合同为准"
         />
       </label>
-      <label className="grid gap-2 text-[10px] text-muted-foreground sm:col-span-2">
+      <label className="grid gap-2 text-xs text-muted-foreground sm:col-span-2">
         注册 / 经营地址
         <input
           className={inputClass}
@@ -141,19 +141,19 @@ export function SupplierFields({
           name="address"
         />
       </label>
-      <label className="grid gap-2 text-[10px] text-muted-foreground sm:col-span-2 xl:col-span-4">
+      <label className="grid gap-2 text-xs text-muted-foreground sm:col-span-2 xl:col-span-4">
         经营范围
         <textarea
-          className="min-h-20 rounded-xl border border-border bg-white p-3 text-xs text-foreground outline-none focus:border-primary/35"
+          className="min-h-20 rounded-md border border-border bg-white p-3 text-xs text-foreground outline-none focus:border-primary/35"
           defaultValue={supplier?.business_scope ?? ""}
           maxLength={1000}
           name="businessScope"
         />
       </label>
-      <label className="grid gap-2 text-[10px] text-muted-foreground sm:col-span-2 xl:col-span-4">
+      <label className="grid gap-2 text-xs text-muted-foreground sm:col-span-2 xl:col-span-4">
         内部备注
         <textarea
-          className="min-h-20 rounded-xl border border-border bg-white p-3 text-xs text-foreground outline-none focus:border-primary/35"
+          className="min-h-20 rounded-md border border-border bg-white p-3 text-xs text-foreground outline-none focus:border-primary/35"
           defaultValue={supplier?.note ?? ""}
           maxLength={1000}
           name="note"

@@ -49,10 +49,12 @@ export function SalesOrderBuilder({
   customers,
   opportunities,
   products,
+  mobile = false,
 }: {
   customers: SalesCustomerOption[];
   opportunities: SalesOpportunityOption[];
   products: SalesProductOption[];
+  mobile?: boolean;
 }) {
   const [customerId, setCustomerId] = useState("");
   const [priceType, setPriceType] = useState<PriceType>("group");
@@ -97,11 +99,12 @@ export function SalesOrderBuilder({
   return (
     <form action={createSalesOrderAction} className="space-y-4">
       <input name="items" type="hidden" value={serializedItems} />
+      {mobile ? <><input name="returnTo" type="hidden" value="/mobile/orders/new" /><input name="submitForApproval" type="hidden" value="true" /></> : null}
       <div className="grid gap-3 sm:grid-cols-2">
-        <label className="text-[10px] text-muted-foreground">
+        <label className="text-xs text-muted-foreground">
           业务客户
           <select
-            className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/45"
+            className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/45"
             name="customerId"
             onChange={(event) => setCustomerId(event.target.value)}
             required
@@ -115,10 +118,10 @@ export function SalesOrderBuilder({
             ))}
           </select>
         </label>
-        <label className="text-[10px] text-muted-foreground">
+        <label className="text-xs text-muted-foreground">
           交易法律实体
           <select
-            className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/45"
+            className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/45"
             defaultValue=""
             name="legalEntityId"
             required
@@ -134,10 +137,10 @@ export function SalesOrderBuilder({
         </label>
       </div>
       <div className="grid gap-3 sm:grid-cols-3">
-        <label className="text-[10px] text-muted-foreground">
+        <label className="text-xs text-muted-foreground">
           关联销售机会
           <select
-            className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/45"
+            className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/45"
             name="opportunityId"
           >
             <option value="">不关联</option>
@@ -148,20 +151,20 @@ export function SalesOrderBuilder({
             ))}
           </select>
         </label>
-        <label className="text-[10px] text-muted-foreground">
+        <label className="text-xs text-muted-foreground">
           订单日期
           <input
-            className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs outline-none focus:border-primary/45"
+            className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs outline-none focus:border-primary/45"
             defaultValue={today}
             name="orderDate"
             required
             type="date"
           />
         </label>
-        <label className="text-[10px] text-muted-foreground">
+        <label className="text-xs text-muted-foreground">
           要求交付
           <input
-            className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs outline-none focus:border-primary/45"
+            className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs outline-none focus:border-primary/45"
             min={today}
             name="requestedDeliveryOn"
             type="date"
@@ -171,9 +174,9 @@ export function SalesOrderBuilder({
       <div className="grid gap-2 sm:grid-cols-3">
         {(Object.keys(priceLabels) as PriceType[]).map((type) => (
           <label
-            className={`cursor-pointer rounded-xl border px-3 py-2.5 text-xs transition ${
+            className={`cursor-pointer rounded-md border px-3 py-2.5 text-xs transition ${
               priceType === type
-                ? "border-[#18afb3]/35 bg-[#e9f8f8] font-medium text-[#0d6475]"
+                ? "border-border bg-muted font-medium text-foreground"
                 : "border-border bg-white text-muted-foreground"
             }`}
             key={type}
@@ -190,16 +193,16 @@ export function SalesOrderBuilder({
           </label>
         ))}
       </div>
-      <section className="overflow-hidden rounded-[18px] border border-border">
-        <div className="flex items-center justify-between bg-[#f3f7fa] px-4 py-3">
+      <section className="overflow-hidden rounded-md border border-border">
+        <div className="flex items-center justify-between bg-muted px-4 py-3">
           <div>
             <h3 className="text-xs font-semibold">订单商品明细</h3>
-            <p className="mt-1 text-[9px] text-muted-foreground">
+            <p className="mt-1 text-xs text-muted-foreground">
               单价从产品中心读取，服务端会再次校验
             </p>
           </div>
           <button
-            className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-white px-3 text-[10px] font-medium text-primary shadow-sm"
+            className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-white px-3 text-xs font-medium text-primary "
             onClick={() => {
               setLines((current) => [
                 ...current,
@@ -222,9 +225,9 @@ export function SalesOrderBuilder({
                 className="grid gap-2 px-4 py-3 sm:grid-cols-[24px_minmax(0,1fr)_90px_110px_32px] sm:items-center"
                 key={line.key}
               >
-                <span className="text-[10px] text-muted-foreground">{index + 1}</span>
+                <span className="text-xs text-muted-foreground">{index + 1}</span>
                 <select
-                  className="h-10 min-w-0 rounded-xl border border-border bg-white px-3 text-[11px] outline-none focus:border-primary/45"
+                  className="h-10 min-w-0 rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/45"
                   onChange={(event) =>
                     updateLine(line.key, { productId: event.target.value })
                   }
@@ -241,7 +244,7 @@ export function SalesOrderBuilder({
                 </select>
                 <input
                   aria-label={`第 ${index + 1} 行数量`}
-                  className="h-10 rounded-xl border border-border px-3 text-right text-[11px] outline-none focus:border-primary/45"
+                  className="h-10 rounded-md border border-border px-3 text-right text-xs outline-none focus:border-primary/45"
                   min="0.001"
                   onChange={(event) =>
                     updateLine(line.key, { quantity: Number(event.target.value) })
@@ -251,9 +254,9 @@ export function SalesOrderBuilder({
                   type="number"
                   value={line.quantity}
                 />
-                <div className="text-right text-[10px]">
+                <div className="text-right text-xs">
                   <div className="font-medium">{money(unitPrice * line.quantity)}</div>
-                  <div className="mt-0.5 text-[8px] text-muted-foreground">
+                  <div className="mt-0.5 text-xs text-muted-foreground">
                     {money(unitPrice)} / 件
                   </div>
                 </div>
@@ -269,34 +272,34 @@ export function SalesOrderBuilder({
             );
           })}
         </div>
-        <div className="flex items-center justify-between border-t border-border bg-[#f8fafc] px-4 py-3">
-          <span className="text-[10px] text-muted-foreground">草稿订单金额</span>
-          <span className="text-lg font-semibold text-[#0a385d]">{money(total)}</span>
+        <div className="flex items-center justify-between border-t border-border bg-muted px-4 py-3">
+          <span className="text-xs text-muted-foreground">草稿订单金额</span>
+          <span className="text-lg font-semibold text-foreground">{money(total)}</span>
         </div>
       </section>
       <div className="grid gap-3 sm:grid-cols-2">
         <input
-          className="h-10 rounded-xl border border-border px-3 text-xs outline-none focus:border-primary/45"
+          className="h-10 rounded-md border border-border px-3 text-xs outline-none focus:border-primary/45"
           name="paymentTerms"
           placeholder="付款条款（选填）"
         />
         <input
-          className="h-10 rounded-xl border border-border px-3 text-xs outline-none focus:border-primary/45"
+          className="h-10 rounded-md border border-border px-3 text-xs outline-none focus:border-primary/45"
           name="deliveryTerms"
           placeholder="交付条款（选填）"
         />
       </div>
       <textarea
-        className="min-h-20 w-full rounded-xl border border-border px-3 py-2.5 text-xs outline-none focus:border-primary/45"
+        className="min-h-20 w-full rounded-md border border-border px-3 py-2.5 text-xs outline-none focus:border-primary/45"
         name="note"
         placeholder="订单备注"
       />
       <button
-        className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#0d6475] to-[#168e98] text-xs font-semibold text-white shadow-[0_12px_28px_-18px_rgba(13,100,117,.8)]"
+        className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-primary text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
         type="submit"
       >
         <ShoppingCart className="size-4" />
-        保存销售订单草稿
+        {mobile ? "保存并提交审批" : "保存销售订单草稿"}
       </button>
     </form>
   );

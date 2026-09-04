@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import type { BiData, BiKpi } from "@/types/bi";
 
-const COLORS = ["#0b7182", "#3d82b8", "#d5a646", "#91a9b8", "#9dcac7"];
+const COLORS = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)"];
 const KPI_ICONS: Record<BiKpi["key"], LucideIcon> = {
   customers: UsersRound,
   receivables: CircleDollarSign,
@@ -33,15 +33,15 @@ const KPI_ICONS: Record<BiKpi["key"], LucideIcon> = {
   employees: PackageSearch,
 };
 const KPI_TONES: Record<BiKpi["key"], string> = {
-  customers: "bg-[#def3f2] text-[#087681]",
-  receivables: "bg-[#e8f0fb] text-[#4775b5]",
-  orders: "bg-[#e9f5ee] text-[#217b62]",
-  inventory: "bg-[#eef2f6] text-[#49677e]",
-  warnings: "bg-[#fff1e2] text-[#b87524]",
-  employees: "bg-[#f1ebf8] text-[#775da1]",
+  customers: "bg-muted text-foreground",
+  receivables: "bg-muted text-foreground",
+  orders: "bg-muted text-foreground",
+  inventory: "bg-muted text-foreground",
+  warnings: "bg-muted text-foreground",
+  employees: "bg-muted text-foreground",
 };
 const card =
-  "overflow-hidden rounded-[22px] border border-white/90 bg-white/82 shadow-[0_18px_54px_-40px_rgba(7,45,76,.58)] backdrop-blur-xl";
+  "overflow-hidden rounded-md border border-white/90 bg-white/82  backdrop-blur-xl";
 
 function money(value: number) {
   return new Intl.NumberFormat("zh-CN", {
@@ -70,13 +70,13 @@ function ChartHeader({
   return (
     <div className="flex items-start justify-between gap-4 px-5 pt-5 sm:px-6 sm:pt-6">
       <div>
-        <h2 className="text-[15px] font-semibold tracking-[-0.025em] text-[#18344d]">
+        <h2 className="text-[15px] font-semibold tracking-[-0.025em] text-foreground">
           {title}
         </h2>
-        <p className="mt-1 text-[10px] text-[#7d8f9f]">{subtitle}</p>
+        <p className="mt-1 text-xs text-foreground">{subtitle}</p>
       </div>
       {badge && (
-        <span className="rounded-full border border-[#dce8ed] bg-[#f6f9fb] px-3 py-1.5 text-[9px] text-[#637787]">
+        <span className="rounded-full border border-border bg-muted px-3 py-1.5 text-xs text-foreground">
           {badge}
         </span>
       )}
@@ -105,28 +105,28 @@ export function BiDashboard({ data }: { data: BiData }) {
           const Icon = KPI_ICONS[item.key];
           return (
             <article
-              className="group relative overflow-hidden rounded-[20px] border border-white/90 bg-white/85 p-5 shadow-[0_16px_46px_-36px_rgba(7,45,76,.58)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_55px_-35px_rgba(7,45,76,.42)]"
+              className="group relative overflow-hidden rounded-md border border-white/90 bg-white/85 p-5  transition duration-300  "
               key={item.key}
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <div className="text-[10px] font-medium text-[#708495]">
+                  <div className="text-xs font-medium text-foreground">
                     {item.label}
                   </div>
-                  <div className="mt-3 truncate text-[25px] font-semibold tracking-[-0.045em] text-[#142d43]">
+                  <div className="mt-3 truncate text-[25px] font-semibold tracking-[-0.045em] text-foreground">
                     {kpiValue(item)}
                   </div>
                 </div>
                 <span
                   className={
-                    "grid size-10 shrink-0 place-items-center rounded-[14px] " +
+                    "grid size-10 shrink-0 place-items-center rounded-md " +
                     KPI_TONES[item.key]
                   }
                 >
                   <Icon className="size-[18px]" />
                 </span>
               </div>
-              <div className="mt-4 border-t border-[#e8eef2] pt-3 text-[9px] leading-4 text-[#8798a6]">
+              <div className="mt-4 border-t border-border pt-3 text-xs leading-4 text-muted-foreground">
                 {item.note}
               </div>
             </article>
@@ -135,7 +135,7 @@ export function BiDashboard({ data }: { data: BiData }) {
       </section>
 
       {data.warnings.length > 0 && (
-        <section className="grid gap-2 rounded-[18px] border border-[#ecdcbf] bg-[#fffaf0]/90 px-4 py-3 text-[10px] leading-5 text-[#8a642e] sm:grid-cols-2">
+        <section className="grid gap-2 rounded-md border border-border bg-muted px-4 py-3 text-xs leading-5 text-foreground sm:grid-cols-2">
           {data.warnings.map((warning) => (
             <div className="flex gap-2" key={warning}>
               <TriangleAlert className="mt-0.5 size-3.5 shrink-0" />
@@ -175,7 +175,7 @@ export function BiDashboard({ data }: { data: BiData }) {
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      border: "1px solid #dce6ed",
+                      border: "1px solid var(--border)",
                       borderRadius: 12,
                       fontSize: 10,
                     }}
@@ -185,27 +185,27 @@ export function BiDashboard({ data }: { data: BiData }) {
               </ResponsiveContainer>
               <div className="pointer-events-none absolute inset-0 grid place-items-center text-center">
                 <div>
-                  <div className="text-[28px] font-semibold tracking-[-0.05em] text-[#17354e]">
+                  <div className="text-[28px] font-semibold tracking-[-0.05em] text-foreground">
                     {customerTotal}
                   </div>
-                  <div className="text-[9px] text-[#8595a3]">客户总数</div>
+                  <div className="text-xs text-foreground">客户总数</div>
                 </div>
               </div>
             </div>
             <div className="space-y-2">
               {data.customerLevels.map((item, index) => (
                 <div
-                  className="flex items-center justify-between rounded-xl border border-[#e6edf1] bg-[#f9fbfc] px-3 py-2.5"
+                  className="flex items-center justify-between rounded-md border border-border bg-muted px-3 py-2.5"
                   key={item.name}
                 >
-                  <span className="flex items-center gap-2 text-[10px] text-[#526878]">
+                  <span className="flex items-center gap-2 text-xs text-foreground">
                     <i
-                      className="size-2.5 rounded-[3px]"
+                      className="size-2.5 rounded-sm"
                       style={{ backgroundColor: COLORS[index] }}
                     />
                     {item.name}
                   </span>
-                  <span className="text-xs font-semibold tabular-nums text-[#203b52]">
+                  <span className="text-xs font-semibold tabular-nums text-foreground">
                     {item.value}
                   </span>
                 </div>
@@ -230,13 +230,13 @@ export function BiDashboard({ data }: { data: BiData }) {
                 >
                   <CartesianGrid
                     horizontal={false}
-                    stroke="#e9eef2"
+                    stroke="var(--border)"
                     strokeDasharray="3 4"
                   />
                   <XAxis
                     axisLine={false}
                     fontSize={9}
-                    tick={{ fill: "#8293a1" }}
+                    tick={{ fill: "var(--muted-foreground)" }}
                     tickFormatter={(value) =>
                       Math.round(Number(value) / 10000) + "万"
                     }
@@ -247,20 +247,20 @@ export function BiDashboard({ data }: { data: BiData }) {
                     axisLine={false}
                     dataKey="name"
                     fontSize={10}
-                    tick={{ fill: "#536979" }}
+                    tick={{ fill: "var(--muted-foreground)" }}
                     tickLine={false}
                     type="category"
                     width={88}
                   />
                   <Tooltip
                     contentStyle={{
-                      border: "1px solid #dce6ed",
+                      border: "1px solid var(--border)",
                       borderRadius: 12,
                       fontSize: 10,
                     }}
                     formatter={(value) => [money(Number(value)), "应收余额"]}
                   />
-                  <Bar dataKey="value" fill="#3d82b8" radius={[0, 7, 7, 0]} />
+                  <Bar dataKey="value" fill="var(--chart-1)" radius={[0, 7, 7, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -281,7 +281,7 @@ export function BiDashboard({ data }: { data: BiData }) {
             <ResponsiveContainer height="100%" width="100%">
               <BarChart data={data.inventoryCategories}>
                 <CartesianGrid
-                  stroke="#e9eef2"
+                  stroke="var(--border)"
                   strokeDasharray="3 4"
                   vertical={false}
                 />
@@ -289,32 +289,32 @@ export function BiDashboard({ data }: { data: BiData }) {
                   axisLine={false}
                   dataKey="name"
                   fontSize={9}
-                  tick={{ fill: "#607686" }}
+                  tick={{ fill: "var(--muted-foreground)" }}
                   tickLine={false}
                 />
                 <YAxis
                   allowDecimals={false}
                   axisLine={false}
                   fontSize={9}
-                  tick={{ fill: "#8b9aa7" }}
+                  tick={{ fill: "var(--muted-foreground)" }}
                   tickLine={false}
                 />
                 <Tooltip
                   contentStyle={{
-                    border: "1px solid #dce6ed",
+                    border: "1px solid var(--border)",
                     borderRadius: 12,
                     fontSize: 10,
                   }}
                 />
                 <Bar
                   dataKey="value"
-                  fill="#0b7182"
+                  fill="var(--chart-1)"
                   name="启用 SKU"
                   radius={[7, 7, 0, 0]}
                 />
                 <Bar
                   dataKey="secondary"
-                  fill="#d5a646"
+                  fill="var(--chart-1)"
                   name="风险 SKU"
                   radius={[7, 7, 0, 0]}
                 />
@@ -333,20 +333,20 @@ export function BiDashboard({ data }: { data: BiData }) {
             {data.receivableRanking.length > 0 ? (
               data.receivableRanking.map((item, index) => (
                 <div key={item.name}>
-                  <div className="flex items-center justify-between gap-3 text-[10px]">
-                    <span className="min-w-0 truncate text-[#405a6e]">
-                      <b className="mr-2 font-mono text-[#8a9aa7]">
+                  <div className="flex items-center justify-between gap-3 text-xs">
+                    <span className="min-w-0 truncate text-foreground">
+                      <b className="mr-2 font-mono text-muted-foreground">
                         {String(index + 1).padStart(2, "0")}
                       </b>
                       {item.name}
                     </span>
-                    <span className="shrink-0 font-semibold tabular-nums text-[#17364e]">
+                    <span className="shrink-0 font-semibold tabular-nums text-foreground">
                       {money(item.outstanding)}
                     </span>
                   </div>
-                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#edf2f5]">
+                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted">
                     <div
-                      className="h-full rounded-full bg-[#0b7182]"
+                      className="h-full rounded-full bg-primary"
                       style={{
                         width:
                           String(
@@ -358,7 +358,7 @@ export function BiDashboard({ data }: { data: BiData }) {
                       }}
                     />
                   </div>
-                  <div className="mt-1 text-right text-[8px] text-[#91a0ac]">
+                  <div className="mt-1 text-right text-xs text-muted-foreground">
                     {item.documentCount} 笔往来
                   </div>
                 </div>
@@ -392,14 +392,14 @@ export function BiDashboard({ data }: { data: BiData }) {
                 >
                   <CartesianGrid
                     horizontal={false}
-                    stroke="#e9eef2"
+                    stroke="var(--border)"
                     strokeDasharray="3 4"
                   />
                   <XAxis
                     allowDecimals={false}
                     axisLine={false}
                     fontSize={9}
-                    tick={{ fill: "#8293a1" }}
+                    tick={{ fill: "var(--muted-foreground)" }}
                     tickLine={false}
                     type="number"
                   />
@@ -407,20 +407,20 @@ export function BiDashboard({ data }: { data: BiData }) {
                     axisLine={false}
                     dataKey="name"
                     fontSize={10}
-                    tick={{ fill: "#536979" }}
+                    tick={{ fill: "var(--muted-foreground)" }}
                     tickLine={false}
                     type="category"
                     width={82}
                   />
                   <Tooltip
                     contentStyle={{
-                      border: "1px solid #dce6ed",
+                      border: "1px solid var(--border)",
                       borderRadius: 12,
                       fontSize: 10,
                     }}
                     formatter={(value) => [String(value) + " 人", "在职人数"]}
                   />
-                  <Bar dataKey="value" fill="#0b7182" radius={[0, 7, 7, 0]} />
+                  <Bar dataKey="value" fill="var(--chart-1)" radius={[0, 7, 7, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -438,20 +438,20 @@ export function BiDashboard({ data }: { data: BiData }) {
           <div className="grid grid-cols-2 gap-3 px-5 pb-6 pt-5 sm:grid-cols-5 sm:px-6">
             {data.orderStatuses.map((item, index) => (
               <div
-                className="rounded-[16px] border border-[#e4ecef] bg-[#f8fafb] p-4 text-center"
+                className="rounded-md border border-border bg-muted p-4 text-center"
                 key={item.name}
               >
                 <span
                   className="mx-auto block size-2 rounded-full"
                   style={{ backgroundColor: COLORS[index % COLORS.length] }}
                 />
-                <div className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-[#18364f]">
+                <div className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-foreground">
                   {item.value}
                 </div>
-                <div className="mt-1 text-[9px] text-[#768998]">
+                <div className="mt-1 text-xs text-foreground">
                   {item.name}
                 </div>
-                <div className="mt-2 truncate text-[8px] text-[#9aa7b1]">
+                <div className="mt-2 truncate text-xs text-muted-foreground">
                   {money(item.secondary ?? 0)}
                 </div>
               </div>
@@ -469,28 +469,28 @@ export function BiDashboard({ data }: { data: BiData }) {
         <div className="grid gap-3 px-5 pb-6 pt-5 sm:grid-cols-2 sm:px-6 lg:grid-cols-4">
           {data.coverage.map((item) => (
             <div
-              className="rounded-[16px] border border-[#e3ebef] bg-[#f9fbfc] p-4"
+              className="rounded-md border border-border bg-muted p-4"
               key={item.label}
             >
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-medium text-[#455f72]">
+                <span className="text-xs font-medium text-foreground">
                   {item.label}
                 </span>
                 <span
                   className={
                     "size-2 rounded-full " +
                     (item.status === "ready"
-                      ? "bg-[#22a58a]"
+                      ? "bg-muted"
                       : item.status === "restricted"
-                        ? "bg-[#d5a646]"
-                        : "bg-[#aab6bf]")
+                        ? "bg-muted"
+                        : "bg-muted")
                   }
                 />
               </div>
-              <div className="mt-3 text-xl font-semibold tabular-nums text-[#18364f]">
+              <div className="mt-3 text-xl font-semibold tabular-nums text-foreground">
                 {item.status === "restricted" ? "—" : item.records}
               </div>
-              <div className="mt-1 text-[8px] leading-4 text-[#8b9aa6]">
+              <div className="mt-1 text-xs leading-4 text-muted-foreground">
                 {item.note}
               </div>
             </div>
@@ -503,7 +503,7 @@ export function BiDashboard({ data }: { data: BiData }) {
 
 function EmptyState({ text }: { text: string }) {
   return (
-    <div className="grid h-full min-h-40 place-items-center text-center text-[10px] text-[#8999a6]">
+    <div className="grid h-full min-h-40 place-items-center text-center text-xs text-muted-foreground">
       {text}
     </div>
   );

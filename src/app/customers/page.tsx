@@ -15,6 +15,7 @@ import {
   UsersRound,
 } from "lucide-react";
 import { WorkflowShell } from "@/features/approvals/workflow-shell";
+import { CustomerLevelBadge } from "@/components/business/customer-level-badge";
 import { requireCurrentEmployee } from "@/features/auth/current-employee";
 import {
   createCustomer,
@@ -94,13 +95,6 @@ const levelOrder: Record<Customer["level"], number> = {
   C: 3,
 };
 
-const levelBadgeTones: Record<Customer["level"], string> = {
-  S: "bg-[#ead191] text-[#795713]",
-  A: "bg-[#d9eee4] text-[#0d6c78]",
-  B: "bg-[#dfe9f5] text-[#426c9b]",
-  C: "bg-[#eee7df] text-[#756657]",
-};
-
 const followupLabels: Record<Followup["followup_type"], string> = {
   call: "电话",
   wechat: "微信",
@@ -148,7 +142,7 @@ function MetricCard({
   tone: string;
 }) {
   return (
-    <article className="rounded-[20px] border border-border/75 bg-white p-5 shadow-[0_8px_30px_-24px_rgba(23,57,50,.35)]">
+    <article className="rounded-md border border-border/75 bg-white p-5 ">
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="text-xs text-muted-foreground">{label}</div>
@@ -156,11 +150,11 @@ function MetricCard({
             {value}
           </div>
         </div>
-        <div className={`grid size-10 place-items-center rounded-xl ${tone}`}>
+        <div className={`grid size-10 place-items-center rounded-md ${tone}`}>
           {icon}
         </div>
       </div>
-      <div className="mt-4 border-t border-border/70 pt-3 text-[10px] text-muted-foreground">
+      <div className="mt-4 border-t border-border/70 pt-3 text-xs text-muted-foreground">
         {note}
       </div>
     </article>
@@ -176,6 +170,8 @@ export default async function CustomersPage({
     error?: string;
     status?: string;
     q?: string;
+    page?: string;
+    pageSize?: string;
   }>;
 }) {
   const configured = isSupabaseConfigured();
@@ -187,36 +183,35 @@ export default async function CustomersPage({
   )
     ? feedback.status!
     : "all";
+  const requestedPage = Number.parseInt(feedback.page ?? "1", 10);
+  const page = Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+  const requestedPageSize = Number.parseInt(feedback.pageSize ?? "50", 10);
+  const pageSize = [20, 50, 100].includes(requestedPageSize)
+    ? requestedPageSize
+    : 50;
+  const rangeFrom = (page - 1) * pageSize;
+  const rangeTo = rangeFrom + pageSize - 1;
 
-  let departmentCode: string | null = null;
+  const departmentCode = employee?.departmentCode ?? null;
   let customers: Customer[] = [];
   let followups: Followup[] = [];
   let assignableEmployees: Array<{ id: string; name: string; title: string | null }> =
     [];
   let customerLogoUrls = new Map<string, string>();
   let dataAvailable = !configured;
+  let customerCount = 0;
 
   if (employee) {
     const supabase = await createClient();
-    if (employee.departmentId) {
-      const { data: department } = await supabase
-        .from("departments")
-        .select("code")
-        .eq("id", employee.departmentId)
-        .maybeSingle();
-      departmentCode = department?.code ?? null;
-    }
 
     let customerQuery = supabase
       .from("customers")
       .select(
         "id, customer_no, name, customer_type, level, status, source, region, address, tags, owner_employee_id, logo_path, last_contact_at, next_follow_up_on, note, created_at, customer_contacts(name, position, phone, email, wechat, is_primary), employees!customers_owner_employee_id_fkey(name)",
+        { count: "exact" },
       )
       .order("updated_at", { ascending: false })
-      // Keep the complete internal customer directory visible until server-side
-      // pagination is introduced. The previous limit hid older manual records
-      // after the finance demo customer import exceeded 100 rows.
-      .limit(500);
+      .range(rangeFrom, rangeTo);
 
     if (statusFilter !== "all") {
       customerQuery = customerQuery.eq("status", statusFilter);
@@ -245,6 +240,7 @@ export default async function CustomersPage({
     ]);
 
     dataAvailable = !customerResult.error;
+    customerCount = customerResult.count ?? 0;
     customers = ((customerResult.data ?? []) as Customer[]).sort(
       (left, right) => levelOrder[left.level] - levelOrder[right.level],
     );
@@ -278,6 +274,15 @@ export default async function CustomersPage({
   const canManage =
     !employee ||
     ["DX-SALES", "DX-CS"].includes(departmentCode ?? "");
+  const totalPages = Math.max(1, Math.ceil(customerCount / pageSize));
+  const pageHref = (targetPage: number) => {
+    const params = new URLSearchParams();
+    if (search) params.set("q", search);
+    if (statusFilter !== "all") params.set("status", statusFilter);
+    params.set("page", String(targetPage));
+    params.set("pageSize", String(pageSize));
+    return `/customers?${params.toString()}`;
+  };
   const today = new Date().toISOString().slice(0, 10);
   const currentMonth = today.slice(0, 7);
   const activeCount = customers.filter((customer) => customer.status === "active").length;
@@ -304,15 +309,15 @@ export default async function CustomersPage({
           : undefined
       }
     >
-      <main className="mx-auto max-w-[1600px] p-4 sm:p-6 xl:p-8">
-        <div className="mb-4 flex justify-end"><Link className="rounded-xl bg-[#0a385d] px-4 py-2 text-[10px] text-white" href="/customers/operations">进入客户经营中心</Link></div>
-        <section className="relative overflow-hidden rounded-[24px] bg-[#0a385d] px-6 py-7 text-white shadow-[0_18px_50px_-32px_rgba(12,47,41,.75)] sm:px-8 lg:px-10">
+      <main className="mx-auto max-w-[1440px] p-4 sm:p-6 xl:p-8">
+        <div className="mb-4 flex justify-end"><Link className="rounded-md bg-primary px-4 py-2 text-xs text-white" href="/customers/operations">进入客户经营中心</Link></div>
+        <section className="ui-page-header">
           <div className="absolute -right-16 -top-28 size-80 rounded-full border border-white/8" />
           <div className="absolute right-24 top-14 size-28 rounded-full border border-white/8" />
           <Handshake className="pointer-events-none absolute right-12 top-1/2 hidden size-40 -translate-y-1/2 text-white/[0.055] sm:block" />
           <div className="relative flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
             <div>
-              <div className="text-xs font-medium tracking-[0.12em] text-[#79d8d5]">
+              <div className="text-xs font-medium tracking-[0.12em] text-muted-foreground">
                 CRM <strong className="font-semibold text-white">·</strong>{" "}
                 Customer Relationship Management
               </div>
@@ -325,13 +330,13 @@ export default async function CustomersPage({
             </div>
             <div className="flex flex-wrap items-center gap-2 self-start lg:self-auto">
               <Link
-                className="inline-flex h-10 items-center gap-2 rounded-xl bg-white px-4 text-[11px] font-medium text-[#105f51] shadow-[0_8px_22px_rgba(0,0,0,.12)] transition hover:-translate-y-0.5 hover:bg-[#edf8f3]"
+                className="inline-flex h-10 items-center gap-2 rounded-md bg-white px-4 text-xs font-medium text-foreground  transition  hover:bg-muted"
                 href="/quotes"
               >
                 <ReceiptText className="size-3.5" />
                 客户报价
               </Link>
-              <div className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/12 bg-white/8 px-4 text-[11px] text-white/68">
+              <div className="inline-flex h-10 items-center gap-2 rounded-md border border-white/12 bg-white/8 px-4 text-xs text-white/68">
                 <ShieldCheck className="size-4" />
                 {canManage ? "客户维护权限已启用" : "客户经营只读视图"}
               </div>
@@ -340,14 +345,14 @@ export default async function CustomersPage({
         </section>
 
         {!canView ? (
-          <section className="mt-5 rounded-[20px] border border-border/75 bg-white px-6 py-16 text-center">
+          <section className="mt-5 rounded-md border border-border/75 bg-white px-6 py-16 text-center">
             <ShieldCheck className="mx-auto size-10 text-muted-foreground/50" />
             <h2 className="mt-4 text-base font-semibold">暂无客户数据访问权限</h2>
             <p className="mt-2 text-xs text-muted-foreground">
               客户联系方式仅向销售、客服、系统管理员和董事长开放。
             </p>
             <Link
-              className="mt-5 inline-flex h-9 items-center rounded-xl bg-primary px-4 text-xs text-primary-foreground"
+              className="mt-5 inline-flex h-9 items-center rounded-md bg-primary px-4 text-xs text-primary-foreground"
               href="/dashboard"
             >
               返回工作台
@@ -356,22 +361,22 @@ export default async function CustomersPage({
         ) : (
           <>
             {!dataAvailable && configured && (
-              <div className="mt-5 rounded-2xl border border-[#ead7b8] bg-[#fff9ef] px-4 py-3 text-xs text-[#8a6633]">
+              <div className="mt-5 rounded-lg border border-border bg-muted px-4 py-3 text-xs text-foreground">
                 客户数据表尚未初始化，请执行最新 Supabase 数据库迁移。
               </div>
             )}
             {feedback.created && (
-              <div className="mt-5 rounded-2xl border border-[#cfe8ec] bg-[#edf7f2] px-4 py-3 text-xs text-[#0d6c78]">
+              <div className="mt-5 rounded-lg border border-border bg-muted px-4 py-3 text-xs text-foreground">
                 {feedback.created}
               </div>
             )}
             {feedback.updated && (
-              <div className="mt-5 rounded-2xl border border-[#cfe8ec] bg-[#edf7f2] px-4 py-3 text-xs text-[#0d6c78]">
+              <div className="mt-5 rounded-lg border border-border bg-muted px-4 py-3 text-xs text-foreground">
                 {feedback.updated}
               </div>
             )}
             {feedback.error && (
-              <div className="mt-5 rounded-2xl border border-[#eed3cd] bg-[#fff4f1] px-4 py-3 text-xs text-[#985846]">
+              <div className="mt-5 rounded-lg border border-border bg-muted px-4 py-3 text-xs text-foreground">
                 {feedback.error}
               </div>
             )}
@@ -381,41 +386,41 @@ export default async function CustomersPage({
                 icon={<UsersRound className="size-5" />}
                 label="客户总数"
                 note="当前筛选范围内客户"
-                tone="bg-[#eaf3f8] text-[#0d6c78]"
+                tone="bg-muted text-foreground"
                 value={`${customers.length}`}
               />
               <MetricCard
                 icon={<UserRoundCheck className="size-5" />}
                 label="合作客户"
                 note="已进入稳定合作状态"
-                tone="bg-[#edf2f7] text-[#42647a]"
+                tone="bg-muted text-foreground"
                 value={`${activeCount}`}
               />
               <MetricCard
                 icon={<Sparkles className="size-5" />}
                 label="本月新增"
                 note="本月新建的客户档案"
-                tone="bg-[#f3eef8] text-[#77518e]"
+                tone="bg-muted text-foreground"
                 value={`${newThisMonth}`}
               />
               <MetricCard
                 icon={<CalendarClock className="size-5" />}
                 label="待跟进"
                 note="计划日期已经到期"
-                tone="bg-[#fff4e7] text-[#9a6321]"
+                tone="bg-muted text-foreground"
                 value={`${dueCount} 项`}
               />
             </section>
 
             <div className="mt-5 grid items-start gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(360px,.55fr)]">
-              <section className="overflow-hidden rounded-[20px] border border-border/75 bg-white">
+              <section className="overflow-hidden rounded-md border border-border/75 bg-white">
                 <div className="flex flex-col gap-4 border-b border-border/70 px-5 py-5 sm:px-6">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <h2 className="text-base font-semibold tracking-[-0.02em]">
                         客户档案
                       </h2>
-                      <p className="mt-1 text-[11px] text-muted-foreground">
+                      <p className="mt-1 text-xs text-muted-foreground">
                         客户分类、负责人、联系人与跟进计划
                       </p>
                     </div>
@@ -423,21 +428,21 @@ export default async function CustomersPage({
                       <label className="relative">
                         <Search className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
                         <input
-                          className="h-9 w-44 rounded-xl border border-border bg-[#fafcfe] pl-9 pr-3 text-[10px] outline-none focus:border-primary/40 sm:w-56"
+                          className="h-9 w-44 rounded-md border border-border bg-muted pl-9 pr-3 text-xs outline-none focus:border-primary/40 sm:w-56"
                           defaultValue={search}
                           name="q"
                           placeholder="搜索客户或编号"
                         />
                       </label>
                       <button
-                        className="h-9 rounded-xl bg-primary px-3 text-[10px] text-primary-foreground"
+                        className="h-9 rounded-md bg-primary px-3 text-xs text-primary-foreground"
                         type="submit"
                       >
                         搜索
                       </button>
                     </form>
                   </div>
-                  <div className="flex flex-wrap gap-2 text-[10px]">
+                  <div className="flex flex-wrap gap-2 text-xs">
                     {[
                       ["all", "全部"],
                       ["lead", "潜在线索"],
@@ -446,10 +451,10 @@ export default async function CustomersPage({
                       ["inactive", "暂停合作"],
                     ].map(([value, label]) => (
                       <Link
-                        className={`rounded-full px-3 py-1.5 ${
+                        className={`rounded-md px-3 py-1.5 ${
                           statusFilter === value
                             ? "bg-primary text-primary-foreground"
-                            : "bg-[#f2f5f4] text-muted-foreground"
+                            : "bg-muted text-muted-foreground"
                         }`}
                         href={
                           value === "all"
@@ -497,16 +502,12 @@ export default async function CustomersPage({
                                   {customer.name}
                                 </Link>
                               </h3>
-                              <span
-                                className={`rounded-full px-2 py-0.5 text-[9px] font-semibold ${levelBadgeTones[customer.level]}`}
-                              >
-                                {customer.level} 级
-                              </span>
-                              <span className="rounded-full bg-muted px-2 py-0.5 text-[9px] text-muted-foreground">
+                              <CustomerLevelBadge level={customer.level} />
+                              <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
                                 {statusLabels[customer.status]}
                               </span>
                             </div>
-                            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-muted-foreground">
+                            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
                               <span>{customer.customer_no}</span>
                               <span>{typeLabels[customer.customer_type]}</span>
                               <span>{customer.region || "未填写地区"}</span>
@@ -515,7 +516,7 @@ export default async function CustomersPage({
                               <div className="mt-2 flex flex-wrap gap-1">
                                 {customer.tags.slice(0, 4).map((tag) => (
                                   <span
-                                    className="rounded-md bg-[#f2f6f4] px-2 py-1 text-[9px] text-[#527068]"
+                                    className="rounded-md bg-muted px-2 py-1 text-xs text-foreground"
                                     key={tag}
                                   >
                                     {tag}
@@ -525,7 +526,7 @@ export default async function CustomersPage({
                             )}
                           </div>
                           <div className="col-span-2 lg:col-span-1">
-                            <div className="flex items-center gap-2 text-[11px]">
+                            <div className="flex items-center gap-2 text-xs">
                               <ContactRound className="size-3.5 text-primary/70" />
                               <span className="font-medium">
                                 {contact?.name || "未添加联系人"}
@@ -536,30 +537,30 @@ export default async function CustomersPage({
                                 </span>
                               )}
                             </div>
-                            <div className="mt-1 text-[10px] leading-4 text-muted-foreground">
+                            <div className="mt-1 text-xs leading-4 text-muted-foreground">
                               {contact?.phone || contact?.email || "暂无联系方式"}
                             </div>
-                            <div className="text-[10px] leading-4 text-muted-foreground">
+                            <div className="text-xs leading-4 text-muted-foreground">
                               负责人：{owner?.name || "未分配"}
                             </div>
                           </div>
                           <div className="col-span-2 lg:col-span-1 lg:text-right">
-                            <div className="text-[9px] text-muted-foreground">
+                            <div className="text-xs text-muted-foreground">
                               最近联系
                             </div>
-                            <div className="mt-1 text-[10px] font-medium text-foreground">
+                            <div className="mt-1 text-xs font-medium text-foreground">
                               {formatDate(customer.last_contact_at)}
                             </div>
                           </div>
                           {canManage && (
                             <details className="group col-span-2 -mt-0.5 lg:col-span-4 lg:-mt-7">
-                              <summary className="flex cursor-pointer list-none items-center justify-end gap-1.5 text-[10px] font-medium leading-4 text-primary marker:hidden">
+                              <summary className="flex cursor-pointer list-none items-center justify-end gap-1.5 text-xs font-medium leading-4 text-primary marker:hidden">
                                 <PencilLine className="size-3.5" />
                                 编辑客户档案
                               </summary>
                               <form
                                 action={updateCustomer}
-                                className="mt-3 rounded-2xl border border-border/75 bg-[#fafcfe] p-4 sm:p-5 lg:mt-8"
+                                className="mt-3 rounded-lg border border-border/75 bg-muted p-4 sm:p-5 lg:mt-8"
                               >
                                 <input
                                   name="customerId"
@@ -567,20 +568,20 @@ export default async function CustomersPage({
                                   value={customer.id}
                                 />
                                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                                  <label className="text-[10px] text-muted-foreground sm:col-span-2">
+                                  <label className="text-xs text-muted-foreground sm:col-span-2">
                                     客户名称
                                     <input
-                                      className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
+                                      className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
                                       defaultValue={customer.name}
                                       maxLength={120}
                                       name="name"
                                       required
                                     />
                                   </label>
-                                  <label className="text-[10px] text-muted-foreground">
+                                  <label className="text-xs text-muted-foreground">
                                     客户类型
                                     <select
-                                      className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
+                                      className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
                                       defaultValue={customer.customer_type}
                                       name="customerType"
                                     >
@@ -591,10 +592,10 @@ export default async function CustomersPage({
                                       <option value="other">其他客户</option>
                                     </select>
                                   </label>
-                                  <label className="text-[10px] text-muted-foreground">
+                                  <label className="text-xs text-muted-foreground">
                                     客户等级
                                     <select
-                                      className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
+                                      className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
                                       defaultValue={customer.level}
                                       name="level"
                                     >
@@ -604,10 +605,10 @@ export default async function CustomersPage({
                                       <option value="C">C级 · 普通</option>
                                     </select>
                                   </label>
-                                  <label className="text-[10px] text-muted-foreground">
+                                  <label className="text-xs text-muted-foreground">
                                     当前状态
                                     <select
-                                      className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
+                                      className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
                                       defaultValue={customer.status}
                                       name="status"
                                     >
@@ -617,10 +618,10 @@ export default async function CustomersPage({
                                       <option value="inactive">暂停合作</option>
                                     </select>
                                   </label>
-                                  <label className="text-[10px] text-muted-foreground">
+                                  <label className="text-xs text-muted-foreground">
                                     客户负责人
                                     <select
-                                      className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
+                                      className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
                                       defaultValue={
                                         customer.owner_employee_id ??
                                         employee?.id ??
@@ -641,43 +642,43 @@ export default async function CustomersPage({
                                       ))}
                                     </select>
                                   </label>
-                                  <label className="text-[10px] text-muted-foreground">
+                                  <label className="text-xs text-muted-foreground">
                                     来源
                                     <input
-                                      className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
+                                      className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
                                       defaultValue={customer.source ?? ""}
                                       name="source"
                                     />
                                   </label>
-                                  <label className="text-[10px] text-muted-foreground">
+                                  <label className="text-xs text-muted-foreground">
                                     地区
                                     <input
-                                      className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
+                                      className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
                                       defaultValue={customer.region ?? ""}
                                       name="region"
                                     />
                                   </label>
-                                  <label className="text-[10px] text-muted-foreground sm:col-span-2">
+                                  <label className="text-xs text-muted-foreground sm:col-span-2">
                                     客户标签
                                     <input
-                                      className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
+                                      className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
                                       defaultValue={customer.tags.join("，")}
                                       name="tags"
                                       placeholder="使用逗号分隔，最多 10 个"
                                     />
                                   </label>
-                                  <label className="text-[10px] text-muted-foreground sm:col-span-2">
+                                  <label className="text-xs text-muted-foreground sm:col-span-2">
                                     地址
                                     <input
-                                      className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
+                                      className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
                                       defaultValue={customer.address ?? ""}
                                       name="address"
                                     />
                                   </label>
-                                  <label className="text-[10px] text-muted-foreground">
+                                  <label className="text-xs text-muted-foreground">
                                     下次跟进
                                     <input
-                                      className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
+                                      className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
                                       defaultValue={
                                         customer.next_follow_up_on ?? ""
                                       }
@@ -685,52 +686,52 @@ export default async function CustomersPage({
                                       type="date"
                                     />
                                   </label>
-                                  <label className="text-[10px] text-muted-foreground">
+                                  <label className="text-xs text-muted-foreground">
                                     主要联系人
                                     <input
-                                      className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
+                                      className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
                                       defaultValue={contact?.name ?? ""}
                                       name="contactName"
                                     />
                                   </label>
-                                  <label className="text-[10px] text-muted-foreground">
+                                  <label className="text-xs text-muted-foreground">
                                     联系人职位
                                     <input
-                                      className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
+                                      className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
                                       defaultValue={contact?.position ?? ""}
                                       name="contactPosition"
                                     />
                                   </label>
-                                  <label className="text-[10px] text-muted-foreground">
+                                  <label className="text-xs text-muted-foreground">
                                     联系电话
                                     <input
-                                      className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
+                                      className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
                                       defaultValue={contact?.phone ?? ""}
                                       name="contactPhone"
                                       type="tel"
                                     />
                                   </label>
-                                  <label className="text-[10px] text-muted-foreground">
+                                  <label className="text-xs text-muted-foreground">
                                     微信
                                     <input
-                                      className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
+                                      className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
                                       defaultValue={contact?.wechat ?? ""}
                                       name="contactWechat"
                                     />
                                   </label>
-                                  <label className="text-[10px] text-muted-foreground">
+                                  <label className="text-xs text-muted-foreground">
                                     联系邮箱
                                     <input
-                                      className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
+                                      className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
                                       defaultValue={contact?.email ?? ""}
                                       name="contactEmail"
                                       type="email"
                                     />
                                   </label>
-                                  <label className="text-[10px] text-muted-foreground sm:col-span-2 lg:col-span-4">
+                                  <label className="text-xs text-muted-foreground sm:col-span-2 lg:col-span-4">
                                     备注
                                     <textarea
-                                      className="mt-1.5 min-h-20 w-full resize-y rounded-xl border border-border bg-white px-3 py-2.5 text-xs outline-none focus:border-primary/40"
+                                      className="mt-1.5 min-h-20 w-full resize-y rounded-md border border-border bg-white px-3 py-2.5 text-xs outline-none focus:border-primary/40"
                                       defaultValue={customer.note ?? ""}
                                       maxLength={500}
                                       name="note"
@@ -738,11 +739,11 @@ export default async function CustomersPage({
                                   </label>
                                 </div>
                                 <div className="mt-4 flex justify-end gap-2 border-t border-border/70 pt-4">
-                                  <span className="self-center text-[9px] text-muted-foreground">
+                                  <span className="self-center text-xs text-muted-foreground">
                                     保存后会记录操作审计
                                   </span>
                                   <button
-                                    className="h-9 rounded-xl bg-primary px-4 text-[10px] font-medium text-primary-foreground"
+                                    className="h-9 rounded-md bg-primary px-4 text-xs font-medium text-primary-foreground"
                                     type="submit"
                                   >
                                     保存客户档案
@@ -754,12 +755,37 @@ export default async function CustomersPage({
                         </article>
                       );
                     })}
+                    <div className="flex flex-wrap items-center justify-between gap-3 py-4 text-xs text-muted-foreground">
+                      <span>
+                        共 {customerCount} 条 · 第 {Math.min(page, totalPages)} / {totalPages} 页
+                      </span>
+                      <div className="flex items-center gap-2">
+                        {page > 1 ? (
+                          <Link
+                            className="inline-flex h-9 items-center rounded-md border border-border bg-white px-3 text-foreground hover:bg-muted"
+                            href={pageHref(page - 1)}
+                            prefetch={false}
+                          >
+                            上一页
+                          </Link>
+                        ) : null}
+                        {page < totalPages ? (
+                          <Link
+                            className="inline-flex h-9 items-center rounded-md border border-border bg-white px-3 text-foreground hover:bg-muted"
+                            href={pageHref(page + 1)}
+                            prefetch={false}
+                          >
+                            下一页
+                          </Link>
+                        ) : null}
+                      </div>
+                    </div>
                   </div>
                 ) : (
                   <div className="px-6 py-16 text-center">
                     <Handshake className="mx-auto size-10 text-muted-foreground/45" />
                     <h3 className="mt-4 text-sm font-medium">还没有客户档案</h3>
-                    <p className="mt-2 text-[11px] text-muted-foreground">
+                    <p className="mt-2 text-xs text-muted-foreground">
                       创建第一个客户后，联系人和跟进计划会显示在这里。
                     </p>
                   </div>
@@ -769,31 +795,31 @@ export default async function CustomersPage({
               <div className="space-y-5">
                 {canManage ? (
                   <>
-                    <section className="rounded-[20px] border border-border/75 bg-white p-5 sm:p-6">
+                    <section className="rounded-md border border-border/75 bg-white p-5 sm:p-6">
                       <div className="flex items-start justify-between">
                         <div>
                           <h2 className="text-base font-semibold">新增客户</h2>
-                          <p className="mt-1 text-[11px] text-muted-foreground">
+                          <p className="mt-1 text-xs text-muted-foreground">
                             建立客户主档和主要联系人
                           </p>
                         </div>
                         <Building2 className="size-5 text-primary/65" />
                       </div>
                       <form action={createCustomer} className="mt-5 space-y-4">
-                        <label className="block text-[10px] text-muted-foreground">
+                        <label className="block text-xs text-muted-foreground">
                           客户名称
                           <input
-                            className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs outline-none focus:border-primary/40"
+                            className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs outline-none focus:border-primary/40"
                             name="name"
                             placeholder="企业或门店完整名称"
                             required
                           />
                         </label>
                         <div className="grid grid-cols-2 gap-3">
-                          <label className="text-[10px] text-muted-foreground">
+                          <label className="text-xs text-muted-foreground">
                             客户类型
                             <select
-                              className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
+                              className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
                               defaultValue="enterprise"
                               name="customerType"
                             >
@@ -804,10 +830,10 @@ export default async function CustomersPage({
                               <option value="other">其他客户</option>
                             </select>
                           </label>
-                          <label className="text-[10px] text-muted-foreground">
+                          <label className="text-xs text-muted-foreground">
                             客户等级
                             <select
-                              className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
+                              className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
                               defaultValue="B"
                               name="level"
                             >
@@ -819,10 +845,10 @@ export default async function CustomersPage({
                           </label>
                         </div>
                         <div className="grid grid-cols-2 gap-3">
-                          <label className="text-[10px] text-muted-foreground">
+                          <label className="text-xs text-muted-foreground">
                             当前状态
                             <select
-                              className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
+                              className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
                               defaultValue="lead"
                               name="status"
                             >
@@ -832,10 +858,10 @@ export default async function CustomersPage({
                               <option value="inactive">暂停合作</option>
                             </select>
                           </label>
-                          <label className="text-[10px] text-muted-foreground">
+                          <label className="text-xs text-muted-foreground">
                             客户负责人
                             <select
-                              className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
+                              className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
                               defaultValue={employee?.id ?? ""}
                               name="ownerEmployeeId"
                             >
@@ -849,94 +875,94 @@ export default async function CustomersPage({
                           </label>
                         </div>
                         <div className="grid grid-cols-2 gap-3">
-                          <label className="text-[10px] text-muted-foreground">
+                          <label className="text-xs text-muted-foreground">
                             来源
                             <input
-                              className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs outline-none focus:border-primary/40"
+                              className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs outline-none focus:border-primary/40"
                               name="source"
                               placeholder="转介绍、展会等"
                             />
                           </label>
-                          <label className="text-[10px] text-muted-foreground">
+                          <label className="text-xs text-muted-foreground">
                             地区
                             <input
-                              className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs outline-none focus:border-primary/40"
+                              className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs outline-none focus:border-primary/40"
                               name="region"
                               placeholder="城市或区域"
                             />
                           </label>
                         </div>
-                        <label className="block text-[10px] text-muted-foreground">
+                        <label className="block text-xs text-muted-foreground">
                           客户标签
                           <input
-                            className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs outline-none focus:border-primary/40"
+                            className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs outline-none focus:border-primary/40"
                             name="tags"
                             placeholder="团购，高端餐饮，长期合作"
                           />
                         </label>
                         <div className="border-t border-border/70 pt-4">
-                          <div className="mb-3 text-[10px] font-medium text-foreground">
+                          <div className="mb-3 text-xs font-medium text-foreground">
                             主要联系人
                           </div>
                           <div className="grid grid-cols-2 gap-3">
-                            <label className="text-[10px] text-muted-foreground">
+                            <label className="text-xs text-muted-foreground">
                               姓名
                               <input
-                                className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs outline-none focus:border-primary/40"
+                                className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs outline-none focus:border-primary/40"
                                 name="contactName"
                               />
                             </label>
-                            <label className="text-[10px] text-muted-foreground">
+                            <label className="text-xs text-muted-foreground">
                               职位
                               <input
-                                className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs outline-none focus:border-primary/40"
+                                className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs outline-none focus:border-primary/40"
                                 name="contactPosition"
                               />
                             </label>
                           </div>
                           <div className="mt-3 grid grid-cols-2 gap-3">
-                            <label className="text-[10px] text-muted-foreground">
+                            <label className="text-xs text-muted-foreground">
                               电话
                               <input
-                                className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs outline-none focus:border-primary/40"
+                                className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs outline-none focus:border-primary/40"
                                 name="contactPhone"
                                 type="tel"
                               />
                             </label>
-                            <label className="text-[10px] text-muted-foreground">
+                            <label className="text-xs text-muted-foreground">
                               微信
                               <input
-                                className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs outline-none focus:border-primary/40"
+                                className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs outline-none focus:border-primary/40"
                                 name="contactWechat"
                               />
                             </label>
                           </div>
-                          <label className="mt-3 block text-[10px] text-muted-foreground">
+                          <label className="mt-3 block text-xs text-muted-foreground">
                             企业邮箱
                             <input
-                              className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs outline-none focus:border-primary/40"
+                              className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs outline-none focus:border-primary/40"
                               name="contactEmail"
                               type="email"
                             />
                           </label>
                         </div>
-                        <label className="block text-[10px] text-muted-foreground">
+                        <label className="block text-xs text-muted-foreground">
                           地址
                           <input
-                            className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs outline-none focus:border-primary/40"
+                            className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs outline-none focus:border-primary/40"
                             name="address"
                           />
                         </label>
-                        <label className="block text-[10px] text-muted-foreground">
+                        <label className="block text-xs text-muted-foreground">
                           备注
                           <textarea
-                            className="mt-1.5 min-h-18 w-full resize-y rounded-xl border border-border px-3 py-2.5 text-xs outline-none focus:border-primary/40"
+                            className="mt-1.5 min-h-18 w-full resize-y rounded-md border border-border px-3 py-2.5 text-xs outline-none focus:border-primary/40"
                             maxLength={500}
                             name="note"
                           />
                         </label>
                         <button
-                          className="h-10 w-full rounded-xl bg-primary text-xs font-medium text-primary-foreground"
+                          className="h-10 w-full rounded-md bg-primary text-xs font-medium text-primary-foreground"
                           type="submit"
                         >
                           创建客户档案
@@ -945,11 +971,11 @@ export default async function CustomersPage({
                     </section>
 
                     {customers.length > 0 && (
-                      <section className="rounded-[20px] border border-border/75 bg-white p-5 sm:p-6">
+                      <section className="rounded-md border border-border/75 bg-white p-5 sm:p-6">
                         <div className="flex items-start justify-between">
                           <div>
                             <h2 className="text-base font-semibold">记录客户跟进</h2>
-                            <p className="mt-1 text-[11px] text-muted-foreground">
+                            <p className="mt-1 text-xs text-muted-foreground">
                               更新沟通结果和下一步计划
                             </p>
                           </div>
@@ -959,10 +985,10 @@ export default async function CustomersPage({
                           action={recordCustomerFollowup}
                           className="mt-5 space-y-4"
                         >
-                          <label className="block text-[10px] text-muted-foreground">
+                          <label className="block text-xs text-muted-foreground">
                             客户
                             <select
-                              className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
+                              className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
                               name="customerId"
                             >
                               {customers
@@ -975,10 +1001,10 @@ export default async function CustomersPage({
                             </select>
                           </label>
                           <div className="grid grid-cols-2 gap-3">
-                            <label className="text-[10px] text-muted-foreground">
+                            <label className="text-xs text-muted-foreground">
                               跟进方式
                               <select
-                                className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
+                                className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
                                 defaultValue="wechat"
                                 name="followupType"
                               >
@@ -989,19 +1015,19 @@ export default async function CustomersPage({
                                 <option value="other">其他</option>
                               </select>
                             </label>
-                            <label className="text-[10px] text-muted-foreground">
+                            <label className="text-xs text-muted-foreground">
                               下次跟进
                               <input
-                                className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs outline-none focus:border-primary/40"
+                                className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs outline-none focus:border-primary/40"
                                 name="nextFollowUpOn"
                                 type="date"
                               />
                             </label>
                           </div>
-                          <label className="block text-[10px] text-muted-foreground">
+                          <label className="block text-xs text-muted-foreground">
                             跟进内容
                             <textarea
-                              className="mt-1.5 min-h-24 w-full resize-y rounded-xl border border-border px-3 py-2.5 text-xs outline-none focus:border-primary/40"
+                              className="mt-1.5 min-h-24 w-full resize-y rounded-md border border-border px-3 py-2.5 text-xs outline-none focus:border-primary/40"
                               maxLength={500}
                               name="summary"
                               placeholder="记录客户需求、反馈和下一步动作"
@@ -1009,7 +1035,7 @@ export default async function CustomersPage({
                             />
                           </label>
                           <button
-                            className="h-10 w-full rounded-xl bg-primary text-xs font-medium text-primary-foreground"
+                            className="h-10 w-full rounded-md bg-primary text-xs font-medium text-primary-foreground"
                             type="submit"
                           >
                             保存跟进记录
@@ -1019,16 +1045,16 @@ export default async function CustomersPage({
                     )}
                   </>
                 ) : (
-                  <section className="rounded-[20px] border border-border/75 bg-white p-6 text-center">
+                  <section className="rounded-md border border-border/75 bg-white p-6 text-center">
                     <ShieldCheck className="mx-auto size-8 text-muted-foreground/50" />
                     <h2 className="mt-3 text-sm font-medium">当前为客户只读视图</h2>
-                    <p className="mt-2 text-[10px] leading-5 text-muted-foreground">
+                    <p className="mt-2 text-xs leading-5 text-muted-foreground">
                       客户创建与跟进操作由销售、客服或系统管理员负责。
                     </p>
                   </section>
                 )}
 
-                <section className="rounded-[20px] border border-border/75 bg-[#eef4f8] p-5 sm:p-6">
+                <section className="rounded-md border border-border/75 bg-muted p-5 sm:p-6">
                   <div className="flex items-center gap-3">
                     <MessageSquareText className="size-5 text-primary" />
                     <h2 className="text-sm font-semibold">最近跟进</h2>
@@ -1040,10 +1066,10 @@ export default async function CustomersPage({
                         const author = relatedOne(followup.employees);
                         return (
                           <div
-                            className="border-b border-[#dce9e3] pb-4 last:border-0 last:pb-0"
+                            className="border-b border-border pb-4 last:border-0 last:pb-0"
                             key={followup.id}
                           >
-                            <div className="flex items-center justify-between text-[10px]">
+                            <div className="flex items-center justify-between text-xs">
                               <span className="font-medium">
                                 {customer?.name ?? "客户"}
                               </span>
@@ -1051,10 +1077,10 @@ export default async function CustomersPage({
                                 {followupLabels[followup.followup_type]}
                               </span>
                             </div>
-                            <p className="mt-2 line-clamp-2 text-[10px] leading-5 text-[#5c7587]">
+                            <p className="mt-2 line-clamp-2 text-xs leading-5 text-foreground">
                               {followup.summary}
                             </p>
-                            <div className="mt-2 text-[9px] text-muted-foreground">
+                            <div className="mt-2 text-xs text-muted-foreground">
                               {author?.name ?? "员工"} ·{" "}
                               {formatDate(followup.created_at)}
                             </div>
@@ -1063,7 +1089,7 @@ export default async function CustomersPage({
                       })}
                     </div>
                   ) : (
-                    <p className="mt-4 text-[10px] leading-5 text-muted-foreground">
+                    <p className="mt-4 text-xs leading-5 text-muted-foreground">
                       客户跟进记录会显示在这里。
                     </p>
                   )}

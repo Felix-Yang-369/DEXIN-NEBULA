@@ -69,7 +69,7 @@ export function KnowledgeContent({ content }: { content: string }) {
         if (block.type === "heading") {
           return (
             <h2
-              className="mt-10 scroll-mt-24 border-t border-border/75 pt-8 text-lg font-semibold tracking-[-0.02em] text-[#183c35] first:mt-0 first:border-0 first:pt-0 sm:text-xl"
+              className="mt-10 scroll-mt-24 border-t border-border/75 pt-8 text-lg font-semibold tracking-[-0.02em] text-foreground first:mt-0 first:border-0 first:pt-0 sm:text-xl"
               id={`section-${index}`}
               key={key}
             >
@@ -81,12 +81,12 @@ export function KnowledgeContent({ content }: { content: string }) {
         if (block.type === "list") {
           return (
             <ul
-              className="mt-4 space-y-2.5 text-[13px] leading-7 text-[#52655f] sm:text-sm"
+              className="mt-4 space-y-2.5 text-[13px] leading-7 text-foreground sm:text-sm"
               key={key}
             >
               {block.items.map((item) => (
                 <li className="flex gap-3" key={item}>
-                  <span className="mt-[11px] size-1.5 shrink-0 rounded-full bg-[#76bca3]" />
+                  <span className="mt-[11px] size-1.5 shrink-0 rounded-full bg-muted" />
                   <span>{item}</span>
                 </li>
               ))}
@@ -96,7 +96,7 @@ export function KnowledgeContent({ content }: { content: string }) {
 
         return (
           <p
-            className="mt-4 text-[13px] leading-7 text-[#52655f] sm:text-sm sm:leading-8"
+            className="mt-4 text-[13px] leading-7 text-foreground sm:text-sm sm:leading-8"
             key={key}
           >
             {block.text}
@@ -118,12 +118,12 @@ export function KnowledgeMetaItem({
 }) {
   return (
     <div className="flex items-start gap-3">
-      <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-xl bg-[#eef4f8] text-primary">
+      <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-md bg-muted text-primary">
         {icon}
       </span>
       <div>
-        <div className="text-[10px] text-muted-foreground">{label}</div>
-        <div className="mt-1 text-xs font-medium text-[#294b65]">{value}</div>
+        <div className="text-xs text-muted-foreground">{label}</div>
+        <div className="mt-1 text-xs font-medium text-foreground">{value}</div>
       </div>
     </div>
   );

@@ -72,7 +72,7 @@ export function AnnouncementList({
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground/65" />
           <input
             aria-label="搜索公告"
-            className="h-10 w-full rounded-xl border border-border bg-[#f3f7fa] pl-10 pr-4 text-xs outline-none transition-colors placeholder:text-muted-foreground/55 focus:border-primary/35 focus:bg-white focus:ring-4 focus:ring-primary/7"
+            className="h-10 w-full rounded-md border border-border bg-muted pl-10 pr-4 text-xs outline-none transition-colors placeholder:text-muted-foreground/55 focus:border-primary/35 focus:bg-white focus:ring-4 focus:ring-primary/7"
             onChange={(event) => setKeyword(event.target.value)}
             placeholder="搜索公告标题或内容"
             type="search"
@@ -81,7 +81,7 @@ export function AnnouncementList({
         </label>
         <div className="flex gap-2 overflow-x-auto pb-1 lg:pb-0">
           <button
-            className={`h-9 shrink-0 rounded-xl px-3 text-[10px] font-medium ${
+            className={`h-9 shrink-0 rounded-md px-3 text-xs font-medium ${
               category === "all"
                 ? "bg-primary text-white"
                 : "border border-border text-muted-foreground"
@@ -93,7 +93,7 @@ export function AnnouncementList({
           </button>
           {Object.entries(announcementCategories).map(([code, meta]) => (
             <button
-              className={`h-9 shrink-0 rounded-xl px-3 text-[10px] font-medium ${
+              className={`h-9 shrink-0 rounded-md px-3 text-xs font-medium ${
                 category === code
                   ? "bg-primary text-white"
                   : "border border-border text-muted-foreground"
@@ -120,18 +120,18 @@ export function AnnouncementList({
 
             return (
               <Link
-                className="group block border-b border-border/80 px-5 py-5 transition-colors last:border-b-0 hover:bg-[#fbfcfc] sm:px-6"
+                className="group block border-b border-border/80 px-5 py-5 transition-colors last:border-b-0 hover:bg-muted sm:px-6"
                 href={href}
                 key={item.id}
               >
                 <div className="flex gap-4">
                   <div
-                    className={`mt-1 grid size-10 shrink-0 place-items-center rounded-xl ${
+                    className={`mt-1 grid size-10 shrink-0 place-items-center rounded-md ${
                       unread
-                        ? "bg-[#eaf3f8] text-primary"
+                        ? "bg-muted text-primary"
                         : item.status === "draft"
-                          ? "bg-[#fff4e7] text-[#9a6321]"
-                          : "bg-[#f3f6f5] text-muted-foreground"
+                          ? "bg-muted text-foreground"
+                          : "bg-muted text-muted-foreground"
                     }`}
                   >
                     {item.status === "draft" ? (
@@ -143,21 +143,21 @@ export function AnnouncementList({
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       {unread && (
-                        <span className="size-1.5 rounded-full bg-[#d88163]" />
+                        <span className="size-1.5 rounded-full bg-muted" />
                       )}
                       {item.is_pinned && item.status === "published" && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-[#f8eeee] px-2 py-1 text-[9px] font-medium text-[#965151]">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs font-medium text-foreground">
                           <Pin className="size-2.5" />
                           置顶
                         </span>
                       )}
                       {item.status === "draft" && canPublish && (
-                        <span className="rounded-full bg-[#fff4e7] px-2 py-1 text-[9px] font-medium text-[#9a6321]">
+                        <span className="rounded-full bg-muted px-2 py-1 text-xs font-medium text-foreground">
                           草稿
                         </span>
                       )}
                       <span
-                        className={`rounded-full px-2 py-1 text-[9px] font-medium ${meta.tone}`}
+                        className={`rounded-full px-2 py-1 text-xs font-medium ${meta.tone}`}
                       >
                         {meta.label}
                       </span>
@@ -165,10 +165,10 @@ export function AnnouncementList({
                         {item.title}
                       </h3>
                     </div>
-                    <p className="mt-2 max-w-4xl text-[11px] leading-6 text-muted-foreground">
+                    <p className="mt-2 max-w-4xl text-xs leading-6 text-muted-foreground">
                       {item.summary}
                     </p>
-                    <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-[9px] text-muted-foreground/75">
+                    <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs text-muted-foreground/75">
                       <span className="inline-flex items-center gap-1.5">
                         <CalendarDays className="size-3" />
                         {formatDateTime(item.published_at ?? item.updated_at)}
@@ -191,11 +191,11 @@ export function AnnouncementList({
           })
         ) : (
           <div className="px-6 py-16 text-center">
-            <div className="mx-auto grid size-12 place-items-center rounded-2xl bg-[#eef4f8] text-primary">
+            <div className="mx-auto grid size-12 place-items-center rounded-lg bg-muted text-primary">
               <Search className="size-5" />
             </div>
             <h3 className="mt-4 text-sm font-semibold">没有找到相关公告</h3>
-            <p className="mt-2 text-[10px] text-muted-foreground">
+            <p className="mt-2 text-xs text-muted-foreground">
               当前还没有公告，或搜索条件没有匹配结果。
             </p>
           </div>

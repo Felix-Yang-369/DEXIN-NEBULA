@@ -7,7 +7,18 @@ export type PlatformNavigationChild = {
   activeMatch?: string;
   allowedRoles?: string[];
   allowedPermissions?: string[];
+  mobilePlacement?: "primary" | "more" | "hidden";
+  desktopOnly?: boolean;
+  quickCreateType?: MobileQuickCreateType;
 };
+
+export type MobileQuickCreateType =
+  | "leave"
+  | "expense"
+  | "seal"
+  | "purchase"
+  | "sales_order"
+  | "scan";
 
 export type PlatformNavigationItem = {
   label: string;
@@ -20,6 +31,9 @@ export type PlatformNavigationItem = {
   allowedRoles?: string[];
   allowedPermissions?: string[];
   financeScoped?: boolean;
+  mobilePlacement?: "primary" | "more" | "hidden";
+  desktopOnly?: boolean;
+  quickCreateType?: MobileQuickCreateType;
   children?: PlatformNavigationChild[];
 };
 
@@ -43,6 +57,7 @@ export const platformNavigationGroups: PlatformNavigationGroup[] = [
         icon: "dashboard",
         href: "/dashboard",
         financeScoped: true,
+        mobilePlacement: "primary",
       },
       {
         label: "数据分析",
@@ -70,6 +85,8 @@ export const platformNavigationGroups: PlatformNavigationGroup[] = [
         icon: "orders",
         href: "/sales#orders",
         activeItems: ["销售订单"],
+        mobilePlacement: "more",
+        quickCreateType: "sales_order",
         children: [
           {
             label: "销售订单",
@@ -103,6 +120,8 @@ export const platformNavigationGroups: PlatformNavigationGroup[] = [
         icon: "supply",
         href: "/purchasing",
         activeItems: ["采购管理"],
+        mobilePlacement: "more",
+        quickCreateType: "purchase",
         children: [
           {
             label: "采购申请",
@@ -277,11 +296,12 @@ export const platformNavigationGroups: PlatformNavigationGroup[] = [
         icon: "approvals",
         href: "/approvals",
         financeScoped: true,
+        mobilePlacement: "primary",
         children: [
-          { label: "待办", href: "/approvals", activeMatch: "审批" },
-          { label: "请假申请", href: "/requests/leave", activeMatch: "请假" },
-          { label: "费用报销", href: "/requests/expense", activeMatch: "费用报销" },
-          { label: "用印申请", href: "/requests/seal", activeMatch: "用印" },
+          { label: "待办", href: "/approvals", activeMatch: "审批", mobilePlacement: "primary" },
+          { label: "请假申请", href: "/requests/leave", activeMatch: "请假", quickCreateType: "leave" },
+          { label: "费用报销", href: "/requests/expense", activeMatch: "费用报销", quickCreateType: "expense" },
+          { label: "用印申请", href: "/requests/seal", activeMatch: "用印", quickCreateType: "seal" },
         ],
       },
       {
@@ -318,6 +338,7 @@ export const platformNavigationGroups: PlatformNavigationGroup[] = [
         icon: "system",
         href: "/system",
         allowedRoles: adminRoles,
+        desktopOnly: true,
         children: [
           {
             label: "组织与用户",

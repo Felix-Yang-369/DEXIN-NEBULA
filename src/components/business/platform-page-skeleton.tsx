@@ -22,10 +22,10 @@ function Bone({ className }: { className: string }) {
 function HeroSkeleton({ compact = false }: { compact?: boolean }) {
   return (
     <section
-      className={`${compact ? "min-h-[166px]" : "min-h-[190px]"} overflow-hidden rounded-[24px] bg-[linear-gradient(135deg,#0a385d,#0b4964_62%,#087c78)] px-6 py-7 sm:px-8 lg:px-10`}
+      className={`${compact ? "min-h-[166px]" : "min-h-[190px]"} overflow-hidden rounded-md bg-card px-6 py-7 sm:px-8 lg:px-10`}
     >
-      <div className="h-2.5 w-44 animate-pulse rounded bg-[#79d8d5]/25 motion-reduce:animate-none" />
-      <div className="mt-4 h-8 w-64 max-w-full animate-pulse rounded-xl bg-white/20 motion-reduce:animate-none" />
+      <div className="h-2.5 w-44 animate-pulse rounded bg-muted motion-reduce:animate-none" />
+      <div className="mt-4 h-8 w-64 max-w-full animate-pulse rounded-md bg-white/20 motion-reduce:animate-none" />
       <div className="mt-4 h-3 w-full max-w-2xl animate-pulse rounded bg-white/10 motion-reduce:animate-none" />
       <div className="mt-2 h-3 w-3/5 max-w-lg animate-pulse rounded bg-white/10 motion-reduce:animate-none" />
     </section>
@@ -37,7 +37,7 @@ function MetricsSkeleton() {
     <section className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {metricItems.map((item) => (
         <article
-          className="min-h-[108px] rounded-[20px] border border-border/70 bg-white p-4"
+          className="min-h-[108px] rounded-md border border-border/70 bg-white p-4"
           key={item}
         >
           <div className="flex justify-between">
@@ -54,7 +54,7 @@ function MetricsSkeleton() {
 
 function ListSkeleton() {
   return (
-    <section className="mt-5 min-h-[560px] overflow-hidden rounded-[22px] border border-border/70 bg-white">
+    <section className="mt-5 min-h-[560px] overflow-hidden rounded-md border border-border/70 bg-white">
       <div className="flex min-h-[74px] items-center justify-between gap-4 border-b border-border/70 px-5 sm:px-6">
         <div>
           <Bone className="h-5 w-32" />
@@ -62,7 +62,7 @@ function ListSkeleton() {
         </div>
         <Bone className="h-10 w-32" />
       </div>
-      <div className="border-b border-border/70 bg-[#f8faf9] p-4 sm:px-6">
+      <div className="border-b border-border/70 bg-muted p-4 sm:px-6">
         <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_160px_120px]">
           <Bone className="h-10 w-full" />
           <Bone className="h-10 w-full" />
@@ -72,7 +72,7 @@ function ListSkeleton() {
       <div className="divide-y divide-border/60 px-4 sm:px-6">
         {listItems.map((item) => (
           <div className="flex min-h-[72px] items-center gap-4 py-3" key={item}>
-            <Bone className="size-10 shrink-0 rounded-xl" />
+            <Bone className="size-10 shrink-0 rounded-md" />
             <div className="min-w-0 flex-1">
               <Bone className="h-3.5 w-40 max-w-2/3" />
               <Bone className="mt-2 h-2.5 w-64 max-w-full" />
@@ -91,25 +91,25 @@ function DashboardSkeleton() {
     <>
       <MetricsSkeleton />
       <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,.65fr)]">
-        <section className="min-h-[430px] rounded-[22px] border border-border/70 bg-white p-5 sm:p-6">
+        <section className="min-h-[430px] rounded-md border border-border/70 bg-white p-5 sm:p-6">
           <Bone className="h-5 w-32" />
           <Bone className="mt-2 h-2.5 w-56" />
-          <div className="mt-6 flex h-[290px] items-end gap-3 rounded-2xl bg-[#f7faf9] p-5">
+          <div className="mt-6 flex h-[290px] items-end gap-3 rounded-lg bg-muted p-5">
             {[42, 68, 54, 80, 62, 88, 72].map((height, index) => (
               <div
-                className="flex-1 animate-pulse rounded-t-lg bg-[#b9d8d3] motion-reduce:animate-none"
+                className="flex-1 animate-pulse rounded-t-lg bg-muted motion-reduce:animate-none"
                 key={`${height}-${index}`}
                 style={{ height: `${height}%` }}
               />
             ))}
           </div>
         </section>
-        <section className="min-h-[430px] rounded-[22px] border border-border/70 bg-white p-5 sm:p-6">
+        <section className="min-h-[430px] rounded-md border border-border/70 bg-white p-5 sm:p-6">
           <Bone className="h-5 w-28" />
           <div className="mt-5 space-y-4">
             {metricItems.map((item) => (
               <div className="flex items-center gap-3" key={item}>
-                <Bone className="size-10 shrink-0 rounded-xl" />
+                <Bone className="size-10 shrink-0 rounded-md" />
                 <div className="flex-1">
                   <Bone className="h-3 w-28" />
                   <Bone className="mt-2 h-2.5 w-full" />
@@ -129,13 +129,13 @@ function DetailSkeleton() {
       <div className="space-y-5">
         {[0, 1].map((section) => (
           <section
-            className="min-h-[260px] rounded-[22px] border border-border/70 bg-white p-5 sm:p-6"
+            className="min-h-[260px] rounded-md border border-border/70 bg-white p-5 sm:p-6"
             key={section}
           >
             <Bone className="h-5 w-28" />
             <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {metricItems.map((item) => (
-                <div className="rounded-xl bg-[#f6f9f7] p-3" key={item}>
+                <div className="rounded-md bg-muted p-3" key={item}>
                   <Bone className="h-2.5 w-14" />
                   <Bone className="mt-3 h-3.5 w-24" />
                 </div>
@@ -145,7 +145,7 @@ function DetailSkeleton() {
           </section>
         ))}
       </div>
-      <section className="min-h-[545px] rounded-[22px] border border-border/70 bg-white p-5 sm:p-6">
+      <section className="min-h-[545px] rounded-md border border-border/70 bg-white p-5 sm:p-6">
         <Bone className="h-5 w-24" />
         <div className="mt-5 space-y-3">
           {listItems.slice(0, 5).map((item) => (
@@ -159,7 +159,7 @@ function DetailSkeleton() {
 
 function FormSkeleton() {
   return (
-    <section className="mt-5 min-h-[600px] rounded-[22px] border border-border/70 bg-white p-5 sm:p-7">
+    <section className="mt-5 min-h-[600px] rounded-md border border-border/70 bg-white p-5 sm:p-7">
       <Bone className="h-5 w-36" />
       <Bone className="mt-2 h-2.5 w-72 max-w-full" />
       <div className="mt-7 grid gap-4 sm:grid-cols-2">
@@ -188,12 +188,12 @@ function ChatSkeleton() {
           {listItems.map((item) => <Bone className="h-14 w-full" key={item} />)}
         </div>
       </aside>
-      <main className="flex min-h-[640px] flex-col bg-[#f7faf9] p-4 sm:p-6">
+      <main className="flex min-h-[640px] flex-col bg-muted p-4 sm:p-6">
         <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col justify-end gap-5">
           <Bone className="h-20 w-3/5" />
           <Bone className="ml-auto h-16 w-2/5" />
           <Bone className="h-28 w-4/5" />
-          <Bone className="mt-auto h-14 w-full rounded-2xl" />
+          <Bone className="mt-auto h-14 w-full rounded-lg" />
         </div>
       </main>
     </div>
@@ -218,7 +218,7 @@ export function PlatformPageSkeleton({
         <main
           aria-busy="true"
           aria-label={`正在加载${label}`}
-          className="mx-auto max-w-[1600px] p-4 sm:p-6 xl:p-8"
+          className="mx-auto max-w-[1440px] p-4 sm:p-6 xl:p-8"
         >
           <span className="sr-only">正在加载{label}，请稍候</span>
           <HeroSkeleton compact={variant === "form"} />

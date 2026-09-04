@@ -69,27 +69,27 @@ function MetricCard({
   warning?: boolean;
 }) {
   return (
-    <article className="rounded-[18px] border border-[#dce6ed] bg-white p-5 shadow-[0_12px_32px_-26px_rgba(12,47,41,.45)]">
+    <article className="rounded-md border border-border bg-white p-5 ">
       <div className="flex items-start justify-between gap-4">
         <div>
           <div className="text-xs text-muted-foreground">{title}</div>
           <div
             className={`mt-2 text-xl font-semibold tracking-[-0.04em] ${
-              warning ? "text-[#c8515b]" : "text-[#143b34]"
+              warning ? "text-foreground" : "text-foreground"
             }`}
           >
             {value}
           </div>
         </div>
         <div
-          className={`grid size-10 place-items-center rounded-xl ${
-            warning ? "bg-[#fff0f1] text-[#c8515b]" : "bg-[#e8f4ef] text-[#0d7580]"
+          className={`grid size-10 place-items-center rounded-md ${
+            warning ? "bg-muted text-foreground" : "bg-muted text-foreground"
           }`}
         >
           {icon}
         </div>
       </div>
-      <div className="mt-4 border-t border-[#eaf0f4] pt-3 text-[10px] text-muted-foreground">
+      <div className="mt-4 border-t border-border pt-3 text-xs text-muted-foreground">
         {note}
       </div>
     </article>
@@ -155,8 +155,8 @@ export default async function ReceivableSummaryPage({
         roleLabel: roleLabel(employee.roleCodes),
       }}
     >
-      <main className="mx-auto max-w-[1700px] p-4 sm:p-6 xl:p-8">
-        <section className="overflow-hidden rounded-[24px] bg-[#0a385d] px-6 py-7 text-white shadow-[0_18px_50px_-32px_rgba(12,47,41,.75)] sm:px-8">
+      <main className="mx-auto max-w-[1440px] p-4 sm:p-6 xl:p-8">
+        <section className="overflow-hidden rounded-md bg-primary px-6 py-7 text-white  sm:px-8">
           <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
             <div>
               <Link
@@ -166,7 +166,7 @@ export default async function ReceivableSummaryPage({
                 <ArrowLeft className="size-3.5" />
                 返回财务管理
               </Link>
-              <div className="mt-5 text-xs font-medium tracking-[0.14em] text-[#79d8d5]">
+              <div className="mt-5 text-xs font-medium tracking-[0.14em] text-muted-foreground">
                 AR · ACCOUNTS RECEIVABLE
               </div>
               <h1 className="mt-2 text-2xl font-semibold tracking-[-0.035em] sm:text-[30px]">
@@ -178,7 +178,7 @@ export default async function ReceivableSummaryPage({
             </div>
             {canView ? (
               <a
-                className="inline-flex h-10 items-center gap-2 self-start rounded-xl bg-white px-4 text-xs font-medium text-[#0b3a5d] transition hover:bg-[#eaf3f8] lg:self-auto"
+                className="inline-flex h-10 items-center gap-2 self-start rounded-md bg-white px-4 text-xs font-medium text-foreground transition hover:bg-muted lg:self-auto"
                 href={`/finance/receivables/export?${exportParams.toString()}`}
               >
                 <Download className="size-4" />
@@ -189,7 +189,7 @@ export default async function ReceivableSummaryPage({
         </section>
 
         {!canView ? (
-          <section className="mt-5 rounded-[20px] border border-border/75 bg-white px-6 py-16 text-center">
+          <section className="mt-5 rounded-md border border-border/75 bg-white px-6 py-16 text-center">
             <ShieldAlert className="mx-auto size-10 text-muted-foreground/60" />
             <h2 className="mt-4 text-base font-semibold">暂无应收汇总账访问权限</h2>
             <p className="mt-2 text-xs text-muted-foreground">
@@ -198,14 +198,14 @@ export default async function ReceivableSummaryPage({
           </section>
         ) : (
           <>
-            <form className="mt-5 rounded-[20px] border border-[#dce6ed] bg-white p-4 shadow-[0_12px_32px_-28px_rgba(12,47,41,.45)]">
+            <form className="mt-5 rounded-md border border-border bg-white p-4 ">
               <div className="grid gap-3 lg:grid-cols-[180px_180px_minmax(220px,1fr)_auto_auto] lg:items-end">
                 <label className="grid gap-1.5 text-xs text-muted-foreground">
                   开始日期
                   <span className="relative">
                     <CalendarRange className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                     <input
-                      className="h-10 w-full rounded-xl border border-[#dce6ed] bg-[#fafcfe] pl-9 pr-3 text-sm text-foreground outline-none transition focus:border-[#6ba18f]"
+                      className="h-10 w-full rounded-md border border-border bg-muted pl-9 pr-3 text-sm text-foreground outline-none transition focus:border-border"
                       defaultValue={startDate}
                       name="startDate"
                       type="date"
@@ -217,7 +217,7 @@ export default async function ReceivableSummaryPage({
                   <span className="relative">
                     <CalendarRange className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                     <input
-                      className="h-10 w-full rounded-xl border border-[#dce6ed] bg-[#fafcfe] pl-9 pr-3 text-sm text-foreground outline-none transition focus:border-[#6ba18f]"
+                      className="h-10 w-full rounded-md border border-border bg-muted pl-9 pr-3 text-sm text-foreground outline-none transition focus:border-border"
                       defaultValue={endDate}
                       name="endDate"
                       type="date"
@@ -229,16 +229,16 @@ export default async function ReceivableSummaryPage({
                   <span className="relative">
                     <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                     <input
-                      className="h-10 w-full rounded-xl border border-[#dce6ed] bg-[#fafcfe] pl-9 pr-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground/65 focus:border-[#6ba18f]"
+                      className="h-10 w-full rounded-md border border-border bg-muted pl-9 pr-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground/65 focus:border-border"
                       defaultValue={search}
                       name="search"
                       placeholder="输入关键词查询"
                     />
                   </span>
                 </label>
-                <label className="flex h-10 items-center gap-2 rounded-xl border border-[#dce6ed] bg-[#fafcfe] px-3 text-xs text-muted-foreground">
+                <label className="flex h-10 items-center gap-2 rounded-md border border-border bg-muted px-3 text-xs text-muted-foreground">
                   <input
-                    className="size-4 accent-[#0d7580]"
+                    className="size-4 accent-primary"
                     defaultChecked={includeZero}
                     name="includeZero"
                     type="checkbox"
@@ -247,7 +247,7 @@ export default async function ReceivableSummaryPage({
                   显示零余额
                 </label>
                 <button
-                  className="h-10 rounded-xl bg-[#0d7580] px-5 text-xs font-medium text-white transition hover:bg-[#155347]"
+                  className="h-10 rounded-md bg-primary px-5 text-xs font-medium text-white transition hover:bg-muted"
                   type="submit"
                 >
                   查询
@@ -256,11 +256,11 @@ export default async function ReceivableSummaryPage({
             </form>
 
             {queryError ? (
-              <div className="mt-5 flex items-start gap-3 rounded-[18px] border border-[#f2c8cc] bg-[#fff7f8] p-5 text-sm text-[#9e3f48]">
+              <div className="mt-5 flex items-start gap-3 rounded-md border border-border bg-muted p-5 text-sm text-foreground">
                 <AlertTriangle className="mt-0.5 size-5 shrink-0" />
                 <div>
                   <div className="font-medium">报表暂不可用</div>
-                  <div className="mt-1 text-xs leading-6 text-[#ad5b63]">{queryError}</div>
+                  <div className="mt-1 text-xs leading-6 text-foreground">{queryError}</div>
                 </div>
               </div>
             ) : null}
@@ -299,22 +299,22 @@ export default async function ReceivableSummaryPage({
               />
             </section>
 
-            <section className="mt-5 overflow-hidden rounded-[20px] border border-[#dbe5e1] bg-white shadow-[0_14px_40px_-32px_rgba(12,47,41,.5)]">
-              <div className="flex flex-col justify-between gap-2 border-b border-[#dfe8ef] px-5 py-4 sm:flex-row sm:items-center">
+            <section className="mt-5 overflow-hidden rounded-md border border-border bg-white ">
+              <div className="flex flex-col justify-between gap-2 border-b border-border px-5 py-4 sm:flex-row sm:items-center">
                 <div>
-                  <h2 className="text-sm font-semibold text-[#153b34]">客户应收汇总明细</h2>
-                  <p className="mt-1 text-[11px] text-muted-foreground">
+                  <h2 className="text-sm font-semibold text-foreground">客户应收汇总明细</h2>
+                  <p className="mt-1 text-xs text-muted-foreground">
                     金额单位：人民币元 · 按期末余额降序
                   </p>
                 </div>
-                <div className="text-[11px] text-muted-foreground">
+                <div className="text-xs text-muted-foreground">
                   数据更新时间：实时读取德馨星云财务单据
                 </div>
               </div>
               <div className="overflow-x-auto">
                 <table className="min-w-[1320px] w-full border-collapse text-xs">
                   <thead>
-                    <tr className="bg-[#0a385d] text-white">
+                    <tr className="bg-primary text-white">
                       <th className="border-r border-white/10 px-3 py-2 text-center font-medium" colSpan={4}>
                         客户与业务员
                       </th>
@@ -328,7 +328,7 @@ export default async function ReceivableSummaryPage({
                         期末与风险
                       </th>
                     </tr>
-                    <tr className="bg-[#256355] text-white/90">
+                    <tr className="bg-primary text-white/90">
                       {[
                         "客户编码",
                         "客户名称",
@@ -356,14 +356,14 @@ export default async function ReceivableSummaryPage({
                         row.period_received,
                       );
                       return (
-                        <tr className="border-b border-[#e8eeeb] transition hover:bg-[#f5faf7]" key={row.customer_key}>
-                          <td className="whitespace-nowrap px-3 py-3 font-mono text-[11px] text-muted-foreground">
+                        <tr className="border-b border-border transition hover:bg-muted" key={row.customer_key}>
+                          <td className="whitespace-nowrap px-3 py-3 font-mono text-xs text-muted-foreground">
                             {row.customer_no || "—"}
                           </td>
-                          <td className="max-w-[260px] px-3 py-3 font-medium text-[#0a385d]">
+                          <td className="max-w-[260px] px-3 py-3 font-medium text-foreground">
                             {row.customer_id ? (
                               <Link
-                                className="underline-offset-4 transition hover:text-[#2a7967] hover:underline"
+                                className="underline-offset-4 transition hover:text-foreground hover:underline"
                                 href={`/finance/receivables/${row.customer_id}?startDate=${startDate}&endDate=${endDate}`}
                               >
                                 {row.customer_name}
@@ -372,7 +372,7 @@ export default async function ReceivableSummaryPage({
                               row.customer_name
                             )}
                           </td>
-                          <td className="whitespace-nowrap px-3 py-3 font-mono text-[11px] text-muted-foreground">
+                          <td className="whitespace-nowrap px-3 py-3 font-mono text-xs text-muted-foreground">
                             {row.salesperson_no || "—"}
                           </td>
                           <td className="whitespace-nowrap px-3 py-3">
@@ -384,13 +384,13 @@ export default async function ReceivableSummaryPage({
                           <td className="whitespace-nowrap px-3 py-3 text-right tabular-nums">
                             {currency.format(row.period_receivable)}
                           </td>
-                          <td className="whitespace-nowrap px-3 py-3 text-right tabular-nums text-[#0d7580]">
+                          <td className="whitespace-nowrap px-3 py-3 text-right tabular-nums text-foreground">
                             {currency.format(row.period_received)}
                           </td>
                           <td className="whitespace-nowrap px-3 py-3 text-right font-medium tabular-nums">
                             {currency.format(row.ending_balance)}
                           </td>
-                          <td className={`whitespace-nowrap px-3 py-3 text-right font-medium tabular-nums ${row.overdue_balance > 0 ? "text-[#c8515b]" : "text-muted-foreground"}`}>
+                          <td className={`whitespace-nowrap px-3 py-3 text-right font-medium tabular-nums ${row.overdue_balance > 0 ? "text-foreground" : "text-muted-foreground"}`}>
                             {currency.format(row.overdue_balance)}
                           </td>
                           <td className="whitespace-nowrap px-3 py-3 text-right tabular-nums">
@@ -411,20 +411,20 @@ export default async function ReceivableSummaryPage({
                     ) : null}
                   </tbody>
                   <tfoot>
-                    <tr className="bg-[#f8f0df] font-semibold text-[#0a385d]">
+                    <tr className="bg-muted font-semibold text-foreground">
                       <td className="px-3 py-3" colSpan={4}>合计</td>
                       <td className="whitespace-nowrap px-3 py-3 text-right tabular-nums">{currency.format(totals.openingBalance)}</td>
                       <td className="whitespace-nowrap px-3 py-3 text-right tabular-nums">{currency.format(totals.periodReceivable)}</td>
                       <td className="whitespace-nowrap px-3 py-3 text-right tabular-nums">{currency.format(totals.periodReceived)}</td>
                       <td className="whitespace-nowrap px-3 py-3 text-right tabular-nums">{currency.format(totals.endingBalance)}</td>
-                      <td className="whitespace-nowrap px-3 py-3 text-right tabular-nums text-[#c8515b]">{currency.format(totals.overdueBalance)}</td>
+                      <td className="whitespace-nowrap px-3 py-3 text-right tabular-nums text-foreground">{currency.format(totals.overdueBalance)}</td>
                       <td className="whitespace-nowrap px-3 py-3 text-right tabular-nums">{percent(totals.collectionRate)}</td>
                       <td className="whitespace-nowrap px-3 py-3 text-right tabular-nums">{totals.documentCount}</td>
                     </tr>
                   </tfoot>
                 </table>
               </div>
-              <div className="border-t border-[#dfe8ef] bg-[#fafcfe] px-5 py-3 text-[10px] leading-5 text-muted-foreground">
+              <div className="border-t border-border bg-muted px-5 py-3 text-xs leading-5 text-muted-foreground">
                 口径：期初余额为开始日期前已开应收减去此前核销；本期应收按开单日期统计；本期已收按核销日期统计；逾期按截止日和单据到期日判断。尚未录入德馨星云的金蝶历史单据不会计入本报表。
               </div>
             </section>

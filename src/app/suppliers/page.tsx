@@ -71,10 +71,10 @@ const statusLabels: Record<string, string> = {
   inactive: "已终止",
 };
 const riskLabels = {
-  expired: ["资质已过期", "bg-[#fff0f0] text-[#a34f4f]"],
-  expiring: ["60 天内到期", "bg-[#fff4df] text-[#96651f]"],
-  missing: ["未登记资质", "bg-[#f2f4f3] text-muted-foreground"],
-  normal: ["资质正常", "bg-[#eaf6f0] text-primary"],
+  expired: ["资质已过期", "bg-muted text-foreground"],
+  expiring: ["60 天内到期", "bg-muted text-foreground"],
+  missing: ["未登记资质", "bg-muted text-muted-foreground"],
+  normal: ["资质正常", "bg-muted text-primary"],
 } as const;
 
 function one<T>(value: T | T[] | null) {
@@ -164,12 +164,12 @@ export default async function SuppliersPage({
         roleLabel: employee.title ?? "内部员工",
       }}
     >
-      <main className="mx-auto max-w-[1500px] p-4 sm:p-6 xl:p-8">
-        <section className="relative overflow-hidden rounded-[24px] bg-[#0a385d] px-6 py-8 text-white sm:px-8">
+      <main className="mx-auto max-w-[1440px] p-4 sm:p-6 xl:p-8">
+        <section className="ui-page-header">
           <div className="absolute -right-20 -top-24 size-80 rounded-full border border-white/10" />
           <UserRoundSearch className="absolute right-12 top-1/2 hidden size-40 -translate-y-1/2 text-white/[0.055] sm:block" />
           <div className="relative">
-            <div className="text-[10px] tracking-[0.16em] text-[#79d8d5]">
+            <div className="text-xs tracking-[0.16em] text-muted-foreground">
               SRM · SUPPLIER RELATIONSHIP MANAGEMENT
             </div>
             <h1 className="mt-3 text-2xl font-semibold tracking-[-0.03em] sm:text-[30px]">
@@ -182,12 +182,12 @@ export default async function SuppliersPage({
         </section>
 
         {message && (
-          <div className="mt-4 rounded-xl border border-[#ead3d3] bg-[#fff7f7] px-4 py-3 text-xs text-[#914949]">
+          <div className="mt-4 rounded-md border border-border bg-muted px-4 py-3 text-xs text-foreground">
             {message}
           </div>
         )}
         {supplierResult.error && (
-          <div className="mt-4 rounded-xl border border-[#ead3d3] bg-[#fff7f7] px-4 py-3 text-xs text-[#914949]">
+          <div className="mt-4 rounded-md border border-border bg-muted px-4 py-3 text-xs text-foreground">
             无法读取供应商数据，请确认 SRM 数据库迁移已经执行。
           </div>
         )}
@@ -223,24 +223,24 @@ export default async function SuppliersPage({
           ].map(({ value, label, icon: MetricIcon, note }) => {
             return (
               <article
-                className="rounded-[18px] border border-border/75 bg-white p-5"
+                className="rounded-md border border-border/75 bg-white p-5"
                 key={String(label)}
               >
                 <div className="flex items-center justify-between">
                   <div className="text-2xl font-semibold">{value}</div>
-                  <span className="grid size-9 place-items-center rounded-xl bg-[#edf4f7] text-primary">
+                  <span className="grid size-9 place-items-center rounded-md bg-muted text-primary">
                     <MetricIcon className="size-4" />
                   </span>
                 </div>
                 <div className="mt-2 text-xs font-medium">{label}</div>
-                <div className="mt-1 text-[9px] text-muted-foreground">{note}</div>
+                <div className="mt-1 text-xs text-muted-foreground">{note}</div>
               </article>
             );
           })}
         </section>
 
         {canManage && (
-          <details className="mt-5 rounded-[20px] border border-border/75 bg-white p-5">
+          <details className="mt-5 rounded-md border border-border/75 bg-white p-5">
             <summary className="cursor-pointer list-none text-sm font-semibold">
               + 新建供应商档案
             </summary>
@@ -248,7 +248,7 @@ export default async function SuppliersPage({
               <SupplierFields employees={employees} />
               <div className="mt-4 flex justify-end">
                 <button
-                  className="h-10 rounded-xl bg-primary px-5 text-xs font-medium text-white"
+                  className="h-10 rounded-md bg-primary px-5 text-xs font-medium text-white"
                   type="submit"
                 >
                   创建供应商
@@ -261,7 +261,7 @@ export default async function SuppliersPage({
         <section className="mt-7 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
           <div>
             <h2 className="text-base font-semibold">供应商档案</h2>
-            <p className="mt-1 text-[10px] text-muted-foreground">
+            <p className="mt-1 text-xs text-muted-foreground">
               真实业务主档；未录入时保持空状态
             </p>
           </div>
@@ -269,14 +269,14 @@ export default async function SuppliersPage({
             <label className="relative">
               <Search className="absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
               <input
-                className="h-10 w-56 rounded-xl border border-border bg-white pl-9 pr-3 text-xs"
+                className="h-10 w-56 rounded-md border border-border bg-white pl-9 pr-3 text-xs"
                 defaultValue={query}
                 name="q"
                 placeholder="名称、编号或信用代码"
               />
             </label>
             <select
-              className="h-10 rounded-xl border border-border bg-white px-3 text-xs"
+              className="h-10 rounded-md border border-border bg-white px-3 text-xs"
               defaultValue={status}
               name="status"
             >
@@ -286,7 +286,7 @@ export default async function SuppliersPage({
               <option value="suspended">暂停合作</option>
               <option value="inactive">已终止</option>
             </select>
-            <button className="h-10 rounded-xl bg-[#edf3f0] px-4 text-xs text-primary">
+            <button className="h-10 rounded-md bg-muted px-4 text-xs text-primary">
               查询
             </button>
           </form>
@@ -294,10 +294,10 @@ export default async function SuppliersPage({
 
         <section className="mt-4 space-y-3">
           {suppliers.length === 0 ? (
-            <div className="rounded-[20px] border border-dashed border-border bg-white p-12 text-center">
+            <div className="rounded-md border border-dashed border-border bg-white p-12 text-center">
               <CircleDashed className="mx-auto size-8 text-muted-foreground/50" />
               <h3 className="mt-3 text-sm font-semibold">暂无供应商档案</h3>
-              <p className="mt-2 text-[10px] text-muted-foreground">
+              <p className="mt-2 text-xs text-muted-foreground">
                 {canManage
                   ? "可从上方创建第一家真实供应商。"
                   : "采购部门尚未录入供应商主档。"}
@@ -316,25 +316,25 @@ export default async function SuppliersPage({
               const [riskLabel, riskTone] = riskLabels[risk];
               return (
                 <Link
-                  className="group grid gap-4 rounded-[18px] border border-border/75 bg-white px-5 py-4 transition-all hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-[0_14px_35px_-28px_rgba(16,62,53,.55)] lg:grid-cols-[minmax(260px,1.4fr)_150px_180px_150px_auto] lg:items-center"
+                  className="group grid gap-4 rounded-md border border-border/75 bg-white px-5 py-4 transition-colors  hover:border-primary/20  lg:grid-cols-[minmax(260px,1.4fr)_150px_180px_150px_auto] lg:items-center"
                   href={`/suppliers/${supplier.id}`}
                   key={supplier.id}
                 >
                   <div className="flex min-w-0 items-center gap-3">
-                    <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-[#eaf3f8] text-sm font-semibold text-primary">
+                    <span className="grid size-11 shrink-0 place-items-center rounded-md bg-muted text-sm font-semibold text-primary">
                       {(supplier.short_name ?? supplier.name).slice(0, 2)}
                     </span>
                     <div className="min-w-0">
                       <div className="truncate text-sm font-semibold">
                         {supplier.name}
                       </div>
-                      <div className="mt-1 text-[9px] text-muted-foreground">
+                      <div className="mt-1 text-xs text-muted-foreground">
                         {supplier.supplier_no} ·{" "}
                         {categoryLabels[supplier.category] ?? supplier.category}
                       </div>
                     </div>
                   </div>
-                  <div className="text-[10px]">
+                  <div className="text-xs">
                     <div className="font-medium">
                       {levelLabels[supplier.cooperation_level] ?? "标准"}供应商
                     </div>
@@ -342,13 +342,13 @@ export default async function SuppliersPage({
                       {statusLabels[supplier.cooperation_status]}
                     </div>
                   </div>
-                  <div className="text-[10px]">
+                  <div className="text-xs">
                     <div className="font-medium">{primary?.name ?? "未添加联系人"}</div>
                     <div className="mt-1 text-muted-foreground">
                       {primary?.mobile ?? "暂无联系方式"}
                     </div>
                   </div>
-                  <div className="text-[10px]">
+                  <div className="text-xs">
                     <span className={`rounded-lg px-2 py-1 ${riskTone}`}>
                       {riskLabel}
                     </span>
@@ -365,14 +365,14 @@ export default async function SuppliersPage({
 
         <div className="mt-5 flex flex-wrap gap-2">
           <Link
-            className="inline-flex h-10 items-center gap-2 rounded-xl border border-border bg-white px-4 text-[10px] text-primary"
+            className="inline-flex h-10 items-center gap-2 rounded-md border border-border bg-white px-4 text-xs text-primary"
             href="/documents?category=supplier"
           >
             <ShieldCheck className="size-4" />
             供应商资质文件
           </Link>
           <Link
-            className="inline-flex h-10 items-center gap-2 rounded-xl border border-border bg-white px-4 text-[10px] text-primary"
+            className="inline-flex h-10 items-center gap-2 rounded-md border border-border bg-white px-4 text-xs text-primary"
             href="/inventory"
           >
             查看仓储库存

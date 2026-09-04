@@ -87,17 +87,17 @@ const categoryMeta: Record<
   rice: {
     label: "大米",
     eyebrow: "RICE",
-    className: "bg-[#eef7e9] text-[#4c703c]",
+    className: "bg-muted text-foreground",
   },
   oil: {
     label: "食用油",
     eyebrow: "EDIBLE OIL",
-    className: "bg-[#fff5df] text-[#8b671f]",
+    className: "bg-muted text-foreground",
   },
   gift: {
     label: "礼盒",
     eyebrow: "GIFT SET",
-    className: "bg-[#fff0ec] text-[#955241]",
+    className: "bg-muted text-foreground",
   },
 };
 
@@ -139,12 +139,11 @@ function ProductArtwork({
   priority?: boolean;
 }) {
   return (
-    <div className="relative flex h-full min-h-[220px] items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_50%_46%,rgba(255,255,255,1),rgba(238,244,240,.76)_56%,rgba(219,231,225,.72))] p-7">
-      <div className="absolute inset-x-8 bottom-5 h-6 rounded-[50%] bg-[#0a385d]/8 blur-xl" />
+    <div className="relative flex h-full min-h-[220px] items-center justify-center overflow-hidden bg-card p-7">
       {src ? (
         <Image
           alt={name}
-          className="relative h-full max-h-[250px] w-full object-contain drop-shadow-[0_18px_16px_rgba(22,58,49,.16)] transition-transform duration-500 group-hover:scale-[1.035]"
+          className="relative h-full max-h-[250px] w-full object-contain transition-transform duration-500 group-hover:scale-[1.035]"
           height={420}
           priority={priority}
           src={src}
@@ -152,11 +151,11 @@ function ProductArtwork({
           width={420}
         />
       ) : (
-        <div className="relative grid place-items-center text-center text-[#779087]">
-          <span className="grid size-14 place-items-center rounded-2xl bg-white/70">
+        <div className="relative grid place-items-center text-center text-foreground">
+          <span className="grid size-14 place-items-center rounded-lg bg-white/70">
             <ImageOff className="size-5" />
           </span>
-          <span className="mt-3 text-[11px]">产品图待补充</span>
+          <span className="mt-3 text-xs">产品图待补充</span>
         </div>
       )}
     </div>
@@ -203,33 +202,24 @@ export default async function ProductsPage({
 
   let products: ProductRow[] = [];
   let prices: PriceRow[] = [];
-  let departmentCode: string | null = null;
+  const departmentCode = employee?.departmentCode ?? null;
   let dataAvailable = !configured;
   const imageUrls = new Map<string, string>();
 
   if (employee) {
     const supabase = await createClient();
-    const [productResult, departmentResult] = await Promise.all([
+    const productResult = await (
       supabase
         .from("products")
         .select(
           "id, code, category, source_category, image_path, barcode, brand, short_name, name, name_en, specification, case_specification, shelf_life, tax_rate, minimum_order, stock_status, supports_dropship, is_recommended, applicable_scenarios, description, delivery_notes, invoice_notes, alternative_product_codes, keywords, customer_query_reply, out_of_stock_reply, order_guide_reply, status",
         )
         .order("code")
-        .limit(200),
-      employee.departmentId
-        ? supabase
-            .from("departments")
-            .select("code")
-            .eq("id", employee.departmentId)
-            .maybeSingle()
-        : Promise.resolve({ data: null, error: null }),
-    ]);
+        .limit(50)
+    );
 
     dataAvailable = !productResult.error;
     products = (productResult.data ?? []) as ProductRow[];
-    departmentCode = departmentResult.data?.code ?? null;
-
     if (products.length) {
       const [priceResult, imageResult] = await Promise.all([
         supabase
@@ -364,12 +354,12 @@ export default async function ProductsPage({
       }
     >
       <main className="px-4 py-6 sm:px-6 xl:px-8">
-        <section className="relative overflow-hidden rounded-[28px] bg-[#0a385d] px-6 py-7 text-white shadow-[0_24px_70px_-46px_rgba(15,57,47,.9)] sm:px-8 lg:px-10 lg:py-9">
+        <section className="ui-page-header">
           <div className="absolute -right-20 -top-32 size-[360px] rounded-full border border-white/10" />
-          <div className="absolute -right-6 -top-10 size-[190px] rounded-full bg-[#6bd7d4]/10 blur-2xl" />
+          <div className="absolute -right-6 -top-10 size-[190px] rounded-full bg-muted blur-2xl" />
           <div className="relative grid gap-8 xl:grid-cols-[1fr_auto] xl:items-end">
             <div>
-              <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-[#a9d8c7]">
+              <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">
                 <Sparkles className="size-3.5" />
                 Product Information Management
               </div>
@@ -388,10 +378,10 @@ export default async function ProductsPage({
                 ["礼盒", String(products.filter((p) => p.category === "gift").length)],
               ].map(([label, value]) => (
                 <div
-                  className="min-w-[92px] rounded-2xl border border-white/10 bg-white/[0.065] px-4 py-3 backdrop-blur-sm"
+                  className="min-w-[92px] rounded-lg border border-white/10 bg-white/[0.065] px-4 py-3 backdrop-blur-sm"
                   key={label}
                 >
-                  <div className="text-[10px] text-white/42">{label}</div>
+                  <div className="text-xs text-white/42">{label}</div>
                   <div className="mt-1 text-xl font-semibold">{value}</div>
                 </div>
               ))}
@@ -401,7 +391,7 @@ export default async function ProductsPage({
 
         {(params.updated || params.error) && (
           <div
-            className={`mt-5 rounded-2xl border px-4 py-3 text-xs ${
+            className={`mt-5 rounded-lg border px-4 py-3 text-xs ${
               params.error
                 ? "border-red-200 bg-red-50 text-red-700"
                 : "border-emerald-200 bg-emerald-50 text-emerald-700"
@@ -414,7 +404,7 @@ export default async function ProductsPage({
         {canExport && (
           <div className="mt-5 flex justify-end">
             <a
-              className="inline-flex h-10 items-center gap-2 rounded-xl border border-[#cfe0d9] bg-white px-4 text-[11px] font-medium text-[#1a5a69] shadow-[0_8px_24px_-20px_rgba(23,57,50,.45)] transition hover:-translate-y-0.5 hover:border-[#82aa99]"
+              className="inline-flex h-10 items-center gap-2 rounded-md border border-border bg-white px-4 text-xs font-medium text-foreground  transition  hover:border-border"
               href="/products/export"
             >
               <Download className="size-4" />
@@ -424,9 +414,9 @@ export default async function ProductsPage({
         )}
 
         {canManage && (
-          <details className="mt-5 rounded-[22px] border border-[#d7e6df] bg-white p-5 shadow-[0_10px_36px_-30px_rgba(23,57,50,.36)]">
-            <summary className="flex cursor-pointer list-none items-center gap-2 text-xs font-semibold text-[#1a5a69]">
-              <span className="grid size-8 place-items-center rounded-xl bg-[#edf6f2]">
+          <details className="mt-5 rounded-md border border-border bg-white p-5 ">
+            <summary className="flex cursor-pointer list-none items-center gap-2 text-xs font-semibold text-foreground">
+              <span className="grid size-8 place-items-center rounded-md bg-muted">
                 <Plus className="size-4" />
               </span>
               新建产品主档
@@ -437,48 +427,45 @@ export default async function ProductsPage({
 
         <section className="mt-5 grid gap-4 sm:grid-cols-3">
           {([
-            ["rice", Wheat, "米类主食与团购福利", "#eef7e9", "#557742"],
-            ["oil", ShoppingBasket, "家庭用油与餐饮采购", "#fff6e4", "#8a671e"],
-            ["gift", Gift, "节庆福利与商务赠礼", "#fff0ec", "#975343"],
-          ] as const).map(([value, Icon, note, background, foreground]) => {
+            ["rice", Wheat, "米类主食与团购福利"],
+            ["oil", ShoppingBasket, "家庭用油与餐饮采购"],
+            ["gift", Gift, "节庆福利与商务赠礼"],
+          ] as const).map(([value, Icon, note]) => {
             const count = products.filter(
               (product) => product.category === value,
             ).length;
             const active = category === value;
             return (
               <Link
-                className={`group flex items-center gap-4 rounded-[20px] border bg-white p-4 transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-30px_rgba(22,59,49,.5)] ${
+                className={`flex items-center gap-4 rounded-md border bg-white p-4 transition-colors hover:bg-muted ${
                   active
-                    ? "border-[#61917d] ring-2 ring-[#cde8dc]"
+                    ? "border-border ring-2 ring-ring/20"
                     : "border-border/75"
                 }`}
                 href={makeHref({ category: value, product: undefined })}
                 key={value}
               >
-                <span
-                  className="grid size-12 shrink-0 place-items-center rounded-2xl"
-                  style={{ background, color: foreground }}
-                >
+                <span className="grid size-10 shrink-0 place-items-center text-primary">
                   <Icon className="size-5" />
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block text-sm font-semibold">
                     {categoryMeta[value].label}
                   </span>
-                  <span className="mt-1 block truncate text-[10px] text-muted-foreground">
+                  <span className="mt-1 block truncate text-xs text-muted-foreground">
                     {note}
                   </span>
                 </span>
                 <span className="text-right">
                   <span className="block text-lg font-semibold">{count}</span>
-                  <span className="text-[9px] text-muted-foreground">款产品</span>
+                  <span className="text-xs text-muted-foreground">款产品</span>
                 </span>
               </Link>
             );
           })}
         </section>
 
-        <section className="mt-5 rounded-[22px] border border-border/75 bg-white p-4 shadow-[0_10px_36px_-30px_rgba(23,57,50,.36)]">
+        <section className="mt-5 rounded-md border border-border/75 bg-white p-4 ">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
             <form className="relative flex-1" method="get">
               {category !== "all" && (
@@ -492,13 +479,13 @@ export default async function ProductsPage({
               )}
               <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <input
-                className="h-11 w-full rounded-xl border border-input bg-[#f8fafc] pl-11 pr-24 text-xs outline-none transition focus:border-[#6ba18b] focus:ring-2 focus:ring-[#d8eee5]"
+                className="h-11 w-full rounded-md border border-input bg-muted pl-11 pr-24 text-xs outline-none transition focus:border-border focus:ring-2 focus:ring-ring/20"
                 defaultValue={params.q}
                 name="q"
                 placeholder="搜索产品编号、条码、品牌、名称或规格"
               />
               <button
-                className="absolute right-1.5 top-1.5 h-8 rounded-lg bg-[#0a385d] px-4 text-[11px] text-white"
+                className="absolute right-1.5 top-1.5 h-8 rounded-lg bg-primary px-4 text-xs text-white"
                 type="submit"
               >
                 搜索
@@ -512,10 +499,10 @@ export default async function ProductsPage({
                 ["gift", "礼盒"],
               ].map(([value, label]) => (
                 <Link
-                  className={`rounded-xl px-3.5 py-2 text-[11px] transition-colors ${
+                  className={`rounded-md px-3.5 py-2 text-xs transition-colors ${
                     category === value
-                      ? "bg-[#0a385d] text-white"
-                      : "bg-[#f2f6f4] text-muted-foreground hover:text-foreground"
+                      ? "bg-primary text-white"
+                      : "bg-muted text-muted-foreground hover:text-foreground"
                   }`}
                   href={makeHref({
                     category: value === "all" ? undefined : value,
@@ -527,12 +514,12 @@ export default async function ProductsPage({
                 </Link>
               ))}
             </div>
-            <div className="flex rounded-xl bg-[#f2f6f4] p-1">
+            <div className="flex rounded-md bg-muted p-1">
               <Link
                 aria-label="表格视图"
                 className={`grid size-8 place-items-center rounded-lg ${
                   view === "table"
-                    ? "bg-white text-[#235d4e] shadow-sm"
+                    ? "bg-white text-foreground "
                     : "text-muted-foreground"
                 }`}
                 href={makeHref({ view: "table", product: undefined })}
@@ -543,7 +530,7 @@ export default async function ProductsPage({
                 aria-label="卡片视图"
                 className={`grid size-8 place-items-center rounded-lg ${
                   view === "cards"
-                    ? "bg-white text-[#235d4e] shadow-sm"
+                    ? "bg-white text-foreground "
                     : "text-muted-foreground"
                 }`}
                 href={makeHref({ view: "cards", product: undefined })}
@@ -553,7 +540,7 @@ export default async function ProductsPage({
             </div>
           </div>
           <div className="mt-3 grid gap-2 border-t border-border/60 pt-3 sm:grid-cols-3">
-            <form className="text-[9px] text-muted-foreground" method="get">
+            <form className="text-xs text-muted-foreground" method="get">
               <span>品牌</span>
               {category !== "all" && (
                 <input name="category" type="hidden" value={category} />
@@ -566,7 +553,7 @@ export default async function ProductsPage({
               )}
               <div className="mt-1 flex gap-1">
               <select
-                className="h-9 min-w-0 flex-1 rounded-xl border border-input bg-white px-3 text-[11px] text-foreground"
+                className="h-9 min-w-0 flex-1 rounded-md border border-input bg-white px-3 text-xs text-foreground"
                 defaultValue={brand}
                 name="brand"
               >
@@ -578,16 +565,16 @@ export default async function ProductsPage({
                 ))}
               </select>
                 <button
-                  className="h-9 rounded-xl bg-[#eaf3ef] px-3 text-[10px] font-medium text-[#1a5a69]"
+                  className="h-9 rounded-md bg-muted px-3 text-xs font-medium text-foreground"
                   type="submit"
                 >
                   筛选
                 </button>
               </div>
             </form>
-            <label className="text-[9px] text-muted-foreground">
+            <label className="text-xs text-muted-foreground">
               上架状态
-              <div className="mt-1 flex h-9 overflow-hidden rounded-xl border border-input bg-white">
+              <div className="mt-1 flex h-9 overflow-hidden rounded-md border border-input bg-white">
                 {[
                   ["", "全部"],
                   ["active", "上架"],
@@ -595,9 +582,9 @@ export default async function ProductsPage({
                   ["archived", "归档"],
                 ].map(([value, label]) => (
                   <Link
-                    className={`grid flex-1 place-items-center text-[10px] ${
+                    className={`grid flex-1 place-items-center text-xs ${
                       status === value
-                        ? "bg-[#0a385d] text-white"
+                        ? "bg-primary text-white"
                         : "text-muted-foreground"
                     }`}
                     href={makeHref({
@@ -611,9 +598,9 @@ export default async function ProductsPage({
                 ))}
               </div>
             </label>
-            <label className="text-[9px] text-muted-foreground">
+            <label className="text-xs text-muted-foreground">
               数据质量
-              <div className="mt-1 flex h-9 overflow-x-auto rounded-xl border border-input bg-white">
+              <div className="mt-1 flex h-9 overflow-x-auto rounded-md border border-input bg-white">
                 {[
                   ["", "全部"],
                   ["missing_image", "缺图"],
@@ -622,9 +609,9 @@ export default async function ProductsPage({
                   ["incomplete_reply", "缺话术"],
                 ].map(([value, label]) => (
                   <Link
-                    className={`grid min-w-[54px] flex-1 place-items-center px-2 text-[10px] ${
+                    className={`grid min-w-[54px] flex-1 place-items-center px-2 text-xs ${
                       quality === value
-                        ? "bg-[#0a385d] text-white"
+                        ? "bg-primary text-white"
                         : "text-muted-foreground"
                     }`}
                     href={makeHref({
@@ -639,7 +626,7 @@ export default async function ProductsPage({
               </div>
             </label>
           </div>
-          <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-border/60 pt-3 text-[10px] text-muted-foreground">
+          <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-border/60 pt-3 text-xs text-muted-foreground">
             <span className="flex items-center gap-1.5">
               <PackageSearch className="size-3.5" />
               当前结果 {filteredProducts.length} 款
@@ -660,7 +647,7 @@ export default async function ProductsPage({
         </section>
 
         {!dataAvailable ? (
-          <section className="mt-5 rounded-[24px] border border-amber-200 bg-amber-50 px-6 py-12 text-center">
+          <section className="mt-5 rounded-md border border-amber-200 bg-amber-50 px-6 py-12 text-center">
             <PackageSearch className="mx-auto size-7 text-amber-700" />
             <h2 className="mt-4 text-sm font-semibold text-amber-900">
               暂时无法读取产品数据
@@ -670,7 +657,7 @@ export default async function ProductsPage({
             </p>
           </section>
         ) : filteredProducts.length === 0 ? (
-          <section className="mt-5 rounded-[24px] border border-border/75 bg-white px-6 py-16 text-center">
+          <section className="mt-5 rounded-md border border-border/75 bg-white px-6 py-16 text-center">
             <PackageSearch className="mx-auto size-7 text-muted-foreground" />
             <h2 className="mt-4 text-sm font-semibold">没有找到匹配产品</h2>
             <p className="mt-2 text-xs text-muted-foreground">
@@ -697,7 +684,7 @@ export default async function ProductsPage({
               const retail = priceMap.get(product.id)?.get("retail");
               return (
                 <Link
-                  className="group overflow-hidden rounded-[22px] border border-border/75 bg-white shadow-[0_10px_32px_-28px_rgba(19,57,48,.42)] transition-all hover:-translate-y-1 hover:border-[#a8cdbd] hover:shadow-[0_24px_52px_-34px_rgba(19,57,48,.5)]"
+                  className="group overflow-hidden rounded-md border border-border/75 bg-white  transition-colors  hover:border-border "
                   href={makeHref({ product: product.id })}
                   key={product.id}
                 >
@@ -712,19 +699,19 @@ export default async function ProductsPage({
                       }
                     />
                     <span
-                      className={`absolute left-4 top-4 rounded-full px-2.5 py-1 text-[9px] font-medium ${meta.className}`}
+                      className={`absolute left-4 top-4 rounded-full px-2.5 py-1 text-xs font-medium ${meta.className}`}
                     >
                       {meta.label}
                     </span>
                     {product.is_recommended && (
-                      <span className="absolute right-4 top-4 flex items-center gap-1 rounded-full bg-[#0a385d] px-2.5 py-1 text-[9px] text-white">
+                      <span className="absolute right-4 top-4 flex items-center gap-1 rounded-full bg-primary px-2.5 py-1 text-xs text-white">
                         <Sparkles className="size-2.5" />
                         推荐
                       </span>
                     )}
                   </div>
                   <div className="p-5">
-                    <div className="flex items-center justify-between text-[9px] uppercase tracking-[0.16em] text-muted-foreground">
+                    <div className="flex items-center justify-between text-xs uppercase tracking-[0.16em] text-muted-foreground">
                       <span>{product.code}</span>
                       <span>{product.brand ?? "德馨精选"}</span>
                     </div>
@@ -733,16 +720,16 @@ export default async function ProductsPage({
                     </h2>
                     <div className="mt-4 flex items-end justify-between gap-3 border-t border-border/60 pt-4">
                       <div>
-                        <div className="text-[9px] text-muted-foreground">
+                        <div className="text-xs text-muted-foreground">
                           {retail === undefined ? "产品规格" : "建议零售价"}
                         </div>
-                        <div className="mt-1 text-sm font-semibold text-[#0a385d]">
+                        <div className="mt-1 text-sm font-semibold text-foreground">
                           {retail === undefined
                             ? product.specification || "待完善"
                             : currency(retail)}
                         </div>
                       </div>
-                      <span className="flex items-center gap-1 text-[10px] text-muted-foreground transition-colors group-hover:text-[#176d78]">
+                      <span className="flex items-center gap-1 text-xs text-muted-foreground transition-colors group-hover:text-foreground">
                         查看主档
                         <ChevronRight className="size-3.5" />
                       </span>
@@ -755,7 +742,7 @@ export default async function ProductsPage({
         )}
 
         {selectedProduct && (
-          <section className="mt-5 overflow-hidden rounded-[26px] border border-border/75 bg-white shadow-[0_22px_60px_-44px_rgba(17,56,47,.55)]">
+          <section className="mt-5 overflow-hidden rounded-md border border-border/75 bg-white ">
             <div className="grid lg:grid-cols-[390px_1fr]">
               <div className="border-b border-border/70 lg:border-b-0 lg:border-r">
                 <div className="h-[390px]">
@@ -771,31 +758,31 @@ export default async function ProductsPage({
                 {canManage && (
                   <form
                     action={uploadProductImageAction}
-                    className="border-t border-border/60 bg-[#f7faf9] p-4"
+                    className="border-t border-border/60 bg-muted p-4"
                   >
                     <input
                       name="productId"
                       type="hidden"
                       value={selectedProduct.id}
                     />
-                    <label className="block text-[10px] font-medium text-[#176d78]">
+                    <label className="block text-xs font-medium text-foreground">
                       上传或更换产品图
                       <input
                         accept="image/png,image/jpeg,image/webp"
-                        className="mt-2 block w-full rounded-xl border border-input bg-white p-2 text-[10px] file:mr-3 file:rounded-lg file:border-0 file:bg-[#eaf3ef] file:px-3 file:py-2 file:text-[10px] file:text-[#1a5a69]"
+                        className="mt-2 block w-full rounded-md border border-input bg-white p-2 text-xs file:mr-3 file:rounded-lg file:border-0 file:bg-muted file:px-3 file:py-2 file:text-xs file:text-foreground"
                         name="image"
                         required
                         type="file"
                       />
                     </label>
                     <button
-                      className="mt-3 flex h-9 w-full items-center justify-center gap-2 rounded-xl bg-[#0a385d] text-[10px] font-medium text-white"
+                      className="mt-3 flex h-9 w-full items-center justify-center gap-2 rounded-md bg-primary text-xs font-medium text-white"
                       type="submit"
                     >
                       <ImagePlus className="size-3.5" />
                       保存产品图片
                     </button>
-                    <p className="mt-2 text-[9px] leading-4 text-muted-foreground">
+                    <p className="mt-2 text-xs leading-4 text-muted-foreground">
                       支持 PNG、JPG、WebP，最大 5MB；透明背景图片展示效果最佳。
                     </p>
                   </form>
@@ -804,20 +791,20 @@ export default async function ProductsPage({
               <div className="p-6 sm:p-8">
                 <div className="flex flex-wrap items-center gap-2">
                   <span
-                    className={`rounded-full px-2.5 py-1 text-[9px] font-medium ${categoryMeta[selectedProduct.category].className}`}
+                    className={`rounded-full px-2.5 py-1 text-xs font-medium ${categoryMeta[selectedProduct.category].className}`}
                   >
                     {categoryMeta[selectedProduct.category].label}
                   </span>
-                  <span className="rounded-full bg-[#f2f6f4] px-2.5 py-1 text-[9px] text-muted-foreground">
+                  <span className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">
                     {selectedProduct.code}
                   </span>
                   {selectedProduct.supports_dropship && (
-                    <span className="rounded-full bg-[#edf6ff] px-2.5 py-1 text-[9px] text-[#38678f]">
+                    <span className="rounded-full bg-muted px-2.5 py-1 text-xs text-foreground">
                       支持一件代发
                     </span>
                   )}
                   <Link
-                    className="ml-auto text-[10px] text-muted-foreground hover:text-foreground"
+                    className="ml-auto text-xs text-muted-foreground hover:text-foreground"
                     href={makeHref({ product: undefined })}
                   >
                     关闭详情
@@ -827,7 +814,7 @@ export default async function ProductsPage({
                   {selectedProduct.name}
                 </h2>
                 {selectedProduct.name_en && (
-                  <p className="mt-2 text-[10px] leading-5 text-muted-foreground">
+                  <p className="mt-2 text-xs leading-5 text-muted-foreground">
                     {selectedProduct.name_en}
                   </p>
                 )}
@@ -840,10 +827,10 @@ export default async function ProductsPage({
                     ["起订量", selectedProduct.minimum_order ?? "待确认"],
                   ] as const).map(([label, value]) => (
                     <div
-                      className="rounded-2xl bg-[#f5f8f7] px-4 py-3"
+                      className="rounded-lg bg-muted px-4 py-3"
                       key={label}
                     >
-                      <div className="text-[9px] text-muted-foreground">{label}</div>
+                      <div className="text-xs text-muted-foreground">{label}</div>
                       <div className="mt-1.5 text-xs font-medium">{value}</div>
                     </div>
                   ))}
@@ -856,14 +843,14 @@ export default async function ProductsPage({
                       if (amount === undefined) return null;
                       return (
                         <div
-                          className="rounded-2xl border border-[#e0eae6] px-4 py-3"
+                          className="rounded-lg border border-border px-4 py-3"
                           key={type}
                         >
-                          <div className="flex items-center gap-1.5 text-[9px] text-muted-foreground">
+                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                             <CircleDollarSign className="size-3" />
                             {priceLabels[type]}
                           </div>
-                          <div className="mt-1.5 text-base font-semibold text-[#0a385d]">
+                          <div className="mt-1.5 text-base font-semibold text-foreground">
                             {currency(amount)}
                           </div>
                         </div>
@@ -875,34 +862,34 @@ export default async function ProductsPage({
                 <div className="mt-6 grid gap-6 xl:grid-cols-2">
                   <div>
                     <h3 className="text-xs font-semibold">产品介绍</h3>
-                    <p className="mt-2 text-[11px] leading-6 text-muted-foreground">
+                    <p className="mt-2 text-xs leading-6 text-muted-foreground">
                       {selectedProduct.description || "产品介绍待完善。"}
                     </p>
                   </div>
                   <div>
                     <h3 className="text-xs font-semibold">配送与库存</h3>
-                    <p className="mt-2 text-[11px] leading-6 text-muted-foreground">
+                    <p className="mt-2 text-xs leading-6 text-muted-foreground">
                       {selectedProduct.delivery_notes || "配送政策下单前确认。"}
                     </p>
                   </div>
                 </div>
 
                 <div className="mt-6 flex flex-wrap gap-2 border-t border-border/60 pt-5">
-                  <span className="flex items-center gap-1.5 rounded-xl bg-[#f5f8f7] px-3 py-2 text-[10px] text-muted-foreground">
+                  <span className="flex items-center gap-1.5 rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">
                     <Barcode className="size-3.5" />
                     {selectedProduct.barcode || "条码待确认"}
                   </span>
-                  <span className="rounded-xl bg-[#f5f8f7] px-3 py-2 text-[10px] text-muted-foreground">
+                  <span className="rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">
                     库存：{selectedProduct.stock_status || "下单前确认"}
                   </span>
                   {selectedProduct.alternative_product_codes.length > 0 && (
-                    <span className="rounded-xl bg-[#f5f8f7] px-3 py-2 text-[10px] text-muted-foreground">
+                    <span className="rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">
                       替代：{selectedProduct.alternative_product_codes.join("、")}
                     </span>
                   )}
                 </div>
 
-                <details className="mt-6 rounded-2xl border border-border/70 px-4 py-3">
+                <details className="mt-6 rounded-lg border border-border/70 px-4 py-3">
                   <summary className="cursor-pointer text-xs font-semibold">
                     客户沟通标准话术
                   </summary>
@@ -912,11 +899,11 @@ export default async function ProductsPage({
                       ["缺货回复", selectedProduct.out_of_stock_reply],
                       ["下单引导", selectedProduct.order_guide_reply],
                     ].map(([label, content]) => (
-                      <div className="rounded-xl bg-[#f5f8f7] p-4" key={label}>
-                        <div className="text-[9px] font-medium text-[#176d78]">
+                      <div className="rounded-md bg-muted p-4" key={label}>
+                        <div className="text-xs font-medium text-foreground">
                           {label}
                         </div>
-                        <p className="mt-2 whitespace-pre-wrap text-[10px] leading-5 text-muted-foreground">
+                        <p className="mt-2 whitespace-pre-wrap text-xs leading-5 text-muted-foreground">
                           {content || "待完善"}
                         </p>
                       </div>
@@ -925,8 +912,8 @@ export default async function ProductsPage({
                 </details>
 
                 {canManage && (
-                  <details className="mt-6 rounded-2xl border border-[#dce9e3] bg-[#f7faf9] p-4">
-                    <summary className="cursor-pointer text-xs font-semibold text-[#1a5a69]">
+                  <details className="mt-6 rounded-lg border border-border bg-muted p-4">
+                    <summary className="cursor-pointer text-xs font-semibold text-foreground">
                       编辑完整产品主档
                     </summary>
                     <ProductMasterForm

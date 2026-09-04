@@ -15,6 +15,7 @@ import { requireCurrentEmployee } from "@/features/auth/current-employee";
 import { QuotePrintButton } from "@/features/quotes/quote-print-button";
 import { transitionSalesQuoteAction } from "@/features/quotes/server-actions";
 import { createClient } from "@/lib/supabase/server";
+import { statusToneClass } from "@/lib/ui/status";
 
 export const metadata: Metadata = {
   title: "报价单详情",
@@ -83,14 +84,6 @@ const statusLabels: Record<QuoteStatus, string> = {
   accepted: "已接受",
   rejected: "已拒绝",
   expired: "已过期",
-};
-
-const statusTones: Record<QuoteStatus, string> = {
-  draft: "bg-[#edf2f0] text-[#5d7069]",
-  sent: "bg-[#e8f1fb] text-[#436f9d]",
-  accepted: "bg-[#e7f5ef] text-[#11715d]",
-  rejected: "bg-[#fff0f1] text-[#bd5760]",
-  expired: "bg-[#fff4e5] text-[#a66d25]",
 };
 
 const priceTypeLabels: Record<QuoteRecord["price_type"], string> = {
@@ -197,10 +190,10 @@ export default async function QuoteDetailPage({
         roleLabel: roleLabel(employee.roleCodes) || employee.title || "内部员工",
       }}
     >
-      <main className="mx-auto max-w-[1380px] p-4 print:max-w-none print:bg-white print:p-0 sm:p-6 xl:p-8">
+      <main className="mx-auto max-w-[1200px] p-4 print:max-w-none print:bg-white print:p-0 sm:p-6 xl:p-8">
         <div className="mb-5 flex flex-col gap-3 print:hidden sm:flex-row sm:items-center sm:justify-between">
           <Link
-            className="inline-flex h-10 items-center gap-2 self-start rounded-xl border border-[#dce6e2] bg-white px-4 text-[11px] font-medium text-[#466057] transition hover:border-[#177966]/25 hover:text-[#0b6d5c]"
+            className="inline-flex h-10 items-center gap-2 self-start rounded-md border border-border bg-white px-4 text-xs font-medium text-foreground transition hover:border-border hover:text-foreground"
             href="/quotes"
           >
             <ArrowLeft className="size-3.5" />
@@ -210,40 +203,40 @@ export default async function QuoteDetailPage({
         </div>
 
         {feedback.updated && (
-          <div className="mb-5 rounded-2xl border border-[#cfe8ec] bg-[#edf7f2] px-4 py-3 text-xs text-[#0d6c78] print:hidden">
+          <div className="mb-5 rounded-lg border border-border bg-muted px-4 py-3 text-xs text-foreground print:hidden">
             {feedback.updated}
           </div>
         )}
         {feedback.error && (
-          <div className="mb-5 rounded-2xl border border-[#eed3cd] bg-[#fff4f1] px-4 py-3 text-xs text-[#985846] print:hidden">
+          <div className="mb-5 rounded-lg border border-border bg-muted px-4 py-3 text-xs text-foreground print:hidden">
             {feedback.error}
           </div>
         )}
 
-        <section className="overflow-hidden rounded-[24px] border border-[#dce6ed] bg-white shadow-[0_18px_52px_rgba(17,66,54,.06)] print:rounded-none print:border-0 print:shadow-none">
-          <header className="relative overflow-hidden bg-[linear-gradient(120deg,#103f37,#0b584b)] px-6 py-7 text-white print:border-b print:border-[#dce6ed] print:bg-white print:px-0 print:text-[#173a33] sm:px-8">
+        <section className="overflow-hidden rounded-md border border-border bg-white  print:rounded-none print:border-0 print:shadow-none">
+          <header className="relative overflow-hidden bg-sidebar px-6 py-7 text-white print:border-b print:border-border print:bg-white print:px-0 print:text-foreground sm:px-8">
             <div className="absolute -right-16 -top-24 size-64 rounded-full border border-white/8 print:hidden" />
             <div className="relative flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#a7dac8] print:text-[#668078]">
+                <div className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground print:text-foreground">
                   DEXIN · SALES QUOTATION
                 </div>
                 <h1 className="mt-3 text-2xl font-semibold tracking-[-0.04em]">
                   长沙德馨淼盛科技有限公司
                 </h1>
-                <p className="mt-2 text-xs text-white/52 print:text-[#71827c]">
+                <p className="mt-2 text-xs text-white/52 print:text-foreground">
                   专业餐饮粮油供应链服务
                 </p>
               </div>
               <div className="text-left sm:text-right">
-                <div className="text-[10px] uppercase tracking-[0.16em] text-white/45 print:text-[#82918c]">
+                <div className="text-xs uppercase tracking-[0.16em] text-white/45 print:text-foreground">
                   Quotation No.
                 </div>
                 <div className="mt-1 text-base font-semibold tracking-[0.04em]">
                   {quote.quote_no}
                 </div>
                 <span
-                  className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-[9px] font-medium ${statusTones[quote.status]}`}
+                  className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${statusToneClass(quote.status)}`}
                 >
                   {statusLabels[quote.status]}
                 </span>
@@ -252,64 +245,64 @@ export default async function QuoteDetailPage({
           </header>
 
           <div className="px-5 py-6 print:px-0 sm:px-8">
-            <div className="grid gap-4 rounded-[18px] border border-[#dce6ed] bg-[#fafcfe] p-5 print:grid-cols-3 print:bg-white sm:grid-cols-3">
+            <div className="grid gap-4 rounded-md border border-border bg-muted p-5 print:grid-cols-3 print:bg-white sm:grid-cols-3">
               <div>
-                <div className="text-[9px] uppercase tracking-[0.14em] text-[#8293a1]">
+                <div className="text-xs uppercase tracking-[0.14em] text-foreground">
                   报价客户
                 </div>
                 <div className="mt-2 text-sm font-semibold">
                   {customer?.name ?? "客户档案"}
                 </div>
-                <div className="mt-1 text-[9px] text-[#88958f]">
+                <div className="mt-1 text-xs text-foreground">
                   {customer?.customer_no}
                 </div>
               </div>
               <div>
-                <div className="text-[9px] uppercase tracking-[0.14em] text-[#8293a1]">
+                <div className="text-xs uppercase tracking-[0.14em] text-foreground">
                   报价信息
                 </div>
                 <div className="mt-2 text-xs font-medium">
                   {priceTypeLabels[quote.price_type]}
                 </div>
-                <div className="mt-1 text-[9px] text-[#88958f]">
+                <div className="mt-1 text-xs text-foreground">
                   创建：{dateTime(quote.created_at)}
                 </div>
               </div>
               <div>
-                <div className="text-[9px] uppercase tracking-[0.14em] text-[#8293a1]">
+                <div className="text-xs uppercase tracking-[0.14em] text-foreground">
                   有效期限
                 </div>
                 <div className="mt-2 text-xs font-medium">
                   {dateOnly(quote.valid_until)}
                 </div>
-                <div className="mt-1 text-[9px] text-[#88958f]">
+                <div className="mt-1 text-xs text-foreground">
                   负责人：{owner?.name ?? "未分配"}
                 </div>
               </div>
             </div>
 
-            <div className="mt-6 overflow-hidden rounded-[18px] border border-[#e2eae6]">
-              <div className="grid grid-cols-[42px_minmax(0,1fr)_80px_100px_110px] gap-3 bg-[#123f37] px-4 py-3 text-[9px] font-medium text-white/70 print:bg-[#eef3f0] print:text-[#52685f]">
+            <div className="mt-6 overflow-hidden rounded-md border border-border">
+              <div className="grid grid-cols-[42px_minmax(0,1fr)_80px_100px_110px] gap-3 bg-primary px-4 py-3 text-xs font-medium text-white/70 print:bg-muted print:text-foreground">
                 <span>序号</span>
                 <span>产品信息</span>
                 <span className="text-right">数量</span>
                 <span className="text-right">单价</span>
                 <span className="text-right">金额</span>
               </div>
-              <div className="divide-y divide-[#eaf0ed]">
+              <div className="divide-y divide-border">
                 {items.map((item, index) => (
                   <div
-                    className="grid grid-cols-[42px_minmax(0,1fr)_80px_100px_110px] items-center gap-3 px-4 py-4 text-[10px]"
+                    className="grid grid-cols-[42px_minmax(0,1fr)_80px_100px_110px] items-center gap-3 px-4 py-4 text-xs"
                     key={item.id}
                   >
-                    <span className="tabular-nums text-[#8293a1]">
+                    <span className="tabular-nums text-foreground">
                       {String(index + 1).padStart(2, "0")}
                     </span>
                     <div className="min-w-0">
-                      <div className="font-medium text-[#294039]">
+                      <div className="font-medium text-foreground">
                         {item.product_name}
                       </div>
-                      <div className="mt-1 text-[9px] text-[#8293a1]">
+                      <div className="mt-1 text-xs text-foreground">
                         {item.product_code}
                         {item.specification
                           ? ` · ${item.specification}`
@@ -322,7 +315,7 @@ export default async function QuoteDetailPage({
                     <span className="text-right tabular-nums">
                       {money(item.unit_price_cny)}
                     </span>
-                    <span className="text-right font-semibold tabular-nums text-[#183e35]">
+                    <span className="text-right font-semibold tabular-nums text-foreground">
                       {money(item.line_total_cny)}
                     </span>
                   </div>
@@ -331,16 +324,16 @@ export default async function QuoteDetailPage({
             </div>
 
             <div className="mt-5 flex justify-end">
-              <div className="w-full max-w-sm rounded-[18px] bg-[#f5f8fb] p-5">
-                <div className="flex items-center justify-between text-[10px] text-[#6f807a]">
+              <div className="w-full max-w-sm rounded-md bg-muted p-5">
+                <div className="flex items-center justify-between text-xs text-foreground">
                   <span>商品小计</span>
                   <span className="tabular-nums">
                     {money(quote.subtotal_cny)}
                   </span>
                 </div>
-                <div className="mt-4 flex items-end justify-between border-t border-[#dce6ed] pt-4">
+                <div className="mt-4 flex items-end justify-between border-t border-border pt-4">
                   <span className="text-xs font-medium">报价总计</span>
-                  <span className="text-2xl font-semibold tracking-[-0.04em] text-[#0b574a]">
+                  <span className="text-2xl font-semibold tracking-[-0.04em] text-foreground">
                     {money(quote.total_cny)}
                   </span>
                 </div>
@@ -348,60 +341,60 @@ export default async function QuoteDetailPage({
             </div>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <div className="rounded-[16px] border border-[#dce6ed] p-4">
-                <div className="text-[9px] uppercase tracking-[0.14em] text-[#8293a1]">
+              <div className="rounded-md border border-border p-4">
+                <div className="text-xs uppercase tracking-[0.14em] text-foreground">
                   付款约定
                 </div>
-                <p className="mt-2 text-[11px] leading-5 text-[#40564f]">
+                <p className="mt-2 text-xs leading-5 text-foreground">
                   {quote.payment_terms ?? "双方另行确认"}
                 </p>
               </div>
-              <div className="rounded-[16px] border border-[#dce6ed] p-4">
-                <div className="text-[9px] uppercase tracking-[0.14em] text-[#8293a1]">
+              <div className="rounded-md border border-border p-4">
+                <div className="text-xs uppercase tracking-[0.14em] text-foreground">
                   交付约定
                 </div>
-                <p className="mt-2 text-[11px] leading-5 text-[#40564f]">
+                <p className="mt-2 text-xs leading-5 text-foreground">
                   {quote.delivery_terms ?? "双方另行确认"}
                 </p>
               </div>
             </div>
 
-            <p className="mt-6 border-t border-[#e7eef3] pt-4 text-[9px] leading-5 text-[#899690]">
+            <p className="mt-6 border-t border-border pt-4 text-xs leading-5 text-foreground">
               本报价在有效期内有效；产品库存、配送安排及最终结算以双方确认结果为准。
             </p>
           </div>
         </section>
 
         <div className="mt-5 grid items-start gap-5 print:hidden xl:grid-cols-[minmax(0,.9fr)_minmax(420px,1.1fr)]">
-          <section className="rounded-[20px] border border-[#dce6ed] bg-white p-5 sm:p-6">
+          <section className="rounded-md border border-border bg-white p-5 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-sm font-semibold">报价操作</h2>
-                <p className="mt-1 text-[10px] text-[#8293a1]">
+                <p className="mt-1 text-xs text-foreground">
                   状态变化不可删除，并写入操作审计
                 </p>
               </div>
-              <ShieldCheck className="size-4 text-[#3d7567]" />
+              <ShieldCheck className="size-4 text-foreground" />
             </div>
 
             {!canManage ? (
-              <div className="mt-5 rounded-xl bg-[#f5f7f6] px-4 py-3 text-[10px] text-[#73817c]">
+              <div className="mt-5 rounded-md bg-muted px-4 py-3 text-xs text-foreground">
                 当前账号拥有只读权限，不能更新报价状态。
               </div>
             ) : quote.status === "draft" ? (
               <form action={transitionSalesQuoteAction} className="mt-5">
                 <input name="quoteId" type="hidden" value={quote.id} />
                 <input name="targetStatus" type="hidden" value="sent" />
-                <label className="block text-[10px] text-[#63756e]">
+                <label className="block text-xs text-foreground">
                   发送说明（选填）
                   <textarea
-                    className="mt-2 min-h-20 w-full rounded-xl border border-[#dce6ed] bg-[#fafcfe] px-3 py-2.5 text-xs outline-none focus:border-[#177966]/35"
+                    className="mt-2 min-h-20 w-full rounded-md border border-border bg-muted px-3 py-2.5 text-xs outline-none focus:border-border"
                     name="note"
                     placeholder="例如：已通过企业微信发送给客户采购负责人"
                   />
                 </label>
                 <button
-                  className="mt-3 inline-flex h-10 items-center gap-2 rounded-xl bg-[#0b6b5a] px-4 text-[11px] font-medium text-white transition hover:bg-[#095c4e]"
+                  className="mt-3 inline-flex h-10 items-center gap-2 rounded-md bg-primary px-4 text-xs font-medium text-white transition hover:bg-muted"
                   type="submit"
                 >
                   <Send className="size-3.5" />
@@ -411,10 +404,10 @@ export default async function QuoteDetailPage({
             ) : quote.status === "sent" ? (
               <form action={transitionSalesQuoteAction} className="mt-5">
                 <input name="quoteId" type="hidden" value={quote.id} />
-                <label className="block text-[10px] text-[#63756e]">
+                <label className="block text-xs text-foreground">
                   客户反馈说明
                   <textarea
-                    className="mt-2 min-h-24 w-full rounded-xl border border-[#dce6ed] bg-[#fafcfe] px-3 py-2.5 text-xs outline-none focus:border-[#177966]/35"
+                    className="mt-2 min-h-24 w-full rounded-md border border-border bg-muted px-3 py-2.5 text-xs outline-none focus:border-border"
                     name="note"
                     placeholder="请记录客户确认方式、联系人和关键反馈"
                     required
@@ -422,7 +415,7 @@ export default async function QuoteDetailPage({
                 </label>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <button
-                    className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#0b6b5a] px-4 text-[11px] font-medium text-white"
+                    className="inline-flex h-10 items-center gap-2 rounded-md bg-primary px-4 text-xs font-medium text-white"
                     name="targetStatus"
                     type="submit"
                     value="accepted"
@@ -431,7 +424,7 @@ export default async function QuoteDetailPage({
                     客户已接受
                   </button>
                   <button
-                    className="inline-flex h-10 items-center gap-2 rounded-xl border border-[#efd3d0] bg-[#fff6f4] px-4 text-[11px] font-medium text-[#a6534b]"
+                    className="inline-flex h-10 items-center gap-2 rounded-md border border-border bg-muted px-4 text-xs font-medium text-foreground"
                     name="targetStatus"
                     type="submit"
                     value="rejected"
@@ -442,13 +435,13 @@ export default async function QuoteDetailPage({
                 </div>
               </form>
             ) : (
-              <div className="mt-5 flex items-center gap-3 rounded-xl bg-[#f5f8f6] px-4 py-4">
-                <FileCheck2 className="size-5 text-[#4b776b]" />
+              <div className="mt-5 flex items-center gap-3 rounded-md bg-muted px-4 py-4">
+                <FileCheck2 className="size-5 text-foreground" />
                 <div>
                   <div className="text-xs font-medium">
                     当前报价已进入终态
                   </div>
-                  <div className="mt-1 text-[9px] text-[#82908b]">
+                  <div className="mt-1 text-xs text-foreground">
                     {statusLabels[quote.status]}状态不能继续修改
                   </div>
                 </div>
@@ -458,7 +451,7 @@ export default async function QuoteDetailPage({
             {canManage && canExpire && (
               <form
                 action={transitionSalesQuoteAction}
-                className="mt-4 border-t border-[#e7eef3] pt-4"
+                className="mt-4 border-t border-border pt-4"
               >
                 <input name="quoteId" type="hidden" value={quote.id} />
                 <input name="targetStatus" type="hidden" value="expired" />
@@ -468,7 +461,7 @@ export default async function QuoteDetailPage({
                   value="报价有效期已结束"
                 />
                 <button
-                  className="inline-flex h-9 items-center gap-2 rounded-xl border border-[#eadbc2] bg-[#fffaf1] px-3 text-[10px] font-medium text-[#90662c]"
+                  className="inline-flex h-9 items-center gap-2 rounded-md border border-border bg-muted px-3 text-xs font-medium text-foreground"
                   type="submit"
                 >
                   <Clock3 className="size-3.5" />
@@ -478,10 +471,10 @@ export default async function QuoteDetailPage({
             )}
           </section>
 
-          <section className="rounded-[20px] border border-[#dce6ed] bg-white p-5 sm:p-6">
+          <section className="rounded-md border border-border bg-white p-5 sm:p-6">
             <div>
               <h2 className="text-sm font-semibold">状态历史</h2>
-              <p className="mt-1 text-[10px] text-[#8293a1]">
+              <p className="mt-1 text-xs text-foreground">
                 报价从草稿到客户结果的完整时间线
               </p>
             </div>
@@ -494,27 +487,27 @@ export default async function QuoteDetailPage({
                     key={event.id}
                   >
                     {index < events.length - 1 && (
-                      <span className="absolute bottom-0 left-[11px] top-6 w-px bg-[#dce6ed]" />
+                      <span className="absolute bottom-0 left-[11px] top-6 w-px bg-muted" />
                     )}
-                    <span className="relative z-10 mt-0.5 grid size-6 place-items-center rounded-full bg-[#e8f5ef] text-[#17715e] ring-4 ring-white">
+                    <span className="relative z-10 mt-0.5 grid size-6 place-items-center rounded-full bg-muted text-foreground ring-4 ring-white">
                       <span className="size-1.5 rounded-full bg-current" />
                     </span>
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-[11px] font-medium">
+                        <span className="text-xs font-medium">
                           {event.from_status
                             ? `${statusLabels[event.from_status]} → ${statusLabels[event.to_status]}`
                             : statusLabels[event.to_status]}
                         </span>
-                        <span className="text-[9px] text-[#8293a1]">
+                        <span className="text-xs text-foreground">
                           {dateTime(event.created_at)}
                         </span>
                       </div>
-                      <div className="mt-1 text-[9px] text-[#8293a1]">
+                      <div className="mt-1 text-xs text-foreground">
                         操作人：{actor?.name ?? "系统"}
                       </div>
                       {event.note && (
-                        <p className="mt-2 rounded-lg bg-[#f7faf8] px-3 py-2 text-[10px] leading-5 text-[#53665f]">
+                        <p className="mt-2 rounded-lg bg-muted px-3 py-2 text-xs leading-5 text-foreground">
                           {event.note}
                         </p>
                       )}

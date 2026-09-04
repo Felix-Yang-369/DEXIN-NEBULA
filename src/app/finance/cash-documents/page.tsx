@@ -105,11 +105,11 @@ const money = new Intl.NumberFormat("zh-CN", {
 });
 
 const statusStyle: Record<CashDocumentStatus, [string, string]> = {
-  draft: ["草稿", "bg-[#f1f3f4] text-[#62717a]"],
-  submitted: ["待处理", "bg-[#fff4df] text-[#93621e]"],
-  approved: ["已批准", "bg-[#eaf1fb] text-[#3c6190]"],
-  completed: ["已完成", "bg-[#e8f5f3] text-[#087c78]"],
-  void: ["已作废", "bg-[#f7ecea] text-[#9b5548]"],
+  draft: ["草稿", "bg-muted text-foreground"],
+  submitted: ["待处理", "bg-muted text-foreground"],
+  approved: ["已批准", "bg-muted text-foreground"],
+  completed: ["已完成", "bg-muted text-foreground"],
+  void: ["已作废", "bg-muted text-foreground"],
 };
 
 const actionLabels = {
@@ -231,17 +231,17 @@ export default async function CashDocumentsPage({
         roleLabel: employee.title ?? "内部员工",
       }}
     >
-      <main className="mx-auto max-w-[1500px] p-4 sm:p-6 xl:p-8">
-        <section className="relative min-h-[196px] overflow-hidden rounded-[26px] bg-[linear-gradient(135deg,#092c4b,#0b4964_62%,#087c78)] px-6 py-8 text-white sm:px-8">
+      <main className="mx-auto max-w-[1440px] p-4 sm:p-6 xl:p-8">
+        <section className="ui-page-header">
           <CircleDollarSign className="absolute right-10 top-1/2 hidden size-40 -translate-y-1/2 text-white/[0.06] sm:block" />
           <div className="relative">
             <Link
-              className="inline-flex items-center gap-1 text-[10px] text-white/55"
+              className="inline-flex items-center gap-1 text-xs text-white/55"
               href="/finance"
             >
               <ArrowLeft className="size-3" /> 返回财务中心
             </Link>
-            <div className="mt-4 text-[10px] tracking-[0.18em] text-[#73d8d5]">
+            <div className="text-xs tracking-[0.18em] text-muted-foreground">
               CASH DOCUMENTS · SETTLEMENT
             </div>
             <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -249,7 +249,7 @@ export default async function CashDocumentsPage({
               <div className="flex flex-wrap gap-2 print:hidden">
                 <CashDocumentPrintButton />
                 <Link
-                  className="inline-flex h-9 items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-3 text-[10px] text-white transition hover:bg-white/15"
+                  className="inline-flex h-9 items-center gap-2 rounded-md border border-white/20 bg-white/10 px-3 text-xs text-white transition hover:bg-white/15"
                   href="/finance/cash-documents/export"
                 >
                   <Download className="size-3.5" /> 导出 Excel
@@ -264,10 +264,10 @@ export default async function CashDocumentsPage({
 
         {(feedback.error || feedback.created || feedback.updated) && (
           <div
-            className={`mt-4 rounded-xl border px-4 py-3 text-xs ${
+            className={`mt-4 rounded-md border px-4 py-3 text-xs ${
               feedback.error
-                ? "border-[#ead3d3] bg-[#fff7f7] text-[#914949]"
-                : "border-[#cce5db] bg-[#f2fbf6] text-[#177355]"
+                ? "border-border bg-muted text-foreground"
+                : "border-border bg-muted text-foreground"
             }`}
           >
             {feedback.error ??
@@ -275,7 +275,7 @@ export default async function CashDocumentsPage({
           </div>
         )}
         {migrationMissing && (
-          <div className="mt-4 rounded-xl border border-[#ead5a8] bg-[#fff9ea] px-4 py-3 text-xs text-[#8b6422]">
+          <div className="mt-4 rounded-md border border-border bg-muted px-4 py-3 text-xs text-foreground">
             收付款单数据库迁移尚未执行。
           </div>
         )}
@@ -308,30 +308,30 @@ export default async function CashDocumentsPage({
             },
           ].map(({ label, value, note, icon: Icon }) => (
             <article
-              className="min-h-[104px] rounded-[20px] border border-border/70 bg-white p-4"
+              className="min-h-[104px] rounded-md border border-border/70 bg-white p-4"
               key={label}
             >
               <div className="flex items-center justify-between">
-                <span className="text-[10px] text-muted-foreground">{label}</span>
-                <Icon className="size-4 text-[#087c78]" />
+                <span className="text-xs text-muted-foreground">{label}</span>
+                <Icon className="size-4 text-foreground" />
               </div>
-              <div className="mt-3 text-xl font-semibold text-[#12324a]">
+              <div className="mt-3 text-xl font-semibold text-foreground">
                 {value}
               </div>
-              <div className="mt-1 text-[9px] text-muted-foreground">{note}</div>
+              <div className="mt-1 text-xs text-muted-foreground">{note}</div>
             </article>
           ))}
         </section>
 
-        <div className="mt-5 flex w-fit rounded-xl bg-[#e9efef] p-1 text-xs print:hidden">
+        <div className="mt-5 flex w-fit rounded-md bg-muted p-1 text-xs print:hidden">
           <Link
-            className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 ${selectedType === "receipt" ? "bg-white font-medium text-[#087c78] shadow-sm" : "text-muted-foreground"}`}
+            className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 ${selectedType === "receipt" ? "bg-white font-medium text-foreground " : "text-muted-foreground"}`}
             href="/finance/cash-documents?type=receipt"
           >
             <ArrowDownLeft className="size-4" /> 收款单
           </Link>
           <Link
-            className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 ${selectedType === "payment" ? "bg-white font-medium text-[#a35e4f] shadow-sm" : "text-muted-foreground"}`}
+            className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 ${selectedType === "payment" ? "bg-white font-medium text-foreground " : "text-muted-foreground"}`}
             href="/finance/cash-documents?type=payment"
           >
             <ArrowUpRight className="size-4" /> 付款单
@@ -339,17 +339,17 @@ export default async function CashDocumentsPage({
         </div>
 
         <div className="mt-5 grid items-start gap-5 xl:grid-cols-[minmax(0,1.4fr)_minmax(380px,.6fr)] print:block">
-          <section className="min-h-[620px] overflow-hidden rounded-[22px] border border-border/70 bg-white">
+          <section className="min-h-[620px] overflow-hidden rounded-md border border-border/70 bg-white">
             <div className="flex items-center justify-between border-b border-border/70 px-5 py-5 sm:px-6">
               <div>
                 <h2 className="text-base font-semibold">
                   {selectedType === "receipt" ? "收款单台账" : "付款单台账"}
                 </h2>
-                <p className="mt-1 text-[10px] text-muted-foreground">
+                <p className="mt-1 text-xs text-muted-foreground">
                   单据状态、核销明细与预收预付余额可追溯
                 </p>
               </div>
-              <span className="text-[10px] text-muted-foreground">
+              <span className="text-xs text-muted-foreground">
                 {visibleDocuments.length} 张
               </span>
             </div>
@@ -370,20 +370,20 @@ export default async function CashDocumentsPage({
                   Number(document.total_amount) - Number(document.allocated_amount);
                 return (
                   <article
-                    className="rounded-[18px] border border-border/70 bg-[#fbfcfc] p-4"
+                    className="rounded-md border border-border/70 bg-muted p-4"
                     key={document.id}
                   >
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                       <div>
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="font-mono text-[11px] font-semibold text-[#12324a]">
+                          <span className="font-mono text-xs font-semibold text-foreground">
                             {document.document_no}
                           </span>
-                          <span className={`rounded-full px-2.5 py-1 text-[9px] ${statusClass}`}>
+                          <span className={`rounded-full px-2.5 py-1 text-xs ${statusClass}`}>
                             {statusLabel}
                           </span>
                           {document.reversal_status && (
-                            <span className={`rounded-full px-2.5 py-1 text-[9px] ${document.reversal_status === "reversed" ? "bg-[#f7ecea] text-[#9b5548]" : "bg-[#fff4df] text-[#93621e]"}`}>
+                            <span className={`rounded-full px-2.5 py-1 text-xs ${document.reversal_status === "reversed" ? "bg-muted text-foreground" : "bg-muted text-foreground"}`}>
                               {document.reversal_status === "reversed" ? "已红冲" : "红冲待审批"}
                             </span>
                           )}
@@ -391,18 +391,18 @@ export default async function CashDocumentsPage({
                         <h3 className="mt-2 text-sm font-semibold">
                           {document.counterparty_name}
                         </h3>
-                        <p className="mt-1 text-[10px] text-muted-foreground">
+                        <p className="mt-1 text-xs text-muted-foreground">
                           {document.document_date} · {channelLabels[document.payment_channel]} · {document.account_name ?? "默认账户"}
                         </p>
-                        <p className="mt-2 text-[11px] text-[#526a78]">
+                        <p className="mt-2 text-xs text-foreground">
                           {document.summary}
                         </p>
                       </div>
                       <div className="sm:text-right">
-                        <div className="text-xl font-semibold text-[#12324a]">
+                        <div className="text-xl font-semibold text-foreground">
                           {money.format(Number(document.total_amount))}
                         </div>
-                        <div className="mt-1 text-[9px] text-muted-foreground">
+                        <div className="mt-1 text-xs text-muted-foreground">
                           已分配 {money.format(Number(document.allocated_amount))}
                           {unapplied > 0 ? ` · 未分配 ${money.format(unapplied)}` : ""}
                         </div>
@@ -415,13 +415,13 @@ export default async function CashDocumentsPage({
                           const financeDocument = one(allocation.finance_document);
                           return (
                             <div
-                              className="rounded-xl border border-[#e2e9e6] bg-white px-3 py-2.5"
+                              className="rounded-md border border-border bg-white px-3 py-2.5"
                               key={allocation.id}
                             >
-                              <div className="text-[10px] font-medium text-[#12324a]">
+                              <div className="text-xs font-medium text-foreground">
                                 {financeDocument?.document_no ?? "往来单据"}
                               </div>
-                              <div className="mt-1 text-[9px] text-muted-foreground">
+                              <div className="mt-1 text-xs text-muted-foreground">
                                 {financeDocument?.counterparty_name} · 核销 {money.format(Number(allocation.amount))}
                               </div>
                             </div>
@@ -437,19 +437,19 @@ export default async function CashDocumentsPage({
                       >
                         <input name="cashDocumentId" type="hidden" value={document.id} />
                         <input
-                          className="h-9 min-w-0 flex-1 rounded-xl border border-border bg-white px-3 text-[10px]"
+                          className="h-9 min-w-0 flex-1 rounded-md border border-border bg-white px-3 text-xs"
                           name="note"
                           placeholder="退回或作废时必须填写原因"
                         />
                         <div className="flex flex-wrap gap-2">
                           {actions.map((action) => (
                             <button
-                              className={`h-9 rounded-xl px-3 text-[10px] font-medium ${
+                              className={`h-9 rounded-md px-3 text-xs font-medium ${
                                 action === "approve" || action === "complete"
-                                  ? "bg-[#087c78] text-white"
+                                  ? "bg-primary text-white"
                                   : action === "reject" || action === "void"
-                                    ? "border border-[#d9b9b2] bg-white text-[#985846]"
-                                    : "bg-[#0a385d] text-white"
+                                    ? "border border-border bg-white text-foreground"
+                                    : "bg-primary text-white"
                               }`}
                               key={action}
                               name="action"
@@ -465,13 +465,13 @@ export default async function CashDocumentsPage({
                     {reversalActions.length > 0 && (
                       <form
                         action={reverseCashDocumentAction}
-                        className="mt-4 flex flex-col gap-2 border-t border-[#ead9d4] pt-4 sm:flex-row sm:items-center print:hidden"
+                        className="mt-4 flex flex-col gap-2 border-t border-border pt-4 sm:flex-row sm:items-center print:hidden"
                       >
                         <input name="cashDocumentId" type="hidden" value={document.id} />
                         <div className="flex min-w-0 flex-1 items-center gap-2">
-                          <RotateCcw className="size-4 shrink-0 text-[#a35e4f]" />
+                          <RotateCcw className="size-4 shrink-0 text-foreground" />
                           <input
-                            className="h-9 min-w-0 flex-1 rounded-xl border border-[#dfc9c3] bg-white px-3 text-[10px]"
+                            className="h-9 min-w-0 flex-1 rounded-md border border-border bg-white px-3 text-xs"
                             name="note"
                             placeholder={reversalActions.includes("request") ? "填写红冲原因（至少四个字）" : "退回时填写审批意见"}
                           />
@@ -479,7 +479,7 @@ export default async function CashDocumentsPage({
                         <div className="flex flex-wrap gap-2">
                           {reversalActions.map((action) => (
                             <button
-                              className={`h-9 rounded-xl px-3 text-[10px] font-medium ${action === "approve" ? "bg-[#a35e4f] text-white" : "border border-[#d9b9b2] bg-white text-[#985846]"}`}
+                              className={`h-9 rounded-md px-3 text-xs font-medium ${action === "approve" ? "bg-primary text-white" : "border border-border bg-white text-foreground"}`}
                               key={action}
                               name="action"
                               type="submit"
@@ -492,7 +492,7 @@ export default async function CashDocumentsPage({
                       </form>
                     )}
                     {document.reversal_reason && (
-                      <p className="mt-3 rounded-xl bg-[#fff8f5] px-3 py-2 text-[9px] leading-5 text-[#8d5c50]">
+                      <p className="mt-3 rounded-md bg-muted px-3 py-2 text-xs leading-5 text-foreground">
                         红冲记录：{document.reversal_reason}
                       </p>
                     )}
@@ -507,50 +507,50 @@ export default async function CashDocumentsPage({
             </div>
           </section>
 
-          <section className="min-h-[620px] rounded-[22px] border border-border/70 bg-white p-5 sm:p-6 print:hidden">
+          <section className="min-h-[620px] rounded-md border border-border/70 bg-white p-5 sm:p-6 print:hidden">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h2 className="text-base font-semibold">
                   新建{selectedType === "receipt" ? "收款单" : "付款单"}
                 </h2>
-                <p className="mt-1 text-[10px] leading-5 text-muted-foreground">
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">
                   最多同时分配四张往来单据；未分配金额作为预收或预付余额保留。
                 </p>
               </div>
               {selectedType === "payment" ? (
-                <ShieldCheck className="size-5 text-[#a77b2d]" />
+                <ShieldCheck className="size-5 text-foreground" />
               ) : (
-                <Plus className="size-5 text-[#087c78]" />
+                <Plus className="size-5 text-foreground" />
               )}
             </div>
 
             {canCreate ? (
               <form action={createCashDocumentAction} className="mt-5 space-y-3">
                 <input name="documentType" type="hidden" value={selectedType} />
-                <label className="block text-[10px] text-muted-foreground">
+                <label className="block text-xs text-muted-foreground">
                   {selectedType === "receipt" ? "付款方" : "收款方"}
                   <input
-                    className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs text-foreground"
+                    className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs text-foreground"
                     maxLength={120}
                     name="counterpartyName"
                     required
                   />
                 </label>
                 <div className="grid grid-cols-2 gap-3">
-                  <label className="text-[10px] text-muted-foreground">
+                  <label className="text-xs text-muted-foreground">
                     单据日期
                     <input
-                      className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs"
+                      className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs"
                       defaultValue={today()}
                       name="documentDate"
                       required
                       type="date"
                     />
                   </label>
-                  <label className="text-[10px] text-muted-foreground">
+                  <label className="text-xs text-muted-foreground">
                     收付款方式
                     <select
-                      className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs"
+                      className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs"
                       name="paymentChannel"
                     >
                       <option value="bank">银行转账</option>
@@ -563,18 +563,18 @@ export default async function CashDocumentsPage({
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <input
-                    className="h-10 rounded-xl border border-border px-3 text-xs"
+                    className="h-10 rounded-md border border-border px-3 text-xs"
                     name="accountName"
                     placeholder="公司资金账户"
                   />
                   <input
-                    className="h-10 rounded-xl border border-border px-3 text-xs"
+                    className="h-10 rounded-md border border-border px-3 text-xs"
                     name="bankReference"
                     placeholder="银行流水号"
                   />
                 </div>
                 <input
-                  className="h-10 w-full rounded-xl border border-border px-3 text-xs"
+                  className="h-10 w-full rounded-md border border-border px-3 text-xs"
                   min="0.01"
                   name="totalAmount"
                   placeholder="收付款总金额"
@@ -583,19 +583,19 @@ export default async function CashDocumentsPage({
                   type="number"
                 />
                 <input
-                  className="h-10 w-full rounded-xl border border-border px-3 text-xs"
+                  className="h-10 w-full rounded-md border border-border px-3 text-xs"
                   maxLength={160}
                   name="summary"
                   placeholder="业务摘要"
                   required
                 />
 
-                <div className="rounded-[16px] border border-[#dce7e3] bg-[#f7faf9] p-3">
+                <div className="rounded-md border border-border bg-muted p-3">
                   <div className="mb-3 flex items-center justify-between">
-                    <span className="text-[10px] font-medium text-[#12324a]">
+                    <span className="text-xs font-medium text-foreground">
                       核销明细（选填）
                     </span>
-                    <span className="text-[9px] text-muted-foreground">
+                    <span className="text-xs text-muted-foreground">
                       {financeDocuments.length} 张可选
                     </span>
                   </div>
@@ -603,7 +603,7 @@ export default async function CashDocumentsPage({
                     {[0, 1, 2, 3].map((index) => (
                       <div className="grid grid-cols-[1fr_105px] gap-2" key={index}>
                         <select
-                          className="h-9 min-w-0 rounded-xl border border-border bg-white px-2 text-[9px]"
+                          className="h-9 min-w-0 rounded-md border border-border bg-white px-2 text-xs"
                           name="allocationDocumentId"
                         >
                           <option value="">选择往来单据</option>
@@ -614,7 +614,7 @@ export default async function CashDocumentsPage({
                           ))}
                         </select>
                         <input
-                          className="h-9 rounded-xl border border-border bg-white px-2 text-[10px]"
+                          className="h-9 rounded-md border border-border bg-white px-2 text-xs"
                           min="0.01"
                           name="allocationAmount"
                           placeholder="核销金额"
@@ -627,19 +627,19 @@ export default async function CashDocumentsPage({
                 </div>
 
                 <textarea
-                  className="min-h-16 w-full rounded-xl border border-border px-3 py-2 text-xs"
+                  className="min-h-16 w-full rounded-md border border-border px-3 py-2 text-xs"
                   maxLength={500}
                   name="note"
                   placeholder="备注（选填）"
                 />
                 {selectedType === "payment" && (
-                  <div className="rounded-xl bg-[#fff8e9] px-3 py-2.5 text-[9px] leading-5 text-[#89631f]">
+                  <div className="rounded-md bg-muted px-3 py-2.5 text-xs leading-5 text-foreground">
                     付款单提交后由董事长审批；批准后财务才能确认付款。
                   </div>
                 )}
                 <div className="grid grid-cols-2 gap-2">
                   <button
-                    className="h-10 rounded-xl border border-border bg-white text-xs font-medium text-[#526a78]"
+                    className="h-10 rounded-md border border-border bg-white text-xs font-medium text-foreground"
                     name="intent"
                     type="submit"
                     value="draft"
@@ -647,7 +647,7 @@ export default async function CashDocumentsPage({
                     保存草稿
                   </button>
                   <button
-                    className="h-10 rounded-xl bg-[#0a385d] text-xs font-medium text-white"
+                    className="h-10 rounded-md bg-primary text-xs font-medium text-white"
                     name="intent"
                     type="submit"
                     value="submit"
@@ -657,19 +657,19 @@ export default async function CashDocumentsPage({
                 </div>
               </form>
             ) : (
-              <div className="mt-5 rounded-xl bg-[#f7f9fa] p-4 text-[10px] leading-5 text-muted-foreground">
+              <div className="mt-5 rounded-md bg-muted p-4 text-xs leading-5 text-muted-foreground">
                 董事长为审批与只读视图，不能代替财务人员制单。
               </div>
             )}
           </section>
         </div>
 
-        <section className="mt-5 rounded-[20px] border border-[#cfe1dd] bg-[#f2f8f6] p-5">
+        <section className="mt-5 rounded-md border border-border bg-muted p-5">
           <div className="flex items-start gap-3">
-            <FileCheck2 className="mt-0.5 size-5 shrink-0 text-[#087c78]" />
+            <FileCheck2 className="mt-0.5 size-5 shrink-0 text-foreground" />
             <div>
-              <h2 className="text-xs font-semibold text-[#12324a]">入账规则</h2>
-              <p className="mt-2 text-[10px] leading-5 text-[#5b7278]">
+              <h2 className="text-xs font-semibold text-foreground">入账规则</h2>
+              <p className="mt-2 text-xs leading-5 text-foreground">
                 草稿、已提交和已批准状态都不会改变应收应付余额。只有点击“确认到账/付款”后，系统才会在一个数据库事务内生成资金流水、已过账凭证、核销记录并更新往来余额，避免审批未完成就提前记账。
               </p>
             </div>

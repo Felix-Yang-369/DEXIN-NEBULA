@@ -140,11 +140,11 @@ export default async function OaPage() {
         roleLabel: employee.title ?? "内部员工",
       }}
     >
-      <main className="mx-auto max-w-[1500px] p-4 sm:p-6 xl:p-8">
-        <section className="relative overflow-hidden rounded-[24px] bg-[#0a385d] px-6 py-8 text-white sm:px-8 lg:px-10">
+      <main className="mx-auto max-w-[1440px] p-4 sm:p-6 xl:p-8">
+        <section className="ui-page-header">
           <PanelsTopLeft className="absolute right-12 top-1/2 hidden size-40 -translate-y-1/2 text-white/[0.05] sm:block" />
           <div className="relative">
-            <div className="text-[10px] font-medium tracking-[0.16em] text-[#79d8d5]">
+            <div className="text-xs font-medium tracking-[0.16em] text-muted-foreground">
               OA · OFFICE AUTOMATION
             </div>
             <h1 className="mt-3 text-2xl font-semibold tracking-[-0.035em] sm:text-[30px]">
@@ -169,12 +169,12 @@ export default async function OaPage() {
             [documentResult.count ?? 0, "可访问文件", "按权限统计"],
           ].map(([value, label, note]) => (
             <article
-              className="rounded-[18px] border border-border/75 bg-white p-5"
+              className="rounded-md border border-border/75 bg-white p-5"
               key={String(label)}
             >
               <div className="text-xl font-semibold">{value}</div>
               <div className="mt-2 text-xs font-medium">{label}</div>
-              <div className="mt-1 text-[9px] text-muted-foreground">{note}</div>
+              <div className="mt-1 text-xs text-muted-foreground">{note}</div>
             </article>
           ))}
         </section>
@@ -186,21 +186,21 @@ export default async function OaPage() {
               const Icon = module.icon;
               return (
                 <Link
-                  className="group rounded-[20px] border border-border/75 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-[0_14px_35px_-28px_rgba(16,62,53,.55)]"
+                  className="group rounded-md border border-border/75 bg-white p-5 transition-colors  hover:border-primary/20 "
                   href={module.href}
                   key={module.title}
                 >
                   <div className="flex items-start justify-between">
-                    <span className="grid size-10 place-items-center rounded-xl bg-[#eaf3f8] text-primary">
+                    <span className="grid size-10 place-items-center rounded-md bg-muted text-primary">
                       <Icon className="size-5" />
                     </span>
                     <ChevronRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
                   </div>
-                  <div className="mt-4 text-[9px] font-medium tracking-[0.12em] text-primary/55">
+                  <div className="mt-4 text-xs font-medium tracking-[0.12em] text-primary/55">
                     {module.english}
                   </div>
                   <h3 className="mt-1 text-sm font-semibold">{module.title}</h3>
-                  <p className="mt-2 text-[10px] leading-5 text-muted-foreground">
+                  <p className="mt-2 text-xs leading-5 text-muted-foreground">
                     {module.description}
                   </p>
                 </Link>
@@ -233,16 +233,16 @@ export default async function OaPage() {
             const Icon = item.icon;
             return (
               <Link
-                className="flex items-center gap-4 rounded-[18px] border border-border bg-[#eef4f8] p-4"
+                className="flex items-center gap-4 rounded-md border border-border bg-muted p-4"
                 href={item.href}
                 key={item.title}
               >
-                <span className="grid size-9 place-items-center rounded-xl bg-white text-primary">
+                <span className="grid size-9 place-items-center rounded-md bg-white text-primary">
                   <Icon className="size-4" />
                 </span>
                 <div className="min-w-0">
                   <h3 className="text-xs font-semibold">{item.title}</h3>
-                  <p className="mt-1 truncate text-[9px] text-muted-foreground">
+                  <p className="mt-1 truncate text-xs text-muted-foreground">
                     {item.description}
                   </p>
                 </div>
@@ -251,7 +251,7 @@ export default async function OaPage() {
           })}
         </section>
 
-        <div className="mt-5 rounded-xl border border-border bg-white px-4 py-3 text-[10px] text-muted-foreground">
+        <div className="mt-5 rounded-md border border-border bg-white px-4 py-3 text-xs text-muted-foreground">
           当前制度与知识库共 {knowledgeResult.count ?? 0} 份已发布资料。OA
           只负责协同入口，员工主档和假期账户仍归 HRM，付款与凭证仍归 FMS。
         </div>

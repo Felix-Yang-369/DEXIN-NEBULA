@@ -23,7 +23,7 @@ export default async function AccountPasswordPage({
   const params = await searchParams;
   const error = errorMessages[params.error ?? ""] ?? params.error;
   const inputClassName =
-    "h-11 w-full rounded-xl border border-border bg-white px-3 text-sm outline-none transition focus:border-primary/45 focus:ring-4 focus:ring-primary/8";
+    "h-11 w-full rounded-md border border-border bg-white px-3 text-sm outline-none transition focus:border-primary/45 focus:ring-4 focus:ring-primary/8";
 
   return (
     <WorkflowShell
@@ -35,8 +35,8 @@ export default async function AccountPasswordPage({
       }}
     >
       <main className="mx-auto max-w-[760px] p-4 sm:p-6 xl:p-8">
-        <section className="rounded-[24px] border border-border/75 bg-white p-6 shadow-[0_22px_60px_-45px_rgba(6,35,64,.5)] sm:p-8">
-          <div className="flex size-11 items-center justify-center rounded-2xl bg-[#e9f6f7] text-primary">
+        <section className="rounded-md border border-border/75 bg-white p-6  sm:p-8">
+          <div className="flex size-11 items-center justify-center rounded-lg bg-muted text-primary">
             <KeyRound className="size-5" />
           </div>
           <h1 className="mt-5 text-2xl font-semibold tracking-[-0.035em]">修改登录密码</h1>
@@ -63,22 +63,22 @@ export default async function AccountPasswordPage({
               新密码至少 {PASSWORD_MIN_LENGTH} 位，并包含大写字母、小写字母、数字、符号中的至少三类。
             </p>
             {error && (
-              <p aria-live="polite" className="rounded-xl border border-[#eed3cd] bg-[#fff4f1] px-4 py-3 text-sm text-[#985846]">
+              <p aria-live="polite" className="rounded-md border border-border bg-muted px-4 py-3 text-sm text-foreground">
                 {error}
               </p>
             )}
             <div className="flex flex-col gap-3 sm:flex-row">
-              <button className="flex h-11 flex-1 items-center justify-center rounded-xl bg-primary px-4 text-sm font-medium text-primary-foreground" type="submit">
+              <button className="flex h-11 flex-1 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground" type="submit">
                 确认修改密码
               </button>
-              <Link className="flex h-11 items-center justify-center rounded-xl border border-border px-5 text-sm font-medium text-muted-foreground" href="/account">
+              <Link className="flex h-11 items-center justify-center rounded-md border border-border px-5 text-sm font-medium text-muted-foreground" href="/account">
                 取消
               </Link>
             </div>
           </form>
 
-          <div className="mt-6 flex items-start gap-2 rounded-2xl bg-[#f3f7fa] px-4 py-3 text-xs leading-5 text-muted-foreground">
-            <ShieldCheck className="mt-0.5 size-4 shrink-0 text-[#527995]" />
+          <div className="mt-6 flex items-start gap-2 rounded-lg bg-muted px-4 py-3 text-xs leading-5 text-muted-foreground">
+            <ShieldCheck className="mt-0.5 size-4 shrink-0 text-foreground" />
             忘记当前密码时，请使用
             <Link className="font-medium text-primary" href="/forgot-password">邮件找回</Link>
             。

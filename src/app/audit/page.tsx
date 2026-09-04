@@ -120,11 +120,11 @@ export default async function AuditPage({
         roleLabel: employee.title ?? "内部员工",
       }}
     >
-      <main className="mx-auto max-w-[1600px] p-4 sm:p-6 xl:p-8">
-        <section className="relative overflow-hidden rounded-[24px] bg-[#0a385d] px-6 py-7 text-white shadow-[0_18px_50px_-32px_rgba(12,47,41,.75)] sm:px-8 lg:px-10">
+      <main className="mx-auto max-w-[1440px] p-4 sm:p-6 xl:p-8">
+        <section className="ui-page-header">
           <ScrollText className="pointer-events-none absolute right-12 top-1/2 hidden size-40 -translate-y-1/2 text-white/[0.055] sm:block" />
           <div className="relative">
-            <div className="text-xs font-medium tracking-[0.12em] text-[#79d8d5]">
+            <div className="text-xs font-medium tracking-[0.12em] text-muted-foreground">
               SECURITY AUDIT
             </div>
             <h1 className="mt-3 text-2xl font-semibold tracking-[-0.035em] sm:text-[30px]">
@@ -137,8 +137,8 @@ export default async function AuditPage({
         </section>
 
         {!canView ? (
-          <section className="mt-5 rounded-[22px] border border-[#ead8d8] bg-white p-8 text-center">
-            <LockKeyhole className="mx-auto size-8 text-[#965151]" />
+          <section className="mt-5 rounded-md border border-border bg-white p-8 text-center">
+            <LockKeyhole className="mx-auto size-8 text-foreground" />
             <h2 className="mt-4 text-base font-semibold">无权查看审计日志</h2>
             <p className="mt-2 text-xs text-muted-foreground">
               当前仅系统管理员可以查看公司级审计记录。
@@ -170,7 +170,7 @@ export default async function AuditPage({
                 const Icon = item.icon;
                 return (
                   <article
-                    className="rounded-[20px] border border-border/80 bg-white p-5"
+                    className="rounded-md border border-border/80 bg-white p-5"
                     key={item.label}
                   >
                     <div className="flex items-start justify-between">
@@ -182,11 +182,11 @@ export default async function AuditPage({
                           {item.value}
                         </div>
                       </div>
-                      <span className="grid size-10 place-items-center rounded-xl bg-[#eaf3f8] text-primary">
+                      <span className="grid size-10 place-items-center rounded-md bg-muted text-primary">
                         <Icon className="size-[17px]" />
                       </span>
                     </div>
-                    <div className="mt-4 border-t border-border/80 pt-3 text-[10px] text-muted-foreground">
+                    <div className="mt-4 border-t border-border/80 pt-3 text-xs text-muted-foreground">
                       {item.note}
                     </div>
                   </article>
@@ -195,12 +195,12 @@ export default async function AuditPage({
             </section>
 
             {error && (
-              <div className="mt-5 rounded-xl border border-[#ead8d8] bg-[#f8eeee] px-4 py-3 text-xs text-[#965151]">
+              <div className="mt-5 rounded-md border border-border bg-muted px-4 py-3 text-xs text-foreground">
                 无法读取审计记录，请确认第十个数据库迁移已经执行。
               </div>
             )}
 
-            <section className="mt-5 overflow-hidden rounded-[22px] border border-border/80 bg-white">
+            <section className="mt-5 overflow-hidden rounded-md border border-border/80 bg-white">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/80 px-5 py-5 sm:px-6">
                 <div>
                   <h2 className="text-base font-semibold">
@@ -208,19 +208,19 @@ export default async function AuditPage({
                       ? "角色与权限变更"
                       : "关键操作记录"}
                   </h2>
-                  <p className="mt-1 text-[10px] text-muted-foreground">
+                  <p className="mt-1 text-xs text-muted-foreground">
                     审计记录只读，不记录业务敏感正文
                   </p>
                 </div>
-                <div className="flex rounded-xl bg-[#f3f7fa] p-1 text-[10px]">
+                <div className="flex rounded-md bg-muted p-1 text-xs">
                   <Link
-                    className={`rounded-lg px-3 py-1.5 ${category === "all" ? "bg-white font-medium text-primary shadow-sm" : "text-muted-foreground"}`}
+                    className={`rounded-lg px-3 py-1.5 ${category === "all" ? "bg-white font-medium text-primary " : "text-muted-foreground"}`}
                     href="/audit"
                   >
                     全部
                   </Link>
                   <Link
-                    className={`rounded-lg px-3 py-1.5 ${category === "roles" ? "bg-white font-medium text-primary shadow-sm" : "text-muted-foreground"}`}
+                    className={`rounded-lg px-3 py-1.5 ${category === "roles" ? "bg-white font-medium text-primary " : "text-muted-foreground"}`}
                     href="/audit?category=roles"
                   >
                     角色权限
@@ -234,7 +234,7 @@ export default async function AuditPage({
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full min-w-[780px] text-left">
-                    <thead className="bg-[#f3f7fa] text-[10px] text-muted-foreground">
+                    <thead className="bg-muted text-xs text-muted-foreground">
                       <tr>
                         <th className="px-5 py-3 font-medium">时间</th>
                         <th className="px-5 py-3 font-medium">操作人</th>
@@ -246,7 +246,7 @@ export default async function AuditPage({
                     <tbody className="divide-y divide-border/70 text-xs">
                       {logs.map((log) => (
                         <tr key={log.id}>
-                          <td className="whitespace-nowrap px-5 py-4 text-[10px] text-muted-foreground">
+                          <td className="whitespace-nowrap px-5 py-4 text-xs text-muted-foreground">
                             {formatDateTime(log.created_at)}
                           </td>
                           <td className="px-5 py-4 font-medium">
@@ -270,13 +270,13 @@ export default async function AuditPage({
                                   ? "请假申请"
                                   : "通用审批"}
                           </td>
-                          <td className="px-5 py-4 text-[10px] text-muted-foreground">
+                          <td className="px-5 py-4 text-xs text-muted-foreground">
                             {log.action === "employee_roles_updated" ? (
                               <>
                                 {roleList(log.metadata.before)} →{" "}
                                 {roleList(log.metadata.after)}
                                 {log.metadata.high_risk === true && (
-                                  <span className="ml-2 rounded-full bg-[#fff4e7] px-2 py-0.5 text-[#9a6321]">
+                                  <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-foreground">
                                     高危
                                   </span>
                                 )}
@@ -285,7 +285,7 @@ export default async function AuditPage({
                               <>
                                 {roleLabels[String(log.metadata.role_code)] ??
                                   String(log.metadata.role_code ?? "—")}
-                                <span className="ml-2 text-[#9a6321]">
+                                <span className="ml-2 text-foreground">
                                   至 {formatDateTime(String(log.metadata.expires_at))}
                                 </span>
                               </>
@@ -293,7 +293,7 @@ export default async function AuditPage({
                               <>
                                 {roleLabels[String(log.metadata.role_code)] ??
                                   String(log.metadata.role_code ?? "—")}
-                                <span className="ml-2 text-[#965151]">已撤销</span>
+                                <span className="ml-2 text-foreground">已撤销</span>
                               </>
                             ) : (
                               <>

@@ -13,17 +13,17 @@ export function DexiaoxinAvatar({
   return (
     <span
       className={cn(
-        "relative inline-grid shrink-0 place-items-center overflow-hidden rounded-[27%] bg-[#0c2d28] shadow-[0_10px_28px_-16px_rgba(7,47,41,.85)] ring-1 ring-[#e5ca79]/35",
+        "relative inline-grid shrink-0 place-items-center overflow-hidden rounded-[27%] bg-primary  ring-1 ring-ring/20",
         className,
       )}
     >
       <Image
         alt={decorative ? "" : "德小馨 AI"}
-        className="size-full scale-[1.035] object-cover"
+        className="size-full object-contain"
         fill
         priority={priority}
         sizes="(max-width: 768px) 96px, 128px"
-        src="/dexinai-icon.png"
+        src="/brand/dexiaoxin-avatar-256.webp"
       />
     </span>
   );

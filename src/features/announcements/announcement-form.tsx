@@ -28,9 +28,9 @@ export function AnnouncementForm({
 
       <div className="grid gap-5 lg:grid-cols-2">
         <label className="block lg:col-span-2">
-          <span className="text-xs font-semibold text-[#294b65]">公告标题</span>
+          <span className="text-xs font-semibold text-foreground">公告标题</span>
           <input
-            className="mt-2 h-11 w-full rounded-xl border border-border bg-white px-4 text-xs outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
+            className="mt-2 h-11 w-full rounded-md border border-border bg-white px-4 text-xs outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
             defaultValue={draft?.title}
             disabled={pending}
             maxLength={120}
@@ -41,9 +41,9 @@ export function AnnouncementForm({
         </label>
 
         <label className="block lg:col-span-2">
-          <span className="text-xs font-semibold text-[#294b65]">公告摘要</span>
+          <span className="text-xs font-semibold text-foreground">公告摘要</span>
           <textarea
-            className="mt-2 min-h-24 w-full resize-y rounded-xl border border-border bg-white px-4 py-3 text-xs leading-6 outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
+            className="mt-2 min-h-24 w-full resize-y rounded-md border border-border bg-white px-4 py-3 text-xs leading-6 outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
             defaultValue={draft?.summary}
             disabled={pending}
             maxLength={300}
@@ -54,9 +54,9 @@ export function AnnouncementForm({
         </label>
 
         <label className="block">
-          <span className="text-xs font-semibold text-[#294b65]">公告分类</span>
+          <span className="text-xs font-semibold text-foreground">公告分类</span>
           <select
-            className="mt-2 h-11 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/35"
+            className="mt-2 h-11 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/35"
             defaultValue={draft?.category_code ?? "company"}
             disabled={pending}
             name="categoryCode"
@@ -69,9 +69,9 @@ export function AnnouncementForm({
         </label>
 
         <label className="block">
-          <span className="text-xs font-semibold text-[#294b65]">可见范围</span>
+          <span className="text-xs font-semibold text-foreground">可见范围</span>
           <select
-            className="mt-2 h-11 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/35"
+            className="mt-2 h-11 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/35"
             defaultValue={draft?.scope_type ?? "all"}
             disabled={pending}
             name="scopeType"
@@ -82,11 +82,11 @@ export function AnnouncementForm({
         </label>
 
         <label className="block lg:col-span-2">
-          <span className="text-xs font-semibold text-[#294b65]">
+          <span className="text-xs font-semibold text-foreground">
             指定部门
           </span>
           <select
-            className="mt-2 h-11 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/35"
+            className="mt-2 h-11 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/35"
             defaultValue={draft?.scope_department_id ?? ""}
             disabled={pending}
             name="scopeDepartmentId"
@@ -101,9 +101,9 @@ export function AnnouncementForm({
         </label>
 
         <label className="block lg:col-span-2">
-          <span className="text-xs font-semibold text-[#294b65]">公告正文</span>
+          <span className="text-xs font-semibold text-foreground">公告正文</span>
           <textarea
-            className="mt-2 min-h-72 w-full resize-y rounded-xl border border-border bg-white px-4 py-3 text-xs leading-7 outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
+            className="mt-2 min-h-72 w-full resize-y rounded-md border border-border bg-white px-4 py-3 text-xs leading-7 outline-none focus:border-primary/35 focus:ring-4 focus:ring-primary/7"
             defaultValue={draft?.content}
             disabled={pending}
             maxLength={20000}
@@ -114,7 +114,7 @@ export function AnnouncementForm({
         </label>
       </div>
 
-      <label className="flex items-center gap-3 rounded-xl border border-border bg-[#f3f7fa] px-4 py-3">
+      <label className="flex items-center gap-3 rounded-md border border-border bg-muted px-4 py-3">
         <input
           defaultChecked={draft?.is_pinned}
           disabled={pending}
@@ -123,7 +123,7 @@ export function AnnouncementForm({
         />
         <span>
           <span className="block text-xs font-medium">发布后置顶</span>
-          <span className="mt-1 block text-[10px] text-muted-foreground">
+          <span className="mt-1 block text-xs text-muted-foreground">
             仅用于需要员工优先关注的重要公告。
           </span>
         </span>
@@ -131,7 +131,7 @@ export function AnnouncementForm({
 
       {state.error && (
         <div
-          className="rounded-xl border border-[#ead8d8] bg-[#f8eeee] px-4 py-3 text-xs text-[#965151]"
+          className="rounded-md border border-border bg-muted px-4 py-3 text-xs text-foreground"
           role="alert"
         >
           {state.error}
@@ -139,12 +139,12 @@ export function AnnouncementForm({
       )}
 
       <div className="flex flex-col-reverse gap-3 border-t border-border pt-5 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-[10px] leading-5 text-muted-foreground">
+        <p className="text-xs leading-5 text-muted-foreground">
           草稿不会通知员工；正式发布后将按可见范围发送站内通知并写入审计日志。
         </p>
         <div className="flex gap-2">
           <button
-            className="inline-flex h-10 items-center gap-2 rounded-xl border border-border bg-white px-4 text-xs font-medium text-muted-foreground disabled:opacity-50"
+            className="inline-flex h-10 items-center gap-2 rounded-md border border-border bg-white px-4 text-xs font-medium text-muted-foreground disabled:opacity-50"
             disabled={pending}
             name="intent"
             type="submit"
@@ -154,7 +154,7 @@ export function AnnouncementForm({
             保存草稿
           </button>
           <button
-            className="inline-flex h-10 items-center gap-2 rounded-xl bg-primary px-5 text-xs font-medium text-white disabled:opacity-50"
+            className="inline-flex h-10 items-center gap-2 rounded-md bg-primary px-5 text-xs font-medium text-white disabled:opacity-50"
             disabled={pending}
             name="intent"
             type="submit"

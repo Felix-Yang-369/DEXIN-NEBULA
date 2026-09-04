@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 const sizes = {
-  sm: "size-8 text-[10px]",
+  sm: "size-8 text-xs",
   md: "size-11 text-xs",
   lg: "size-14 text-sm",
 } as const;
@@ -18,7 +18,7 @@ export function EmployeeAvatar({
   return (
     <span
       aria-label={`${name}的头像`}
-      className={`relative grid shrink-0 place-items-center overflow-hidden rounded-full border border-white/80 bg-[#eaf3f8] font-semibold text-primary shadow-[0_4px_14px_-8px_rgba(23,63,56,.45)] ${sizes[size]}`}
+      className={`relative grid shrink-0 place-items-center overflow-hidden rounded-full border border-white/80 bg-muted font-semibold text-primary  ${sizes[size]}`}
       role="img"
     >
       {src ? (

@@ -132,10 +132,10 @@ const levelLabels: Record<number, string> = {
 };
 
 const levelTones: Record<number, string> = {
-  1: "bg-[#e8f6ef] text-[#27765b]",
-  2: "bg-[#eaf3f8] text-[#0d6c78]",
-  3: "bg-[#fff4df] text-[#96651f]",
-  4: "bg-[#fff0ed] text-[#a34e42]",
+  1: "bg-muted text-foreground",
+  2: "bg-muted text-foreground",
+  3: "bg-muted text-foreground",
+  4: "bg-muted text-foreground",
 };
 
 const statusLabels: Record<FolderAccessRequest["status"], string> = {
@@ -339,12 +339,12 @@ export default async function DocumentsPage({
         roleLabel: roleLabel(employee.roleCodes) || "内部员工",
       }}
     >
-      <main className="mx-auto max-w-[1600px] p-4 sm:p-6 xl:p-8">
-        <section className="relative overflow-hidden rounded-[24px] bg-[#0a385d] px-6 py-7 text-white sm:px-8 lg:px-10">
+      <main className="mx-auto max-w-[1440px] p-4 sm:p-6 xl:p-8">
+        <section className="ui-page-header">
           <FileArchive className="pointer-events-none absolute right-10 top-1/2 hidden size-40 -translate-y-1/2 text-white/[0.055] sm:block" />
           <div className="relative flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
             <div>
-              <div className="text-xs font-medium tracking-[0.13em] text-[#79d8d5]">
+              <div className="text-xs font-medium tracking-[0.13em] text-muted-foreground">
                 DOCUMENT CENTER · NAS PRIVATE STORAGE
               </div>
               <h1 className="mt-3 text-2xl font-semibold tracking-[-0.035em] sm:text-[30px]">
@@ -355,16 +355,16 @@ export default async function DocumentsPage({
                 NAS。
               </p>
             </div>
-            <div className="flex flex-wrap gap-2 text-[11px]">
+            <div className="flex flex-wrap gap-2 text-xs">
               <Link
-                className="rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-white/80"
+                className="rounded-md border border-white/15 bg-white/10 px-4 py-3 text-white/80"
                 href="/documents?view=my-requests"
               >
                 我的申请{" "}
                 {myRequests.filter((item) => item.status === "pending").length}
               </Link>
               <Link
-                className="rounded-xl bg-white px-4 py-3 font-medium text-[#0a385d]"
+                className="rounded-md bg-white px-4 py-3 font-medium text-foreground"
                 href="/documents?view=approvals"
               >
                 权限审批 {myPendingApprovals.length}
@@ -375,14 +375,14 @@ export default async function DocumentsPage({
 
         {(params.created || params.updated || params.error) && (
           <div
-            className={`mt-5 rounded-2xl border px-4 py-3 text-xs ${params.error ? "border-[#eed3cd] bg-[#fff4f1] text-[#985846]" : "border-[#cfe8ec] bg-[#edf7f2] text-[#0d6c78]"}`}
+            className={`mt-5 rounded-lg border px-4 py-3 text-xs ${params.error ? "border-border bg-muted text-foreground" : "border-border bg-muted text-foreground"}`}
           >
             {params.error || params.created || params.updated}
           </div>
         )}
 
         {folderResult.error && (
-          <div className="mt-5 rounded-2xl border border-[#eed3cd] bg-[#fff4f1] px-5 py-4 text-xs text-[#985846]">
+          <div className="mt-5 rounded-lg border border-border bg-muted px-5 py-4 text-xs text-foreground">
             文件夹权限数据尚未就绪。请先执行本次 Supabase 数据库迁移。
           </div>
         )}
@@ -543,27 +543,27 @@ function DriveNavigation({
         const active = activeView === item.key;
         return (
           <Link
-            className={`flex items-center gap-3 rounded-2xl border px-4 py-3 transition ${
+            className={`flex items-center gap-3 rounded-lg border px-4 py-3 transition ${
               active
-                ? "border-primary/25 bg-primary text-white shadow-sm"
-                : "border-border/75 bg-white hover:border-primary/20 hover:bg-[#f7faf9]"
+                ? "border-primary/25 bg-primary text-white "
+                : "border-border/75 bg-white hover:border-primary/20 hover:bg-muted"
             }`}
             href={item.href}
             key={item.key}
           >
             <span
-              className={`grid size-9 shrink-0 place-items-center rounded-xl ${
-                active ? "bg-white/15" : "bg-[#edf4f3] text-primary"
+              className={`grid size-9 shrink-0 place-items-center rounded-md ${
+                active ? "bg-white/15" : "bg-muted text-primary"
               }`}
             >
               {item.icon}
             </span>
             <span className="min-w-0">
-              <span className="block text-[11px] font-medium">
+              <span className="block text-xs font-medium">
                 {item.label}
               </span>
               <span
-                className={`mt-0.5 block truncate text-[9px] ${
+                className={`mt-0.5 block truncate text-xs ${
                   active ? "text-white/65" : "text-muted-foreground"
                 }`}
               >
@@ -608,11 +608,11 @@ function MicrodriveExplorer({
     : null;
 
   return (
-    <section className="mt-4 overflow-hidden rounded-[22px] border border-border/75 bg-white shadow-sm">
-      <div className="flex min-h-16 flex-wrap items-center gap-3 border-b border-border/70 bg-[#fbfcfd] px-4 py-3 sm:px-5">
+    <section className="mt-4 overflow-hidden rounded-md border border-border/75 bg-white ">
+      <div className="flex min-h-16 flex-wrap items-center gap-3 border-b border-border/70 bg-muted px-4 py-3 sm:px-5">
         <Link
           aria-label="返回全部共享空间"
-          className="grid size-9 place-items-center rounded-xl border border-border bg-white text-muted-foreground hover:text-primary"
+          className="grid size-9 place-items-center rounded-md border border-border bg-white text-muted-foreground hover:text-primary"
           href="/documents"
         >
           <ArrowLeft className="size-4" />
@@ -649,17 +649,17 @@ function MicrodriveExplorer({
             folderId={selectedFolder?.can_upload ? selectedFolder.id : null}
           />
           <a
-            className={`inline-flex h-9 items-center gap-1.5 rounded-xl border px-4 text-[11px] ${selectedFolder?.can_manage ? "border-border bg-white text-foreground" : "pointer-events-none border-border/60 bg-[#f7f8f9] text-muted-foreground"}`}
+            className={`inline-flex h-9 items-center gap-1.5 rounded-md border px-4 text-xs ${selectedFolder?.can_manage ? "border-border bg-white text-foreground" : "pointer-events-none border-border/60 bg-muted text-muted-foreground"}`}
             href="#drive-new"
           >
             <Plus className="size-3.5" />
             新建文件夹
           </a>
-          <span className="hidden items-center rounded-xl bg-[#eef1f3] p-1 text-muted-foreground sm:flex">
+          <span className="hidden items-center rounded-md bg-muted p-1 text-muted-foreground sm:flex">
             <span className="grid size-8 place-items-center rounded-lg">
               <List className="size-4" />
             </span>
-            <span className="grid size-8 place-items-center rounded-lg bg-white text-primary shadow-sm">
+            <span className="grid size-8 place-items-center rounded-lg bg-white text-primary ">
               <Columns3 className="size-4" />
             </span>
             <span className="grid size-8 place-items-center rounded-lg">
@@ -671,8 +671,8 @@ function MicrodriveExplorer({
 
       <div className="overflow-x-auto">
         <div className="grid min-h-[560px] min-w-[1080px] grid-cols-[230px_270px_410px_minmax(280px,1fr)] divide-x divide-border/70">
-          <aside className="bg-[#f8fafb] px-3 py-4">
-            <div className="px-3 text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+          <aside className="bg-muted px-3 py-4">
+            <div className="px-3 text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
               共享空间
             </div>
             <div className="mt-3 space-y-1">
@@ -680,13 +680,13 @@ function MicrodriveExplorer({
                 const active = explorerRoot?.id === folder.id;
                 return (
                   <Link
-                    className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-[11px] transition ${active ? "bg-[#e6ebee] font-medium text-foreground" : "text-muted-foreground hover:bg-white hover:text-foreground"}`}
+                    className={`flex items-center gap-2.5 rounded-md px-3 py-2.5 text-xs transition ${active ? "bg-muted font-medium text-foreground" : "text-muted-foreground hover:bg-white hover:text-foreground"}`}
                     href={folderHref(folder.id)}
                     key={folder.id}
                   >
-                    <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-white text-primary shadow-sm">
+                    <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-white text-primary ">
                       {folder.is_locked ? (
-                        <Lock className="size-3.5 text-[#8f7557]" />
+                        <Lock className="size-3.5 text-foreground" />
                       ) : (
                         <HardDrive className="size-3.5" />
                       )}
@@ -708,7 +708,7 @@ function MicrodriveExplorer({
               </h2>
               {explorerRoot && (
                 <span
-                  className={`rounded-full px-2 py-1 text-[8px] ${levelTones[explorerRoot.access_level]}`}
+                  className={`rounded-full px-2 py-1 text-xs ${levelTones[explorerRoot.access_level]}`}
                 >
                   {levelLabels[explorerRoot.access_level]}
                 </span>
@@ -716,11 +716,11 @@ function MicrodriveExplorer({
             </div>
             <div className="mt-3 space-y-1">
               {!explorerRoot ? (
-                <p className="px-3 py-10 text-center text-[10px] leading-5 text-muted-foreground">
+                <p className="px-3 py-10 text-center text-xs leading-5 text-muted-foreground">
                   从左侧选择公司共享空间
                 </p>
               ) : explorerFolders.length === 0 ? (
-                <p className="px-3 py-10 text-center text-[10px] leading-5 text-muted-foreground">
+                <p className="px-3 py-10 text-center text-xs leading-5 text-muted-foreground">
                   当前空间暂无下级文件夹
                 </p>
               ) : (
@@ -728,12 +728,12 @@ function MicrodriveExplorer({
                   const active = selectedFolder?.id === folder.id;
                   return (
                     <Link
-                      className={`flex items-center gap-2 rounded-xl px-3 py-2.5 text-[11px] transition ${active ? "bg-[#e6ebee] font-medium" : "hover:bg-[#f7f9fa]"}`}
+                      className={`flex items-center gap-2 rounded-md px-3 py-2.5 text-xs transition ${active ? "bg-muted font-medium" : "hover:bg-muted"}`}
                       href={folderHref(folder.id)}
                       key={folder.id}
                     >
                       <span
-                        className={`grid size-7 place-items-center rounded-lg ${folder.is_locked ? "bg-[#f6f1e9] text-[#8f7557]" : "bg-[#e9f5fb] text-[#3288bd]"}`}
+                        className={`grid size-7 place-items-center rounded-lg ${folder.is_locked ? "bg-muted text-foreground" : "bg-muted text-foreground"}`}
                       >
                         {folder.is_locked ? (
                           <Lock className="size-3.5" />
@@ -758,7 +758,7 @@ function MicrodriveExplorer({
                 <h2 className="text-xs font-semibold">
                   {selectedFolder?.name || "文件列表"}
                 </h2>
-                <p className="mt-1 text-[9px] text-muted-foreground">
+                <p className="mt-1 text-xs text-muted-foreground">
                   {selectedFolder
                     ? `${documents.length} 个文件`
                     : "选择目录后查看文件"}
@@ -767,19 +767,19 @@ function MicrodriveExplorer({
             </div>
             <div className="mt-3">
               {documentError ? (
-                <p className="px-5 py-12 text-center text-[10px] text-[#985846]">
+                <p className="px-5 py-12 text-center text-xs text-foreground">
                   文件读取失败，请稍后重试
                 </p>
               ) : selectedFolder?.is_locked ? (
-                <p className="px-5 py-12 text-center text-[10px] leading-5 text-[#8f7557]">
+                <p className="px-5 py-12 text-center text-xs leading-5 text-foreground">
                   当前目录需要申请权限后查看
                 </p>
               ) : !selectedFolder ? (
-                <p className="px-5 py-12 text-center text-[10px] text-muted-foreground">
+                <p className="px-5 py-12 text-center text-xs text-muted-foreground">
                   请先选择左侧共享空间
                 </p>
               ) : documents.length === 0 ? (
-                <p className="px-5 py-12 text-center text-[10px] text-muted-foreground">
+                <p className="px-5 py-12 text-center text-xs text-muted-foreground">
                   这个文件夹还没有文件
                 </p>
               ) : (
@@ -787,20 +787,20 @@ function MicrodriveExplorer({
                   const active = selectedDocument?.id === document.id;
                   return (
                     <Link
-                      className={`flex items-center gap-3 border-y border-transparent px-4 py-3 transition ${active ? "border-border/60 bg-[#f1f3f4]" : "hover:bg-[#f8fafb]"}`}
+                      className={`flex items-center gap-3 border-y border-transparent px-4 py-3 transition ${active ? "border-border/60 bg-muted" : "hover:bg-muted"}`}
                       href={folderHref(selectedFolder.id, {
                         document: document.id,
                       })}
                       key={document.id}
                     >
-                      <span className="grid size-9 shrink-0 place-items-center rounded-xl border border-border/70 bg-white text-primary">
+                      <span className="grid size-9 shrink-0 place-items-center rounded-md border border-border/70 bg-white text-primary">
                         <FileText className="size-4" />
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate text-[11px] font-medium">
+                        <span className="block truncate text-xs font-medium">
                           {document.title}
                         </span>
-                        <span className="mt-1 block truncate text-[9px] text-muted-foreground">
+                        <span className="mt-1 block truncate text-xs text-muted-foreground">
                           {document.original_file_name} ·{" "}
                           {displaySize(document.file_size)}
                         </span>
@@ -816,16 +816,16 @@ function MicrodriveExplorer({
           <aside className="p-5">
             {selectedDocument ? (
               <div>
-                <span className="mx-auto grid size-16 place-items-center rounded-2xl border border-border/70 bg-[#f6f9f7] text-primary">
+                <span className="mx-auto grid size-16 place-items-center rounded-lg border border-border/70 bg-muted text-primary">
                   <FileText className="size-7" />
                 </span>
                 <h2 className="mt-4 break-words text-center text-sm font-semibold">
                   {selectedDocument.title}
                 </h2>
-                <p className="mt-1 break-all text-center text-[9px] text-muted-foreground">
+                <p className="mt-1 break-all text-center text-xs text-muted-foreground">
                   {selectedDocument.original_file_name}
                 </p>
-                <dl className="mt-6 space-y-3 border-t border-border/70 pt-5 text-[10px]">
+                <dl className="mt-6 space-y-3 border-t border-border/70 pt-5 text-xs">
                   <DriveDetail
                     label="文件编号"
                     value={selectedDocument.document_no}
@@ -858,7 +858,7 @@ function MicrodriveExplorer({
                 <div className="mt-6 grid gap-2">
                   {canDownload(selectedDocument) && (
                     <Link
-                      className="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-primary text-[10px] text-white"
+                      className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-primary text-xs text-white"
                       href={`/documents/${selectedDocument.id}/download`}
                     >
                       <Download className="size-3.5" />
@@ -867,8 +867,8 @@ function MicrodriveExplorer({
                   )}
                   {canArchive(selectedDocument) &&
                     selectedDocument.status === "active" && (
-                      <details className="rounded-xl border border-border bg-white">
-                        <summary className="flex h-9 cursor-pointer list-none items-center justify-center gap-2 text-[10px] text-muted-foreground [&::-webkit-details-marker]:hidden">
+                      <details className="rounded-md border border-border bg-white">
+                        <summary className="flex h-9 cursor-pointer list-none items-center justify-center gap-2 text-xs text-muted-foreground [&::-webkit-details-marker]:hidden">
                           <MoreHorizontal className="size-3.5" />
                           更多操作
                         </summary>
@@ -883,7 +883,7 @@ function MicrodriveExplorer({
                               value={selectedDocument.id}
                             />
                             <input
-                              className="h-9 min-w-0 flex-1 rounded-xl border border-border px-3 text-[10px]"
+                              className="h-9 min-w-0 flex-1 rounded-md border border-border px-3 text-xs"
                               defaultValue={selectedDocument.title}
                               maxLength={160}
                               minLength={2}
@@ -891,7 +891,7 @@ function MicrodriveExplorer({
                               required
                             />
                             <button
-                              className="grid size-9 place-items-center rounded-xl border border-primary/25 text-primary"
+                              className="grid size-9 place-items-center rounded-md border border-primary/25 text-primary"
                               title="保存名称"
                               type="submit"
                             >
@@ -908,7 +908,7 @@ function MicrodriveExplorer({
                               value={selectedDocument.id}
                             />
                             <select
-                              className="h-9 min-w-0 flex-1 rounded-xl border border-border bg-white px-2 text-[10px]"
+                              className="h-9 min-w-0 flex-1 rounded-md border border-border bg-white px-2 text-xs"
                               defaultValue={selectedDocument.folder_id}
                               name="targetFolderId"
                             >
@@ -919,7 +919,7 @@ function MicrodriveExplorer({
                               ))}
                             </select>
                             <button
-                              className="grid size-9 place-items-center rounded-xl border border-primary/25 text-primary"
+                              className="grid size-9 place-items-center rounded-md border border-primary/25 text-primary"
                               title="移动文件"
                               type="submit"
                             >
@@ -933,7 +933,7 @@ function MicrodriveExplorer({
                               value={selectedDocument.id}
                             />
                             <button
-                              className="flex h-9 w-full items-center justify-center gap-2 rounded-xl border border-[#e8cbc5] text-[10px] text-[#a34e42]"
+                              className="flex h-9 w-full items-center justify-center gap-2 rounded-md border border-border text-xs text-foreground"
                               type="submit"
                             >
                               <Trash2 className="size-3.5" />
@@ -947,11 +947,11 @@ function MicrodriveExplorer({
               </div>
             ) : (
               <div className="flex min-h-[460px] flex-col items-center justify-center text-center">
-                <span className="grid size-12 place-items-center rounded-2xl bg-[#f2f5f6] text-muted-foreground">
+                <span className="grid size-12 place-items-center rounded-lg bg-muted text-muted-foreground">
                   <Info className="size-5" />
                 </span>
                 <h2 className="mt-4 text-xs font-medium">文件详情</h2>
-                <p className="mt-2 max-w-52 text-[10px] leading-5 text-muted-foreground">
+                <p className="mt-2 max-w-52 text-xs leading-5 text-muted-foreground">
                   在左侧文件列表中选择一个文件，即可查看详细信息和可用操作。
                 </p>
               </div>
@@ -974,9 +974,9 @@ function DriveDetail({ label, value }: { label: string; value: string }) {
 
 function LockedFolder({ folder }: { folder: DocumentFolder }) {
   return (
-    <section className="mx-auto mt-6 max-w-2xl rounded-[22px] border border-[#e8dfd1] bg-white p-6 sm:p-8">
+    <section className="mx-auto mt-6 max-w-2xl rounded-md border border-border bg-white p-6 sm:p-8">
       <div className="flex items-start gap-4">
-        <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-[#f6f1e9] text-[#8f7557]">
+        <span className="grid size-12 shrink-0 place-items-center rounded-lg bg-muted text-foreground">
           <FolderKey className="size-6" />
         </span>
         <div>
@@ -988,17 +988,17 @@ function LockedFolder({ folder }: { folder: DocumentFolder }) {
         </div>
       </div>
       {folder.pending_request_id ? (
-        <div className="mt-6 rounded-2xl bg-[#fff7e7] px-5 py-4 text-xs text-[#8b692d]">
+        <div className="mt-6 rounded-lg bg-muted px-5 py-4 text-xs text-foreground">
           <Clock3 className="mr-2 inline size-4" />
           该目录已有审批中的申请，无需重复提交。
         </div>
       ) : folder.is_requestable ? (
         <form action={requestDocumentFolderAccess} className="mt-6 space-y-4">
           <input name="folderId" type="hidden" value={folder.id} />
-          <label className="block text-[11px] text-muted-foreground">
+          <label className="block text-xs text-muted-foreground">
             申请原因
             <textarea
-              className="mt-1.5 min-h-24 w-full rounded-xl border border-border p-3 text-xs outline-none focus:border-primary/40"
+              className="mt-1.5 min-h-24 w-full rounded-md border border-border p-3 text-xs outline-none focus:border-primary/40"
               maxLength={1000}
               minLength={10}
               name="reason"
@@ -1006,19 +1006,19 @@ function LockedFolder({ folder }: { folder: DocumentFolder }) {
               required
             />
           </label>
-          <label className="block text-[11px] text-muted-foreground">
+          <label className="block text-xs text-muted-foreground">
             关联客户 / 项目 / 事项（可选）
             <input
-              className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs outline-none focus:border-primary/40"
+              className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs outline-none focus:border-primary/40"
               maxLength={500}
               name="relatedContext"
             />
           </label>
           <div className="grid gap-4 sm:grid-cols-2">
-            <label className="text-[11px] text-muted-foreground">
+            <label className="text-xs text-muted-foreground">
               申请时长
               <select
-                className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs"
+                className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs"
                 defaultValue="24"
                 name="durationHours"
               >
@@ -1029,10 +1029,10 @@ function LockedFolder({ folder }: { folder: DocumentFolder }) {
                 <option value="0">长期权限</option>
               </select>
             </label>
-            <label className="text-[11px] text-muted-foreground">
+            <label className="text-xs text-muted-foreground">
               紧急程度
               <select
-                className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs"
+                className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs"
                 defaultValue="normal"
                 name="urgency"
               >
@@ -1041,7 +1041,7 @@ function LockedFolder({ folder }: { folder: DocumentFolder }) {
               </select>
             </label>
           </div>
-          <label className="flex items-center gap-2 text-[11px]">
+          <label className="flex items-center gap-2 text-xs">
             <input
               className="accent-primary"
               defaultChecked
@@ -1051,7 +1051,7 @@ function LockedFolder({ folder }: { folder: DocumentFolder }) {
             同时申请下载权限
           </label>
           <button
-            className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary text-xs font-medium text-white"
+            className="flex h-11 w-full items-center justify-center gap-2 rounded-md bg-primary text-xs font-medium text-white"
             type="submit"
           >
             <ShieldCheck className="size-4" />
@@ -1059,7 +1059,7 @@ function LockedFolder({ folder }: { folder: DocumentFolder }) {
           </button>
         </form>
       ) : (
-        <div className="mt-6 rounded-2xl bg-muted px-5 py-4 text-xs text-muted-foreground">
+        <div className="mt-6 rounded-lg bg-muted px-5 py-4 text-xs text-muted-foreground">
           此目录不开放自助申请，请联系系统管理员。
         </div>
       )}
@@ -1093,7 +1093,7 @@ function DocumentList({
   uploadFolders: DocumentFolder[];
 }) {
   return (
-    <section className="overflow-hidden rounded-[20px] border border-border/75 bg-white">
+    <section className="overflow-hidden rounded-md border border-border/75 bg-white">
       <div className="border-b border-border/70 px-5 py-5 sm:px-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
@@ -1106,7 +1106,7 @@ function DocumentList({
                   archived: "回收站",
                 }[fileView]}
             </h2>
-            <p className="mt-1 text-[11px] text-muted-foreground">
+            <p className="mt-1 text-xs text-muted-foreground">
               {documents.length} 个文件 · 目录权限实时生效
             </p>
           </div>
@@ -1120,21 +1120,21 @@ function DocumentList({
             <label className="relative">
               <Search className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
               <input
-                className="h-9 w-52 rounded-xl border border-border bg-[#fafcfe] pl-9 pr-3 text-[10px] outline-none"
+                className="h-9 w-52 rounded-md border border-border bg-muted pl-9 pr-3 text-xs outline-none"
                 defaultValue={query}
                 name="q"
                 placeholder="搜索标题、编号或往来单位"
               />
             </label>
             <button
-              className="h-9 rounded-xl bg-primary px-3 text-[10px] text-white"
+              className="h-9 rounded-md bg-primary px-3 text-xs text-white"
               type="submit"
             >
               搜索
             </button>
           </form>
         </div>
-        <div className="mt-4 flex flex-wrap gap-2 text-[10px]">
+        <div className="mt-4 flex flex-wrap gap-2 text-xs">
           {(
             [
               ["all", "全部"],
@@ -1145,7 +1145,7 @@ function DocumentList({
             ] as const
           ).map(([value, label]) => (
             <Link
-              className={`rounded-full px-3 py-1.5 ${category === value ? "bg-primary text-white" : "bg-[#f2f5f4] text-muted-foreground"}`}
+              className={`rounded-md px-3 py-1.5 ${category === value ? "bg-primary text-white" : "bg-muted text-muted-foreground"}`}
               href={folderHref(selectedFolder?.id, {
                 ...(fileView === "all" ? {} : { view: fileView }),
                 ...(value === "all" ? {} : { category: value }),
@@ -1156,7 +1156,7 @@ function DocumentList({
             </Link>
           ))}
           <Link
-            className={`ml-auto rounded-full px-3 py-1.5 ${status === "archived" ? "bg-[#eee9e2] text-[#756657]" : "bg-[#f2f5f4] text-muted-foreground"}`}
+            className={`ml-auto rounded-md px-3 py-1.5 ${status === "archived" ? "bg-muted text-foreground" : "bg-muted text-muted-foreground"}`}
             href={
               status === "archived"
                 ? folderHref(selectedFolder?.id)
@@ -1168,7 +1168,7 @@ function DocumentList({
         </div>
       </div>
       {documentError ? (
-        <div className="px-6 py-16 text-center text-xs text-[#985846]">
+        <div className="px-6 py-16 text-center text-xs text-foreground">
           无法读取文件数据，请稍后重试。
         </div>
       ) : documents.length === 0 ? (
@@ -1190,7 +1190,7 @@ function DocumentList({
                 className="grid gap-3 py-4 lg:grid-cols-[44px_minmax(0,1fr)_180px_auto] lg:items-center"
                 key={document.id}
               >
-                <span className="grid size-11 place-items-center rounded-[14px] border border-border/70 bg-[#f6f9f7] text-primary">
+                <span className="grid size-11 place-items-center rounded-md border border-border/70 bg-muted text-primary">
                   <FileText className="size-5" />
                 </span>
                 <div className="min-w-0">
@@ -1198,22 +1198,22 @@ function DocumentList({
                     <h3 className="truncate text-[12px] font-semibold">
                       {document.title}
                     </h3>
-                    <span className="rounded-full bg-[#eef4f7] px-2 py-0.5 text-[9px] text-[#426c7b]">
+                    <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-foreground">
                       {categoryLabels[document.category]}
                     </span>
                   </div>
-                  <p className="mt-1.5 truncate text-[10px] text-muted-foreground">
+                  <p className="mt-1.5 truncate text-xs text-muted-foreground">
                     {document.document_no} · {document.original_file_name} ·{" "}
                     {displaySize(document.file_size)}
                   </p>
-                  <p className="mt-1 truncate text-[10px] text-muted-foreground">
+                  <p className="mt-1 truncate text-xs text-muted-foreground">
                     {customer?.name ||
                       document.related_party_name ||
                       document.reference_no ||
                       "未关联往来单位"}
                   </p>
                 </div>
-                <div className="text-[10px] leading-5 text-muted-foreground">
+                <div className="text-xs leading-5 text-muted-foreground">
                   <div>{folder?.name || "文件目录"}</div>
                   <div>
                     {uploader?.name || "未知上传人"} ·{" "}
@@ -1223,7 +1223,7 @@ function DocumentList({
                 <div className="flex items-start justify-end gap-2 lg:min-w-72">
                   {canDownload(document) && (
                     <Link
-                      className="inline-flex h-8 items-center gap-1.5 rounded-xl bg-primary px-3 text-[10px] text-white"
+                      className="inline-flex h-8 items-center gap-1.5 rounded-md bg-primary px-3 text-xs text-white"
                       href={`/documents/${document.id}/download`}
                     >
                       <Download className="size-3.5" />
@@ -1231,7 +1231,7 @@ function DocumentList({
                     </Link>
                   )}
                   {canArchive(document) && (
-                    <details className="group max-w-72 rounded-xl border border-border bg-white">
+                    <details className="group max-w-72 rounded-md border border-border bg-white">
                       <summary className="grid size-8 cursor-pointer list-none place-items-center text-muted-foreground [&::-webkit-details-marker]:hidden">
                         <MoreHorizontal className="size-4" />
                       </summary>
@@ -1244,7 +1244,7 @@ function DocumentList({
                               value={document.id}
                             />
                             <button
-                              className="flex h-9 w-full items-center justify-center gap-2 rounded-xl bg-primary text-[10px] text-white"
+                              className="flex h-9 w-full items-center justify-center gap-2 rounded-md bg-primary text-xs text-white"
                               type="submit"
                             >
                               <RotateCcw className="size-3.5" />
@@ -1262,11 +1262,11 @@ function DocumentList({
                                 type="hidden"
                                 value={document.id}
                               />
-                              <label className="text-[9px] text-muted-foreground">
+                              <label className="text-xs text-muted-foreground">
                                 重命名
                                 <span className="mt-1 flex gap-2">
                                   <input
-                                    className="h-9 min-w-0 flex-1 rounded-xl border border-border px-3 text-[10px]"
+                                    className="h-9 min-w-0 flex-1 rounded-md border border-border px-3 text-xs"
                                     defaultValue={document.title}
                                     maxLength={160}
                                     minLength={2}
@@ -1274,7 +1274,7 @@ function DocumentList({
                                     required
                                   />
                                   <button
-                                    className="grid size-9 place-items-center rounded-xl border border-primary/25 text-primary"
+                                    className="grid size-9 place-items-center rounded-md border border-primary/25 text-primary"
                                     title="保存名称"
                                     type="submit"
                                   >
@@ -1292,11 +1292,11 @@ function DocumentList({
                                 type="hidden"
                                 value={document.id}
                               />
-                              <label className="text-[9px] text-muted-foreground">
+                              <label className="text-xs text-muted-foreground">
                                 移动到
                                 <span className="mt-1 flex gap-2">
                                   <select
-                                    className="h-9 min-w-0 flex-1 rounded-xl border border-border bg-white px-2 text-[10px]"
+                                    className="h-9 min-w-0 flex-1 rounded-md border border-border bg-white px-2 text-xs"
                                     defaultValue={document.folder_id}
                                     name="targetFolderId"
                                   >
@@ -1307,7 +1307,7 @@ function DocumentList({
                                     ))}
                                   </select>
                                   <button
-                                    className="grid size-9 place-items-center rounded-xl border border-primary/25 text-primary"
+                                    className="grid size-9 place-items-center rounded-md border border-primary/25 text-primary"
                                     title="移动文件"
                                     type="submit"
                                   >
@@ -1323,7 +1323,7 @@ function DocumentList({
                                 value={document.id}
                               />
                               <button
-                                className="flex h-9 w-full items-center justify-center gap-2 rounded-xl border border-[#e8cbc5] text-[10px] text-[#a34e42]"
+                                className="flex h-9 w-full items-center justify-center gap-2 rounded-md border border-border text-xs text-foreground"
                                 type="submit"
                               >
                                 <Trash2 className="size-3.5" />
@@ -1358,7 +1358,7 @@ function UploadPanel({
     return (
       <section
         id="drive-upload"
-        className="scroll-mt-6 rounded-[20px] border border-border/75 bg-white p-6 text-xs text-muted-foreground"
+        className="scroll-mt-6 rounded-md border border-border/75 bg-white p-6 text-xs text-muted-foreground"
       >
         当前账号暂无可上传目录。可以进入锁定目录提交权限申请。
       </section>
@@ -1369,24 +1369,24 @@ function UploadPanel({
   return (
     <section
       id="drive-upload"
-      className="scroll-mt-6 rounded-[20px] border border-border/75 bg-white p-5 sm:p-6"
+      className="scroll-mt-6 rounded-md border border-border/75 bg-white p-5 sm:p-6"
     >
       <div className="flex items-start justify-between">
         <div>
           <h2 className="text-base font-semibold">上传到 NAS</h2>
-          <p className="mt-1 text-[11px] text-muted-foreground">
+          <p className="mt-1 text-xs text-muted-foreground">
             无需打开绿联软件，单文件最大 20MB
           </p>
         </div>
-        <span className="grid size-10 place-items-center rounded-xl bg-[#eaf3f8] text-primary">
+        <span className="grid size-10 place-items-center rounded-md bg-muted text-primary">
           <Upload className="size-5" />
         </span>
       </div>
       <form action={uploadBusinessDocument} className="mt-5 space-y-4">
-        <label className="block text-[10px] text-muted-foreground">
+        <label className="block text-xs text-muted-foreground">
           目标文件夹
           <select
-            className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs"
+            className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs"
             defaultValue={defaultFolder}
             name="folderId"
             required
@@ -1399,10 +1399,10 @@ function UploadPanel({
           </select>
         </label>
         <div className="grid grid-cols-2 gap-3">
-          <label className="text-[10px] text-muted-foreground">
+          <label className="text-xs text-muted-foreground">
             文件分类
             <select
-              className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs"
+              className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs"
               defaultValue="internal"
               name="category"
             >
@@ -1412,30 +1412,30 @@ function UploadPanel({
               <option value="supplier">供应商资料</option>
             </select>
           </label>
-          <label className="text-[10px] text-muted-foreground">
+          <label className="text-xs text-muted-foreground">
             文件编号
             <input
-              className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs"
+              className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs"
               maxLength={100}
               name="referenceNo"
             />
           </label>
         </div>
-        <label className="block text-[10px] text-muted-foreground">
+        <label className="block text-xs text-muted-foreground">
           文件标题
           <input
-            className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs"
+            className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs"
             maxLength={160}
             minLength={2}
             name="title"
             required
           />
         </label>
-        <label className="block text-[10px] text-muted-foreground">
+        <label className="block text-xs text-muted-foreground">
           选择文件
           <input
             accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx,.xls,.xlsx"
-            className="mt-1.5 block w-full rounded-xl border border-dashed border-primary/25 bg-[#f5faf7] p-3 text-[10px] file:mr-3 file:rounded-lg file:border-0 file:bg-primary file:px-3 file:py-2 file:text-[10px] file:text-white"
+            className="mt-1.5 block w-full rounded-md border border-dashed border-primary/25 bg-muted p-3 text-xs file:mr-3 file:rounded-lg file:border-0 file:bg-primary file:px-3 file:py-2 file:text-xs file:text-white"
             id="business-document-file"
             name="file"
             required
@@ -1443,10 +1443,10 @@ function UploadPanel({
           />
         </label>
         {customers.length > 0 && (
-          <label className="block text-[10px] text-muted-foreground">
+          <label className="block text-xs text-muted-foreground">
             关联客户（可选）
             <select
-              className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs"
+              className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs"
               name="customerId"
             >
               <option value="">不关联客户</option>
@@ -1458,25 +1458,25 @@ function UploadPanel({
             </select>
           </label>
         )}
-        <label className="block text-[10px] text-muted-foreground">
+        <label className="block text-xs text-muted-foreground">
           往来单位（可选）
           <input
-            className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs"
+            className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs"
             maxLength={160}
             name="relatedPartyName"
           />
         </label>
-        <label className="block text-[10px] text-muted-foreground">
+        <label className="block text-xs text-muted-foreground">
           备注说明
           <textarea
-            className="mt-1.5 min-h-20 w-full rounded-xl border border-border p-3 text-xs"
+            className="mt-1.5 min-h-20 w-full rounded-md border border-border p-3 text-xs"
             maxLength={500}
             name="description"
           />
         </label>
         <input name="visibility" type="hidden" value="department" />
         <button
-          className="flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-primary text-xs font-medium text-white"
+          className="flex h-10 w-full items-center justify-center gap-2 rounded-md bg-primary text-xs font-medium text-white"
           type="submit"
         >
           <ShieldCheck className="size-4" />
@@ -1491,7 +1491,7 @@ function CreateFolderPanel({ folder }: { folder: DocumentFolder }) {
   return (
     <section
       id="drive-new"
-      className="scroll-mt-6 rounded-[20px] border border-border/75 bg-white p-5 sm:p-6"
+      className="scroll-mt-6 rounded-md border border-border/75 bg-white p-5 sm:p-6"
     >
       <div className="flex items-center gap-2">
         <Plus className="size-4 text-primary" />
@@ -1500,7 +1500,7 @@ function CreateFolderPanel({ folder }: { folder: DocumentFolder }) {
       <form action={createDocumentFolder} className="mt-4 space-y-3">
         <input name="parentId" type="hidden" value={folder.id} />
         <input
-          className="h-10 w-full rounded-xl border border-border px-3 text-xs"
+          className="h-10 w-full rounded-md border border-border px-3 text-xs"
           maxLength={80}
           minLength={2}
           name="name"
@@ -1508,13 +1508,13 @@ function CreateFolderPanel({ folder }: { folder: DocumentFolder }) {
           required
         />
         <textarea
-          className="min-h-16 w-full rounded-xl border border-border p-3 text-xs"
+          className="min-h-16 w-full rounded-md border border-border p-3 text-xs"
           maxLength={500}
           name="description"
           placeholder="用途说明（可选）"
         />
         <select
-          className="h-10 w-full rounded-xl border border-border bg-white px-3 text-xs"
+          className="h-10 w-full rounded-md border border-border bg-white px-3 text-xs"
           defaultValue={folder.access_level}
           name="accessLevel"
         >
@@ -1527,7 +1527,7 @@ function CreateFolderPanel({ folder }: { folder: DocumentFolder }) {
             ))}
         </select>
         <button
-          className="h-10 w-full rounded-xl border border-primary/30 text-xs font-medium text-primary"
+          className="h-10 w-full rounded-md border border-primary/30 text-xs font-medium text-primary"
           type="submit"
         >
           创建文件夹
@@ -1547,12 +1547,12 @@ function AccessRequestList({
   requests: FolderAccessRequest[];
 }) {
   return (
-    <section className="mt-5 overflow-hidden rounded-[20px] border border-border/75 bg-white">
+    <section className="mt-5 overflow-hidden rounded-md border border-border/75 bg-white">
       <div className="border-b border-border/70 px-6 py-5">
         <h2 className="text-base font-semibold">
           {mode === "approvals" ? "待我审批的文件权限" : "我的文件权限申请"}
         </h2>
-        <p className="mt-1 text-[11px] text-muted-foreground">
+        <p className="mt-1 text-xs text-muted-foreground">
           审批通过后系统自动开放权限；到期后自动失效。
         </p>
       </div>
@@ -1577,27 +1577,27 @@ function AccessRequestList({
                       </h3>
                       {folder && (
                         <span
-                          className={`rounded-full px-2 py-0.5 text-[9px] ${levelTones[folder.access_level]}`}
+                          className={`rounded-full px-2 py-0.5 text-xs ${levelTones[folder.access_level]}`}
                         >
                           {levelLabels[folder.access_level]}
                         </span>
                       )}
-                      <span className="rounded-full bg-[#f1f3f4] px-2 py-0.5 text-[9px] text-muted-foreground">
+                      <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
                         {statusLabels[request.status]}
                       </span>
                       {access?.urgency === "urgent" && (
-                        <span className="rounded-full bg-[#fff0ed] px-2 py-0.5 text-[9px] text-[#a34e42]">
+                        <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-foreground">
                           紧急
                         </span>
                       )}
                     </div>
-                    <p className="mt-2 text-[11px] leading-5 text-muted-foreground">
+                    <p className="mt-2 text-xs leading-5 text-muted-foreground">
                       {request.request_no} · 申请人{" "}
                       {one(request.applicant)?.name || "未知"} ·{" "}
                       {displayDate(request.created_at)}
                     </p>
                     <p className="mt-2 text-xs">{access?.reason}</p>
-                    <p className="mt-1 text-[10px] text-muted-foreground">
+                    <p className="mt-1 text-xs text-muted-foreground">
                       权限：查看
                       {access?.requested_can_download ? " + 下载" : ""} · 时长：
                       {durationLabel(access?.duration_hours ?? 24)} · 审批进度{" "}
@@ -1621,7 +1621,7 @@ function AccessRequestList({
                       />
                       <div className="grid grid-cols-2 gap-2">
                         <select
-                          className="h-9 rounded-xl border border-border bg-white px-3 text-[10px]"
+                          className="h-9 rounded-md border border-border bg-white px-3 text-xs"
                           defaultValue={access?.duration_hours ?? 24}
                           name="durationHours"
                           title="批准时长（只能缩短）"
@@ -1644,7 +1644,7 @@ function AccessRequestList({
                               </option>
                             ))}
                         </select>
-                        <label className="flex h-9 items-center gap-2 rounded-xl border border-border px-3 text-[10px]">
+                        <label className="flex h-9 items-center gap-2 rounded-md border border-border px-3 text-xs">
                           <input
                             className="accent-primary"
                             defaultChecked={access?.requested_can_download}
@@ -1656,13 +1656,13 @@ function AccessRequestList({
                         </label>
                       </div>
                       <input
-                        className="h-9 rounded-xl border border-border px-3 text-[10px]"
+                        className="h-9 rounded-md border border-border px-3 text-xs"
                         name="opinion"
                         placeholder="审批意见（拒绝时必填）"
                       />
                       <div className="grid grid-cols-2 gap-2">
                         <button
-                          className="flex h-9 items-center justify-center gap-1 rounded-xl bg-primary text-[10px] text-white"
+                          className="flex h-9 items-center justify-center gap-1 rounded-md bg-primary text-xs text-white"
                           name="action"
                           type="submit"
                           value="approve"
@@ -1671,7 +1671,7 @@ function AccessRequestList({
                           同意
                         </button>
                         <button
-                          className="flex h-9 items-center justify-center gap-1 rounded-xl border border-[#e2bdb7] text-[10px] text-[#a34e42]"
+                          className="flex h-9 items-center justify-center gap-1 rounded-md border border-border text-xs text-foreground"
                           name="action"
                           type="submit"
                           value="reject"
@@ -1697,7 +1697,7 @@ function AccessRequestList({
                       />
                       <input name="opinion" type="hidden" value="申请人撤回" />
                       <button
-                        className="h-9 rounded-xl border border-border px-4 text-[10px] text-muted-foreground"
+                        className="h-9 rounded-md border border-border px-4 text-xs text-muted-foreground"
                         name="action"
                         type="submit"
                         value="withdraw"

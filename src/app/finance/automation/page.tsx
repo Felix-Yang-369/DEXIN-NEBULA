@@ -37,14 +37,14 @@ export default async function Page({
       breadcrumb="财务 / 业财自动化"
       currentUser={{ name: e.name, roleLabel: e.title ?? "内部员工" }}
     >
-      <main className="mx-auto max-w-[1400px] p-4 sm:p-6 xl:p-8">
+      <main className="mx-auto max-w-[1440px] p-4 sm:p-6 xl:p-8">
         <CapabilityHero
           eyebrow="BUSINESS · ACCOUNTING · TRACEABILITY"
           title="业财自动化"
           description="把应收、应付业务单据按可配置规则生成正式会计内核的凭证草稿，继续执行独立审核与过账。"
         />
         {(p.created || p.error) && (
-          <div className="mt-4 rounded-xl border p-3 text-[10px]">
+          <div className="mt-4 rounded-md border p-3 text-xs">
             {p.error ?? p.created}
           </div>
         )}
@@ -54,10 +54,10 @@ export default async function Page({
             const c = Array.isArray(x.credit) ? x.credit[0] : x.credit;
             return (
               <article
-                className="rounded-[18px] border border-border bg-white p-5"
+                className="rounded-md border border-border bg-white p-5"
                 key={x.id}
               >
-                <div className="text-[9px] text-muted-foreground">
+                <div className="text-xs text-muted-foreground">
                   {x.source_type === "receivable" ? "应收确认" : "采购应付"}
                 </div>
                 <div className="mt-2 text-xs font-semibold">
@@ -66,7 +66,7 @@ export default async function Page({
                 <div className="mt-1 text-xs font-semibold">
                   贷 {c?.code} {c?.name}
                 </div>
-                <div className="mt-2 text-[9px] text-muted-foreground">
+                <div className="mt-2 text-xs text-muted-foreground">
                   {x.summary_template}
                 </div>
               </article>
@@ -103,7 +103,7 @@ export default async function Page({
               action: (
                 <form action={generateBusinessJournalAction}>
                   <input name="documentId" type="hidden" value={x.id} />
-                  <button className="rounded-lg bg-primary px-3 py-2 text-[9px] text-white">
+                  <button className="rounded-lg bg-primary px-3 py-2 text-xs text-white">
                     生成凭证草稿
                   </button>
                 </form>
@@ -123,7 +123,7 @@ export default async function Page({
               : x.journal_entries;
             return (
               <Link
-                className="flex justify-between rounded-xl border border-border bg-white p-4 text-[10px]"
+                className="flex justify-between rounded-md border border-border bg-white p-4 text-xs"
                 href={
                   j
                     ? `/finance/accounting/entries/${j.id}`

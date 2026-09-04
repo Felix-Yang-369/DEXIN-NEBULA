@@ -13,8 +13,8 @@ import {
 import { createClient } from "@/lib/supabase/server";
 export const metadata: Metadata = { title: "采购控制塔" };
 export const dynamic = "force-dynamic";
-const input = "h-9 rounded-xl border border-border bg-white px-3 text-[10px]";
-const card = "rounded-[20px] border border-border bg-white p-5";
+const input = "h-9 rounded-md border border-border bg-white px-3 text-xs";
+const card = "rounded-md border border-border bg-white p-5";
 const one = <T,>(v: T | T[] | null) => (Array.isArray(v) ? (v[0] ?? null) : v);
 export default async function Page({
   searchParams,
@@ -88,7 +88,7 @@ export default async function Page({
       breadcrumb="供应链 / 采购 / 控制塔"
       currentUser={{ name: e.name, roleLabel: e.title ?? "内部员工" }}
     >
-      <main className="mx-auto max-w-[1400px] p-4 sm:p-6 xl:p-8">
+      <main className="mx-auto max-w-[1440px] p-4 sm:p-6 xl:p-8">
         <CapabilityHero
           eyebrow="RFQ · QUALITY · THREE-WAY MATCH"
           title="采购控制塔"
@@ -114,15 +114,15 @@ export default async function Page({
                 ))}
               </select>
               <input className={input} name="dueAt" type="datetime-local" />
-              <div className="max-h-32 overflow-auto rounded-xl border border-border p-2">
+              <div className="max-h-32 overflow-auto rounded-md border border-border p-2">
                 {(sup ?? []).map((x) => (
-                  <label className="flex gap-2 p-1 text-[10px]" key={x.id}>
+                  <label className="flex gap-2 p-1 text-xs" key={x.id}>
                     <input name="supplierIds" type="checkbox" value={x.id} />
                     {x.name}
                   </label>
                 ))}
               </div>
-              <button className="h-9 rounded-xl bg-primary text-[10px] text-white">
+              <button className="h-9 rounded-md bg-primary text-xs text-white">
                 创建询价单
               </button>
             </form>
@@ -154,7 +154,7 @@ export default async function Page({
                 required
               />
               <input className={input} name="reason" placeholder="不合格原因" />
-              <button className="h-9 rounded-xl bg-primary text-[10px] text-white">
+              <button className="h-9 rounded-md bg-primary text-xs text-white">
                 提交质检结果
               </button>
             </form>
@@ -165,7 +165,7 @@ export default async function Page({
               {unmatched.map((x) => (
                 <form
                   action={matchProcurementAction}
-                  className="flex items-center justify-between rounded-xl border border-border p-3 text-[10px]"
+                  className="flex items-center justify-between rounded-md border border-border p-3 text-xs"
                   key={x.id}
                 >
                   <input name="documentId" type="hidden" value={x.id} />
@@ -175,7 +175,7 @@ export default async function Page({
                       {x.counterparty_name}
                     </small>
                   </span>
-                  <button className="rounded-lg bg-[#e5f4f3] px-3 py-2 text-primary">
+                  <button className="rounded-lg bg-muted px-3 py-2 text-primary">
                     执行匹配
                   </button>
                 </form>
@@ -194,7 +194,7 @@ export default async function Page({
                 return (
                   <form
                     action={completePurchaseReturnAction}
-                    className="flex flex-wrap items-center gap-2 rounded-xl border border-border p-3 text-[10px]"
+                    className="flex flex-wrap items-center gap-2 rounded-md border border-border p-3 text-xs"
                     key={row.id}
                   >
                     <input name="inspectionId" type="hidden" value={row.id} />
@@ -208,7 +208,7 @@ export default async function Page({
                       name="reason"
                       required
                     />
-                    <button className="h-9 rounded-xl bg-[#9c4f55] px-3 text-[9px] text-white">
+                    <button className="h-9 rounded-md bg-primary px-3 text-xs text-white">
                       完成退货
                     </button>
                   </form>
@@ -229,7 +229,7 @@ export default async function Page({
             rfq: (
               <div>
                 <b>{x.rfq_no}</b>
-                <div className="text-[9px] text-muted-foreground">
+                <div className="text-xs text-muted-foreground">
                   {x.title}
                 </div>
               </div>
@@ -267,7 +267,7 @@ export default async function Page({
                     />
                     <input name="paymentTerms" type="hidden" />
                     <input name="note" type="hidden" />
-                    <button className="rounded-lg bg-primary px-3 text-[9px] text-white">
+                    <button className="rounded-lg bg-primary px-3 text-xs text-white">
                       保存
                     </button>
                   </form>
@@ -287,7 +287,7 @@ export default async function Page({
 function Feedback({ p }: { p: { created?: string; error?: string } }) {
   return p.created || p.error ? (
     <div
-      className={`mt-4 rounded-xl border p-3 text-[10px] ${p.error ? "border-red-200 bg-red-50 text-red-700" : "border-emerald-200 bg-emerald-50 text-emerald-700"}`}
+      className={`mt-4 rounded-md border p-3 text-xs ${p.error ? "border-red-200 bg-red-50 text-red-700" : "border-emerald-200 bg-emerald-50 text-emerald-700"}`}
     >
       {p.error ?? p.created}
     </div>

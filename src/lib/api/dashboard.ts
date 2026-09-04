@@ -61,7 +61,7 @@ function salesReadModel(orders: SalesOrderRow[], items: SalesOrderItemRow[]) {
   const yesterdayRows = validOrders.filter((order) => order.order_date === yesterday);
   const todaySales = todayRows.reduce((sum, row) => sum + Number(row.total_cny), 0);
   const yesterdaySales = yesterdayRows.reduce((sum, row) => sum + Number(row.total_cny), 0);
-  const channels = [{ key: "retail", name: "零售价订单", color: "#087D67" }, { key: "group", name: "团购价订单", color: "#4FA58C" }, { key: "dropship", name: "代发价订单", color: "#96C8B7" }];
+  const channels = [{ key: "retail", name: "零售价订单", color: "var(--chart-1)" }, { key: "group", name: "团购价订单", color: "var(--chart-3)" }, { key: "dropship", name: "代发价订单", color: "var(--chart-4)" }];
   const totalOrders = Math.max(1, validOrders.length);
   const businessSource = channels.map((channel) => ({ name: channel.name, value: Number((validOrders.filter((order) => order.price_type === channel.key).length / totalOrders * 100).toFixed(1)), color: channel.color })).filter((item) => item.value > 0);
   const productTotals = new Map<string, number>();

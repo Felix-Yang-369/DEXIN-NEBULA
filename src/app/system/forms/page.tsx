@@ -33,7 +33,7 @@ export default async function Page({
       breadcrumb="系统 / 表单设计器"
       currentUser={{ name: e.name, roleLabel: e.title ?? "内部员工" }}
     >
-      <main className="mx-auto max-w-[1300px] p-4 sm:p-6 xl:p-8">
+      <main className="mx-auto max-w-[1200px] p-4 sm:p-6 xl:p-8">
         <CapabilityHero
           eyebrow="FORM · VERSION · WORKFLOW"
           title="表单设计器"
@@ -41,46 +41,46 @@ export default async function Page({
           icon={PanelsTopLeft}
         />
         {(p.created || p.error) && (
-          <div className="mt-4 rounded-xl border p-3 text-[10px]">
+          <div className="mt-4 rounded-md border p-3 text-xs">
             {p.error ? "保存失败，请检查字段定义和权限。" : "表单已保存。"}
           </div>
         )}
         <div className="mt-5 grid gap-5 xl:grid-cols-[420px_1fr]">
           <form
             action={saveFormDefinitionAction}
-            className="grid gap-3 rounded-[20px] border border-border bg-white p-5"
+            className="grid gap-3 rounded-md border border-border bg-white p-5"
           >
             <h2 className="text-sm font-semibold">创建表单</h2>
             <input
-              className="h-9 rounded-xl border px-3 text-[10px]"
+              className="h-9 rounded-md border px-3 text-xs"
               name="code"
               placeholder="form_code"
               required
             />
             <input
-              className="h-9 rounded-xl border px-3 text-[10px]"
+              className="h-9 rounded-md border px-3 text-xs"
               name="name"
               placeholder="表单名称"
               required
             />
             <input
-              className="h-9 rounded-xl border px-3 text-[10px]"
+              className="h-9 rounded-md border px-3 text-xs"
               name="description"
               placeholder="用途说明"
             />
             <select
-              className="h-9 rounded-xl border bg-white px-3 text-[10px]"
+              className="h-9 rounded-md border bg-white px-3 text-xs"
               name="status"
             >
               <option value="draft">草稿</option>
               <option value="published">发布</option>
             </select>
             <textarea
-              className="min-h-72 rounded-xl border p-3 font-mono text-[9px]"
+              className="min-h-72 rounded-md border p-3 font-mono text-xs"
               defaultValue={sample}
               name="schema"
             />
-            <button className="h-9 rounded-xl bg-primary text-[10px] text-white">
+            <button className="h-9 rounded-md bg-primary text-xs text-white">
               保存表单
             </button>
           </form>
@@ -96,7 +96,7 @@ export default async function Page({
               form: (
                 <div>
                   <b>{x.name}</b>
-                  <div className="font-mono text-[9px] text-muted-foreground">
+                  <div className="font-mono text-xs text-muted-foreground">
                     {x.code}
                   </div>
                 </div>

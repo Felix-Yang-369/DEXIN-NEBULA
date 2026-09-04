@@ -105,11 +105,11 @@ export function QuoteBuilder({
 
       <div className="grid gap-4 md:grid-cols-3">
         <label className="space-y-2 md:col-span-2">
-          <span className="text-[11px] font-medium text-[#526b7e]">
+          <span className="text-xs font-medium text-foreground">
             报价客户
           </span>
           <select
-            className="h-11 w-full rounded-xl border border-[#dbe6ed] bg-[#fbfcfe] px-3 text-xs outline-none transition focus:border-[#0d7580]/40 focus:bg-white focus:ring-4 focus:ring-[#0d7580]/7"
+            className="h-11 w-full rounded-md border border-border bg-muted px-3 text-xs outline-none transition focus:border-border focus:bg-white focus:ring-4 focus:ring-ring/20"
             name="customerId"
             required
           >
@@ -122,11 +122,11 @@ export function QuoteBuilder({
           </select>
         </label>
         <label className="space-y-2">
-          <span className="text-[11px] font-medium text-[#526b7e]">
+          <span className="text-xs font-medium text-foreground">
             报价有效期
           </span>
           <input
-            className="h-11 w-full rounded-xl border border-[#dbe6ed] bg-[#fbfcfe] px-3 text-xs outline-none transition focus:border-[#0d7580]/40 focus:bg-white focus:ring-4 focus:ring-[#0d7580]/7"
+            className="h-11 w-full rounded-md border border-border bg-muted px-3 text-xs outline-none transition focus:border-border focus:bg-white focus:ring-4 focus:ring-ring/20"
             defaultValue={validUntilValue}
             name="validUntil"
             required
@@ -136,16 +136,16 @@ export function QuoteBuilder({
       </div>
 
       <div>
-        <div className="mb-2 text-[11px] font-medium text-[#526b7e]">
+        <div className="mb-2 text-xs font-medium text-foreground">
           价格口径
         </div>
         <div className="grid gap-2 sm:grid-cols-3">
           {(Object.keys(priceTypeLabels) as QuotePriceType[]).map((type) => (
             <label
-              className={`cursor-pointer rounded-xl border px-4 py-3 transition ${
+              className={`cursor-pointer rounded-md border px-4 py-3 transition ${
                 priceType === type
-                  ? "border-[#18816d]/25 bg-[#edf8f3] text-[#0b6f5d] shadow-[inset_0_0_0_1px_rgba(24,129,109,.04)]"
-                  : "border-[#e2e9e6] bg-white text-[#6c7d77] hover:bg-[#f8fafc]"
+                  ? "border-border bg-muted text-foreground "
+                  : "border-border bg-white text-foreground hover:bg-muted"
               }`}
               key={type}
             >
@@ -158,7 +158,7 @@ export function QuoteBuilder({
                 value={type}
               />
               <span className="text-xs font-medium">{priceTypeLabels[type]}</span>
-              <span className="mt-1 block text-[9px] opacity-65">
+              <span className="mt-1 block text-xs opacity-65">
                 {availableProducts.length} 个产品已配置
               </span>
             </label>
@@ -166,16 +166,16 @@ export function QuoteBuilder({
         </div>
       </div>
 
-      <section className="overflow-hidden rounded-[18px] border border-[#e2ebe7]">
-        <div className="flex items-center justify-between border-b border-[#e7eef3] bg-[#f8fbf9] px-4 py-3">
+      <section className="overflow-hidden rounded-md border border-border">
+        <div className="flex items-center justify-between border-b border-border bg-muted px-4 py-3">
           <div>
             <h3 className="text-xs font-semibold">报价商品</h3>
-            <p className="mt-1 text-[9px] text-[#899690]">
+            <p className="mt-1 text-xs text-foreground">
               单价由产品中心当前有效价格自动带入，保存时由服务端再次核验
             </p>
           </div>
           <button
-            className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#dbe6ed] bg-white px-3 text-[10px] font-medium text-[#146f5f] transition hover:border-[#19806c]/30 hover:bg-[#f2f9f6]"
+            className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-border bg-white px-3 text-xs font-medium text-foreground transition hover:border-border hover:bg-muted"
             onClick={addLine}
             type="button"
           >
@@ -184,7 +184,7 @@ export function QuoteBuilder({
           </button>
         </div>
 
-        <div className="divide-y divide-[#eaf0f4]">
+        <div className="divide-y divide-border">
           {lines.map((line, index) => {
             const product = products.find(
               (item) => item.id === line.productId,
@@ -195,12 +195,12 @@ export function QuoteBuilder({
                 className="grid gap-3 px-4 py-4 sm:grid-cols-[28px_minmax(0,1fr)_100px_110px_34px] sm:items-center"
                 key={line.key}
               >
-                <span className="grid size-7 place-items-center rounded-lg bg-[#eef4f1] text-[10px] font-semibold text-[#58716a]">
+                <span className="grid size-7 place-items-center rounded-lg bg-muted text-xs font-semibold text-foreground">
                   {index + 1}
                 </span>
                 <select
                   aria-label={`第 ${index + 1} 行商品`}
-                  className="h-10 min-w-0 rounded-xl border border-[#dbe6ed] bg-white px-3 text-[11px] outline-none focus:border-[#0d7580]/40"
+                  className="h-10 min-w-0 rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-border"
                   onChange={(event) =>
                     updateLine(line.key, { productId: event.target.value })
                   }
@@ -221,7 +221,7 @@ export function QuoteBuilder({
                   <span className="sr-only">数量</span>
                   <input
                     aria-label={`第 ${index + 1} 行数量`}
-                    className="h-10 w-full rounded-xl border border-[#dbe6ed] bg-white px-3 text-right text-[11px] tabular-nums outline-none focus:border-[#0d7580]/40"
+                    className="h-10 w-full rounded-md border border-border bg-white px-3 text-right text-xs tabular-nums outline-none focus:border-border"
                     min="0.01"
                     onChange={(event) =>
                       updateLine(line.key, {
@@ -235,16 +235,16 @@ export function QuoteBuilder({
                   />
                 </label>
                 <div className="text-right">
-                  <div className="text-[9px] text-[#8293a1]">
+                  <div className="text-xs text-foreground">
                     {money(unitPrice)} / 件
                   </div>
-                  <div className="mt-1 text-[11px] font-semibold tabular-nums text-[#263d36]">
+                  <div className="mt-1 text-xs font-semibold tabular-nums text-foreground">
                     {money(unitPrice * line.quantity)}
                   </div>
                 </div>
                 <button
                   aria-label={`删除第 ${index + 1} 行`}
-                  className="grid size-8 place-items-center rounded-lg text-[#a08882] transition hover:bg-[#fff1ef] hover:text-[#c25e54]"
+                  className="grid size-8 place-items-center rounded-lg text-foreground transition hover:bg-muted hover:text-foreground"
                   onClick={() => removeLine(line.key)}
                   type="button"
                 >
@@ -258,21 +258,21 @@ export function QuoteBuilder({
 
       <div className="grid gap-4 md:grid-cols-2">
         <label className="space-y-2">
-          <span className="text-[11px] font-medium text-[#526b7e]">
+          <span className="text-xs font-medium text-foreground">
             付款约定
           </span>
           <input
-            className="h-11 w-full rounded-xl border border-[#dbe6ed] bg-[#fbfcfe] px-3 text-xs outline-none focus:border-[#0d7580]/40"
+            className="h-11 w-full rounded-md border border-border bg-muted px-3 text-xs outline-none focus:border-border"
             name="paymentTerms"
             placeholder="例如：款到发货、月结 30 天"
           />
         </label>
         <label className="space-y-2">
-          <span className="text-[11px] font-medium text-[#526b7e]">
+          <span className="text-xs font-medium text-foreground">
             交付约定
           </span>
           <input
-            className="h-11 w-full rounded-xl border border-[#dbe6ed] bg-[#fbfcfe] px-3 text-xs outline-none focus:border-[#0d7580]/40"
+            className="h-11 w-full rounded-md border border-border bg-muted px-3 text-xs outline-none focus:border-border"
             name="deliveryTerms"
             placeholder="例如：长沙市内配送、运费另计"
           />
@@ -280,21 +280,21 @@ export function QuoteBuilder({
       </div>
 
       <label className="block space-y-2">
-        <span className="text-[11px] font-medium text-[#526b7e]">内部备注</span>
+        <span className="text-xs font-medium text-foreground">内部备注</span>
         <textarea
-          className="min-h-20 w-full resize-y rounded-xl border border-[#dbe6ed] bg-[#fbfcfe] px-3 py-3 text-xs outline-none focus:border-[#0d7580]/40"
+          className="min-h-20 w-full resize-y rounded-md border border-border bg-muted px-3 py-3 text-xs outline-none focus:border-border"
           name="note"
           placeholder="仅内部可见，不作为正式报价条款"
         />
       </label>
 
-      <div className="flex flex-col gap-4 rounded-[18px] bg-[#113e37] px-5 py-4 text-white sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 rounded-md bg-primary px-5 py-4 text-white sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <span className="grid size-10 place-items-center rounded-xl bg-white/10 text-[#9bd9c3]">
+          <span className="grid size-10 place-items-center rounded-md bg-white/10 text-muted-foreground">
             <PackageSearch className="size-4.5" />
           </span>
           <div>
-            <div className="text-[9px] uppercase tracking-[0.16em] text-white/45">
+            <div className="text-xs uppercase tracking-[0.16em] text-white/45">
               Quotation Total
             </div>
             <div className="mt-1 text-xl font-semibold tracking-[-0.03em]">
@@ -303,7 +303,7 @@ export function QuoteBuilder({
           </div>
         </div>
         <button
-          className="h-10 rounded-xl bg-white px-5 text-xs font-semibold text-[#0b5a4d] shadow-[0_8px_20px_rgba(0,0,0,.14)] transition hover:-translate-y-0.5 hover:bg-[#eff9f5]"
+          className="h-10 rounded-md bg-white px-5 text-xs font-semibold text-foreground  transition  hover:bg-muted"
           disabled={!customers.length || !availableProducts.length}
           type="submit"
         >

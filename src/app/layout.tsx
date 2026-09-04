@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { FloatingAiAssistant } from "@/features/ai/floating-ai-assistant";
+import { FloatingAiAssistantTrigger } from "@/features/ai/floating-ai-assistant-trigger";
 import { PwaRegistration } from "@/components/pwa-registration";
+import { ToastProvider } from "@/components/ui/toast";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -25,9 +26,13 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body>
-        <PwaRegistration />
-        {children}
-        <FloatingAiAssistant configured={Boolean(process.env.DEEPSEEK_API_KEY)} />
+        <ToastProvider>
+          <PwaRegistration />
+          {children}
+          <FloatingAiAssistantTrigger
+            configured={Boolean(process.env.DEEPSEEK_API_KEY)}
+          />
+        </ToastProvider>
       </body>
     </html>
   );

@@ -10,6 +10,11 @@ This page tracks capabilities already present in the deployed internal alpha but
 - Controlled employee role assignment with confirmation, protection of critical roles, and audit.
 - Private document storage through server-authorized access, with relational metadata and download audit.
 - Database-filtered global search with broader permission-aware result types and identifier-first ranking.
+- Consolidated authenticated application bootstrap data for identity, authorization, workspace preferences, and shell counters.
+- Compact 232px/64px navigation with one-group accordion behavior and interaction-driven route prefetching.
+- Lazy-loaded floating AI assistant with a transparent lightweight 3D avatar and a single-avatar resting state.
+- Server-side customer pagination and bounded product, inventory, and finance initial queries.
+- Targeted hot-path RLS policy consolidation and employee/customer-follow-up indexes.
 
 ## Engineering Validation
 

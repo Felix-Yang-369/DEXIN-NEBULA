@@ -36,8 +36,8 @@ export default async function Page({
       currentUser={{ name: e.name, roleLabel: e.title ?? "内部员工" }}
     >
       <main className="mx-auto max-w-2xl p-4 sm:p-6 xl:p-8">
-        <section className="rounded-[22px] border border-border bg-white p-6 sm:p-8">
-          <div className="text-[9px] tracking-[.14em] text-primary">
+        <section className="rounded-md border border-border bg-white p-6 sm:p-8">
+          <div className="text-xs tracking-[.14em] text-primary">
             FORM · V{data.version}
           </div>
           <h1 className="mt-2 text-xl font-semibold">{data.name}</h1>
@@ -45,7 +45,7 @@ export default async function Page({
             {data.description}
           </p>
           {(feedback.submitted || feedback.error) && (
-            <div className="my-4 rounded-xl border p-3 text-[10px]">
+            <div className="my-4 rounded-md border p-3 text-xs">
               {feedback.error ? "提交失败，请检查必填字段。" : "表单已提交。"}
             </div>
           )}

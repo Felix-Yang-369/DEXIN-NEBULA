@@ -213,21 +213,21 @@ function MetricCard({
   tone: string;
 }) {
   return (
-    <article className="group relative overflow-hidden rounded-[22px] border border-white/80 bg-white/72 p-5 shadow-[0_18px_46px_-30px_rgba(9,57,91,.45)] backdrop-blur-xl transition duration-300 hover:-translate-y-0.5 hover:border-white hover:bg-white/82 hover:shadow-[0_22px_52px_-30px_rgba(9,57,91,.58)]">
-      <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-[#6bd7d4]/70 to-transparent" />
-      <div className="pointer-events-none absolute -right-8 -top-10 size-28 rounded-full bg-[#dff5f4]/55 blur-3xl transition group-hover:bg-[#dff5f4]/80" />
+    <article className="group relative overflow-hidden rounded-md border border-white/80 bg-white/72 p-5  backdrop-blur-xl transition duration-300  hover:border-white hover:bg-white/82 ">
+      <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-card  /70 " />
+      <div className="pointer-events-none absolute -right-8 -top-10 size-28 rounded-full bg-muted blur-3xl transition group-hover:bg-muted" />
       <div className="flex items-start justify-between gap-3">
         <div className="relative">
-          <div className="text-[11px] font-medium text-[#5f7487]">{label}</div>
-          <div className="mt-3 text-[28px] font-semibold tracking-[-0.045em] text-[#122c46]">
+          <div className="text-xs font-medium text-foreground">{label}</div>
+          <div className="mt-3 text-[28px] font-semibold tracking-[-0.045em] text-foreground">
             {value}
           </div>
         </div>
-        <div className={`relative grid size-10 place-items-center rounded-[14px] shadow-sm ring-1 ring-white/80 ${tone}`}>
+        <div className={`relative grid size-10 place-items-center rounded-md  ring-1 ring-white/80 ${tone}`}>
           {icon}
         </div>
       </div>
-      <div className="relative mt-4 border-t border-[#dce6ed]/75 pt-3 text-[10px] text-[#718497]">
+      <div className="relative mt-4 border-t border-border pt-3 text-xs text-foreground">
         {note}
       </div>
     </article>
@@ -272,19 +272,11 @@ export default async function InventoryPage({
   let movements: MovementRow[] = [];
   let batches: BatchRow[] = [];
   let latestImport: ImportRow | null = null;
-  let departmentCode: string | null = null;
+  const departmentCode = employee?.departmentCode ?? null;
   let dataAvailable = !configured;
 
   if (employee) {
     const supabase = await createClient();
-    if (employee.departmentId) {
-      const { data: department } = await supabase
-        .from("departments")
-        .select("code")
-        .eq("id", employee.departmentId)
-        .maybeSingle();
-      departmentCode = department?.code ?? null;
-    }
 
     const [warehouseResult, inventoryResult, movementResult, batchResult, importResult] =
       await Promise.all([
@@ -299,30 +291,37 @@ export default async function InventoryPage({
           .select(
             "id, warehouse_id, product_id, sku, product_name, specification, unit, category, barcode, case_specification, location_code, quantity, available_quantity, reserved_quantity, quarantined_quantity, safety_stock, last_imported_at, status, warehouses(name, code)",
           )
-          .order("product_name"),
-        supabase
-          .from("inventory_movements")
-          .select(
-            "id, movement_no, movement_type, quantity, before_quantity, after_quantity, reference_no, created_at, inventory_items(product_name, sku, unit), warehouses(name)",
-          )
-          .order("created_at", { ascending: false })
-          .limit(30),
-        supabase
-          .from("inventory_batches")
-          .select(
-            "id, lot_key, source_row_no, production_date, shelf_life_months, expiry_date, quantity, reserved_quantity, status, note, inventory_items(product_name, sku, specification, unit), warehouses(name)",
-          )
-          .order("expiry_date", { ascending: true, nullsFirst: false })
-          .limit(180),
-        supabase
-          .from("inventory_imports")
-          .select(
-            "id, source_file_name, source_sheet_name, total_rows, positive_rows, total_quantity, matched_product_rows, unmatched_product_rows, missing_production_date_rows, missing_shelf_life_rows, missing_barcode_rows, imported_at, metadata",
-          )
-          .eq("status", "completed")
-          .order("imported_at", { ascending: false })
-          .limit(1)
-          .maybeSingle(),
+          .order("product_name")
+          .limit(50),
+        view === "movements"
+          ? supabase
+              .from("inventory_movements")
+              .select(
+                "id, movement_no, movement_type, quantity, before_quantity, after_quantity, reference_no, created_at, inventory_items(product_name, sku, unit), warehouses(name)",
+              )
+              .order("created_at", { ascending: false })
+              .limit(50)
+          : Promise.resolve({ data: [], error: null }),
+        view === "batches"
+          ? supabase
+              .from("inventory_batches")
+              .select(
+                "id, lot_key, source_row_no, production_date, shelf_life_months, expiry_date, quantity, reserved_quantity, status, note, inventory_items(product_name, sku, specification, unit), warehouses(name)",
+              )
+              .order("expiry_date", { ascending: true, nullsFirst: false })
+              .limit(50)
+          : Promise.resolve({ data: [], error: null }),
+        view === "batches"
+          ? supabase
+              .from("inventory_imports")
+              .select(
+                "id, source_file_name, source_sheet_name, total_rows, positive_rows, total_quantity, matched_product_rows, unmatched_product_rows, missing_production_date_rows, missing_shelf_life_rows, missing_barcode_rows, imported_at, metadata",
+              )
+              .eq("status", "completed")
+              .order("imported_at", { ascending: false })
+              .limit(1)
+              .maybeSingle()
+          : Promise.resolve({ data: null, error: null }),
       ]);
 
     dataAvailable =
@@ -407,35 +406,27 @@ export default async function InventoryPage({
           : undefined
       }
     >
-      <main className="relative isolate mx-auto max-w-[1600px] overflow-hidden p-4 sm:p-6 xl:p-8">
-        <div className="mb-4 flex justify-end"><Link className="rounded-xl bg-[#0a385d] px-4 py-2 text-[10px] text-white" href="/inventory/control">进入精细库存控制</Link></div>
-        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_12%_4%,rgba(24,175,179,.12),transparent_28%),radial-gradient(circle_at_88%_16%,rgba(57,127,192,.11),transparent_30%),linear-gradient(180deg,#f4f9fc_0%,#f7f9fb_48%,#f5f8fb_100%)]" />
-        <section className="relative overflow-hidden rounded-[26px] border border-white/12 bg-[radial-gradient(circle_at_78%_18%,rgba(24,175,179,.28),transparent_26%),linear-gradient(135deg,#071d34_0%,#0a2d4e_52%,#0c5263_100%)] px-6 py-7 text-white shadow-[0_24px_70px_-38px_rgba(6,24,44,.9)] sm:px-8 lg:px-10">
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.035)_1px,transparent_1px)] bg-[size:42px_42px] [mask-image:linear-gradient(to_right,transparent,black_55%,black)]" />
-          <div className="absolute -right-16 -top-28 size-80 rounded-full border border-white/10" />
-          <div className="absolute right-24 top-14 size-28 rounded-full border border-[#6bd7d4]/20" />
-          <div className="absolute right-[18%] top-1/2 h-px w-44 -rotate-12 bg-gradient-to-r from-transparent via-[#6bd7d4]/45 to-transparent" />
-          <Warehouse className="pointer-events-none absolute right-12 top-1/2 hidden size-40 -translate-y-1/2 text-[#6bd7d4]/10 sm:block" />
+      <main className="relative isolate mx-auto max-w-[1440px] overflow-hidden p-4 sm:p-6 xl:p-8">
+        <div className="mb-4 flex justify-end"><Link className="rounded-md bg-primary px-4 py-2 text-xs text-white" href="/inventory/control">进入精细库存控制</Link></div>
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-card" />
+        <section className="ui-page-header">
           <div className="relative flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
             <div>
-              <div className="text-xs font-medium tracking-[0.14em] text-[#6bd7d4]">
-                WMS · WAREHOUSE MANAGEMENT SYSTEM
-              </div>
-              <h1 className="mt-3 text-2xl font-semibold tracking-[-0.035em] sm:text-[30px]">
+              <h1>
                 仓储库存中心
               </h1>
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-white/65">
+              <p className="mt-2 max-w-2xl">
                 统一管理自有与第三方仓库存，区分物理、可用和隔离数量，并通过批次效期与先到期先出规则保障食品仓储安全。
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3 self-start lg:self-auto">
-              <div className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-[11px] text-white/78 shadow-[inset_0_1px_0_rgba(255,255,255,.08)] backdrop-blur-xl">
+              <div className="inline-flex items-center gap-2 rounded-md border border-border bg-white px-4 py-2 text-xs text-muted-foreground">
                 <ShieldCheck className="size-4" />
                 {canManage ? "仓储操作权限已启用" : "库存查询视图"}
               </div>
               {canExport && (
                 <Link
-                  className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#6bd7d4] to-[#8be4df] px-4 py-3 text-[11px] font-semibold text-[#08253d] shadow-[0_10px_28px_-16px_rgba(107,215,212,.9)] transition hover:-translate-y-0.5 hover:from-[#80e0dc] hover:to-[#a0ebe6]"
+                  className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/85"
                   href="/inventory/export"
                   prefetch={false}
                 >
@@ -448,17 +439,17 @@ export default async function InventoryPage({
         </section>
 
         {!dataAvailable && configured && (
-          <div className="mt-5 rounded-2xl border border-[#ead7b8] bg-[#fff9ef] px-4 py-3 text-xs text-[#8a6633]">
+          <div className="mt-5 rounded-lg border border-border bg-muted px-4 py-3 text-xs text-foreground">
             仓储数据表尚未初始化，请执行最新 Supabase 数据库迁移。
           </div>
         )}
         {feedback.created && (
-          <div className="mt-5 rounded-2xl border border-[#cfe8ec] bg-[#edf7f2] px-4 py-3 text-xs text-[#0d6c78]">
+          <div className="mt-5 rounded-lg border border-border bg-muted px-4 py-3 text-xs text-foreground">
             {feedback.created}
           </div>
         )}
         {feedback.error && (
-          <div className="mt-5 rounded-2xl border border-[#eed3cd] bg-[#fff4f1] px-4 py-3 text-xs text-[#985846]">
+          <div className="mt-5 rounded-lg border border-border bg-muted px-4 py-3 text-xs text-foreground">
             {feedback.error}
           </div>
         )}
@@ -468,7 +459,7 @@ export default async function InventoryPage({
             icon={<Boxes className="size-5" />}
             label="物理库存"
             note={`${activeInventory.length} 个 SKU · ${warehouses.filter((warehouse) => warehouse.status === "active").length} 个仓库`}
-            tone="bg-gradient-to-br from-[#dff5f4] to-[#e8f4fb] text-[#0d7580]"
+            tone="bg-card   text-foreground"
             value={number(totalPhysicalQuantity)}
           />
           <MetricCard
@@ -480,28 +471,28 @@ export default async function InventoryPage({
                 0,
               ),
             )}`}
-            tone="bg-gradient-to-br from-[#e7f0fb] to-[#f0f5fa] text-[#397fc0]"
+            tone="bg-card   text-foreground"
             value={number(totalAvailableQuantity)}
           />
           <MetricCard
             icon={<PackageX className="size-5" />}
             label="零库存 SKU"
             note="源表中保留、当前没有物理库存"
-            tone="bg-gradient-to-br from-[#fff4d7] to-[#fff8e9] text-[#a36a20]"
+            tone="bg-card   text-foreground"
             value={`${stockoutItems.length} 项`}
           />
           <MetricCard
             icon={<Clock3 className="size-5" />}
             label="效期风险"
             note={`已隔离 ${number(totalQuarantinedQuantity)} · 90 天内到期`}
-            tone="bg-gradient-to-br from-[#ffebe8] to-[#fff3ef] text-[#c35f5f]"
+            tone="bg-card   text-foreground"
             value={`${expiryRiskBatches.length} 个批次`}
           />
         </section>
 
         <div className="mt-5 grid items-start gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(350px,.55fr)]">
-          <section className="overflow-hidden rounded-[22px] border border-white/85 bg-white/88 shadow-[0_18px_50px_-38px_rgba(9,57,91,.42)] backdrop-blur-xl">
-            <div className="flex flex-col gap-4 border-b border-[#dce6ed]/75 bg-white/45 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <section className="overflow-hidden rounded-md border border-white/85 bg-white/88  backdrop-blur-xl">
+            <div className="flex flex-col gap-4 border-b border-border bg-white/45 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
               <div>
                 <h2 className="text-base font-semibold tracking-[-0.02em]">
                   {view === "stock"
@@ -510,7 +501,7 @@ export default async function InventoryPage({
                       ? "批次与效期"
                       : "出入库流水"}
                 </h2>
-                <p className="mt-1 text-[11px] text-muted-foreground">
+                <p className="mt-1 text-xs text-muted-foreground">
                   {view === "stock"
                     ? "按仓库与 SKU 查看物理、可用和隔离库存"
                     : view === "batches"
@@ -518,11 +509,11 @@ export default async function InventoryPage({
                       : "库存变化全程留痕，便于追溯业务来源"}
                 </p>
               </div>
-              <div className="flex rounded-xl border border-white/80 bg-[#eaf2f7]/75 p-1 text-[10px] shadow-inner backdrop-blur-md">
+              <div className="flex rounded-md border border-border bg-muted p-1 text-xs">
                 <Link
                   className={`rounded-lg px-3 py-2 ${
                     view === "stock"
-                      ? "bg-white font-medium text-primary shadow-sm"
+                      ? "bg-white font-medium text-primary "
                       : "text-muted-foreground"
                   }`}
                   href="/inventory"
@@ -532,7 +523,7 @@ export default async function InventoryPage({
                 <Link
                   className={`rounded-lg px-3 py-2 ${
                     view === "batches"
-                      ? "bg-white font-medium text-primary shadow-sm"
+                      ? "bg-white font-medium text-primary "
                       : "text-muted-foreground"
                   }`}
                   href="/inventory?view=batches"
@@ -542,7 +533,7 @@ export default async function InventoryPage({
                 <Link
                   className={`rounded-lg px-3 py-2 ${
                     view === "movements"
-                      ? "bg-white font-medium text-primary shadow-sm"
+                      ? "bg-white font-medium text-primary "
                       : "text-muted-foreground"
                   }`}
                   href="/inventory?view=movements"
@@ -554,20 +545,20 @@ export default async function InventoryPage({
 
             {view === "stock" && (
               <form
-                className="grid gap-3 border-b border-[#dce6ed]/70 bg-[#f3f8fb]/72 px-5 py-4 backdrop-blur-md sm:grid-cols-[minmax(220px,1fr)_140px_140px_auto] sm:px-6"
+                className="grid gap-3 border-b border-border bg-muted px-5 py-4 backdrop-blur-md sm:grid-cols-[minmax(220px,1fr)_140px_140px_auto] sm:px-6"
                 method="get"
               >
                 <label className="relative">
                   <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                   <input
-                    className="h-10 w-full rounded-xl border border-white/90 bg-white/78 pl-9 pr-3 text-xs shadow-sm outline-none backdrop-blur-md transition focus:border-[#18afb3]/55 focus:bg-white"
+                    className="h-10 w-full rounded-md border border-white/90 bg-white/78 pl-9 pr-3 text-xs  outline-none backdrop-blur-md transition focus:border-border focus:bg-white"
                     defaultValue={query}
                     name="q"
                     placeholder="搜索商品、SKU、规格或条码"
                   />
                 </label>
                 <select
-                  className="h-10 rounded-xl border border-white/90 bg-white/78 px-3 text-xs shadow-sm outline-none backdrop-blur-md transition focus:border-[#18afb3]/55 focus:bg-white"
+                  className="h-10 rounded-md border border-white/90 bg-white/78 px-3 text-xs  outline-none backdrop-blur-md transition focus:border-border focus:bg-white"
                   defaultValue={categoryFilter}
                   name="category"
                 >
@@ -578,7 +569,7 @@ export default async function InventoryPage({
                   <option value="other">调味杂粮</option>
                 </select>
                 <select
-                  className="h-10 rounded-xl border border-white/90 bg-white/78 px-3 text-xs shadow-sm outline-none backdrop-blur-md transition focus:border-[#18afb3]/55 focus:bg-white"
+                  className="h-10 rounded-md border border-white/90 bg-white/78 px-3 text-xs  outline-none backdrop-blur-md transition focus:border-border focus:bg-white"
                   defaultValue={statusFilter}
                   name="status"
                 >
@@ -588,7 +579,7 @@ export default async function InventoryPage({
                   <option value="quarantined">存在隔离库存</option>
                 </select>
                 <button
-                  className="h-10 rounded-xl bg-gradient-to-r from-[#0d6475] to-[#168e98] px-5 text-xs font-medium text-white shadow-[0_10px_24px_-16px_rgba(13,100,117,.8)] transition hover:-translate-y-0.5"
+                  className="h-10 rounded-md bg-primary px-5 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
                   type="submit"
                 >
                   筛选
@@ -600,7 +591,7 @@ export default async function InventoryPage({
               filteredInventory.length ? (
                 <div className="overflow-x-auto">
                   <table className="w-full min-w-[1040px] text-left">
-                    <thead className="bg-[#edf4f8]/80 text-[10px] text-[#63798d]">
+                    <thead className="bg-muted text-xs text-foreground">
                       <tr>
                         <th className="px-6 py-3 font-medium">商品 / SKU</th>
                         <th className="px-4 py-3 font-medium">仓库与库位</th>
@@ -624,53 +615,53 @@ export default async function InventoryPage({
                           Number(item.available_quantity) <=
                             Number(item.safety_stock);
                         return (
-                          <tr className="text-xs transition-colors hover:bg-[#eef8f8]/58" key={item.id}>
+                          <tr className="text-xs transition-colors hover:bg-muted" key={item.id}>
                             <td className="px-6 py-4">
                               <div className="font-medium">{item.product_name}</div>
-                              <div className="mt-1 font-mono text-[9px] text-muted-foreground">
+                              <div className="mt-1 font-mono text-xs text-muted-foreground">
                                 {item.sku}
                                 {item.specification
                                   ? ` · ${item.specification}`
                                   : ""}
                               </div>
                               {item.barcode && (
-                                <div className="mt-1 font-mono text-[9px] text-muted-foreground">
+                                <div className="mt-1 font-mono text-xs text-muted-foreground">
                                   条码 {item.barcode}
                                 </div>
                               )}
                             </td>
                             <td className="px-4 py-4">
                               <div>{warehouse?.name ?? "未分配仓库"}</div>
-                              <div className="mt-1 flex items-center gap-1 text-[10px] text-muted-foreground">
+                              <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
                                 <MapPin className="size-3" />
                                 {item.location_code || "未设置库位"}
                               </div>
                             </td>
                             <td className="px-4 py-4">
                               <div>{categoryLabel(item.category)}</div>
-                              <div className="mt-1 text-[10px] text-muted-foreground">
+                              <div className="mt-1 text-xs text-muted-foreground">
                                 {item.case_specification || "箱规待补充"}
                               </div>
                             </td>
                             <td className="px-4 py-4 text-right font-semibold">
                               {number(item.quantity)} {item.unit}
                             </td>
-                            <td className="px-4 py-4 text-right font-semibold text-[#0d7580]">
+                            <td className="px-4 py-4 text-right font-semibold text-foreground">
                               {number(item.available_quantity)} {item.unit}
                             </td>
-                            <td className="px-4 py-4 text-right text-[#a55b45]">
+                            <td className="px-4 py-4 text-right text-foreground">
                               {number(item.quarantined_quantity)} {item.unit}
                             </td>
                             <td className="px-6 py-4">
                               <span
-                                className={`rounded-full px-2.5 py-1 text-[9px] ${
+                                className={`rounded-full px-2.5 py-1 text-xs ${
                                   quarantined
-                                    ? "bg-[#fff0eb] text-[#a55b45]"
+                                    ? "bg-muted text-foreground"
                                     : stockout
-                                      ? "bg-[#f1f3f3] text-[#65716d]"
+                                      ? "bg-muted text-foreground"
                                       : warning
-                                    ? "bg-[#fff1e9] text-[#a45d42]"
-                                    : "bg-[#eaf3f8] text-[#0d6c78]"
+                                    ? "bg-muted text-foreground"
+                                    : "bg-muted text-foreground"
                                 }`}
                               >
                                 {quarantined
@@ -694,7 +685,7 @@ export default async function InventoryPage({
                   <h3 className="mt-4 text-sm font-medium">
                     {inventory.length ? "没有符合条件的库存" : "还没有库存商品"}
                   </h3>
-                  <p className="mt-2 text-[11px] text-muted-foreground">
+                  <p className="mt-2 text-xs text-muted-foreground">
                     {inventory.length
                       ? "请调整关键词、分类或库存状态后重试。"
                       : "先创建仓库与 SKU，再通过入库流水增加库存。"}
@@ -705,7 +696,7 @@ export default async function InventoryPage({
               batches.length ? (
                 <div className="overflow-x-auto">
                   <table className="w-full min-w-[900px] text-left">
-                    <thead className="bg-[#edf4f8]/80 text-[10px] text-[#63798d]">
+                    <thead className="bg-muted text-xs text-foreground">
                       <tr>
                         <th className="px-6 py-3 font-medium">商品 / 批次</th>
                         <th className="px-4 py-3 font-medium">生产日期</th>
@@ -731,12 +722,12 @@ export default async function InventoryPage({
                           !expired &&
                           Boolean(expiry && expiry <= ninetyDaysLater);
                         return (
-                          <tr className="text-xs transition-colors hover:bg-[#eef8f8]/58" key={batch.id}>
+                          <tr className="text-xs transition-colors hover:bg-muted" key={batch.id}>
                             <td className="px-6 py-4">
                               <div className="font-medium">
                                 {item?.product_name ?? "库存商品"}
                               </div>
-                              <div className="mt-1 font-mono text-[9px] text-muted-foreground">
+                              <div className="mt-1 font-mono text-xs text-muted-foreground">
                                 {item?.sku ?? "SKU"}
                                 {item?.specification
                                   ? ` · ${item.specification}`
@@ -748,7 +739,7 @@ export default async function InventoryPage({
                             </td>
                             <td className="px-4 py-4">
                               <div>{formatDate(batch.expiry_date)}</div>
-                              <div className="mt-1 text-[9px] text-muted-foreground">
+                              <div className="mt-1 text-xs text-muted-foreground">
                                 {batch.shelf_life_months
                                   ? `${batch.shelf_life_months} 个月`
                                   : "保质期待补充"}
@@ -759,7 +750,7 @@ export default async function InventoryPage({
                             </td>
                             <td className="px-4 py-4">
                               <div>{warehouse?.name ?? "仓库"}</div>
-                              <div className="mt-1 text-[9px] text-muted-foreground">
+                              <div className="mt-1 text-xs text-muted-foreground">
                                 {batch.source_row_no
                                   ? `源表第 ${batch.source_row_no} 行`
                                   : "手工出入库"}
@@ -767,14 +758,14 @@ export default async function InventoryPage({
                             </td>
                             <td className="px-6 py-4">
                               <span
-                                className={`rounded-full px-2.5 py-1 text-[9px] ${
+                                className={`rounded-full px-2.5 py-1 text-xs ${
                                   expired
-                                    ? "bg-[#fff0eb] text-[#a55b45]"
+                                    ? "bg-muted text-foreground"
                                     : expiring
-                                      ? "bg-[#fff4e7] text-[#9a6321]"
+                                      ? "bg-muted text-foreground"
                                       : batch.status === "depleted"
-                                        ? "bg-[#f1f3f3] text-[#65716d]"
-                                        : "bg-[#eaf3f8] text-[#0d6c78]"
+                                        ? "bg-muted text-foreground"
+                                        : "bg-muted text-foreground"
                                 }`}
                               >
                                 {expired
@@ -798,7 +789,7 @@ export default async function InventoryPage({
                 <div className="px-6 py-16 text-center">
                   <Clock3 className="mx-auto size-10 text-muted-foreground/45" />
                   <h3 className="mt-4 text-sm font-medium">还没有库存批次</h3>
-                  <p className="mt-2 text-[11px] text-muted-foreground">
+                  <p className="mt-2 text-xs text-muted-foreground">
                     导入库存快照或完成入库后，批次效期会显示在这里。
                   </p>
                 </div>
@@ -814,12 +805,12 @@ export default async function InventoryPage({
                       key={movement.id}
                     >
                       <div
-                        className={`grid size-9 place-items-center rounded-xl ${
+                        className={`grid size-9 place-items-center rounded-md ${
                           ["inbound", "opening_balance", "adjustment_in"].includes(
                             movement.movement_type,
                           )
-                            ? "bg-[#eaf3f8] text-[#0d6c78]"
-                            : "bg-[#fff0eb] text-[#a55b45]"
+                            ? "bg-muted text-foreground"
+                            : "bg-muted text-foreground"
                         }`}
                       >
                         {["inbound", "opening_balance", "adjustment_in"].includes(
@@ -835,14 +826,14 @@ export default async function InventoryPage({
                           <span className="text-xs font-medium">
                             {item?.product_name ?? "库存商品"}
                           </span>
-                          <span className="rounded-full bg-[#f1f4f3] px-2 py-0.5 text-[9px] text-muted-foreground">
+                          <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
                             {movementLabel(movement.movement_type)}
                           </span>
-                          <span className="font-mono text-[9px] text-muted-foreground">
+                          <span className="font-mono text-xs text-muted-foreground">
                             {movement.movement_no}
                           </span>
                         </div>
-                        <div className="mt-1 text-[10px] text-muted-foreground">
+                        <div className="mt-1 text-xs text-muted-foreground">
                           {warehouse?.name ?? "仓库"} · {item?.sku ?? "SKU"} ·{" "}
                           {formatDateTime(movement.created_at)}
                           {movement.reference_no
@@ -856,8 +847,8 @@ export default async function InventoryPage({
                             ["inbound", "opening_balance", "adjustment_in"].includes(
                               movement.movement_type,
                             )
-                              ? "text-[#0d7580]"
-                              : "text-[#a55b45]"
+                              ? "text-foreground"
+                              : "text-foreground"
                           }`}
                         >
                           {[
@@ -869,7 +860,7 @@ export default async function InventoryPage({
                             : "-"}
                           {number(movement.quantity)} {item?.unit ?? ""}
                         </div>
-                        <div className="mt-1 text-[9px] text-muted-foreground">
+                        <div className="mt-1 text-xs text-muted-foreground">
                           {number(movement.before_quantity)} →{" "}
                           {number(movement.after_quantity)}
                         </div>
@@ -882,7 +873,7 @@ export default async function InventoryPage({
               <div className="px-6 py-16 text-center">
                 <ClipboardList className="mx-auto size-10 text-muted-foreground/45" />
                 <h3 className="mt-4 text-sm font-medium">还没有出入库流水</h3>
-                <p className="mt-2 text-[11px] text-muted-foreground">
+                <p className="mt-2 text-xs text-muted-foreground">
                   完成第一笔入库后，库存变化会显示在这里。
                 </p>
               </div>
@@ -891,25 +882,25 @@ export default async function InventoryPage({
 
           <div className="space-y-5">
             {latestImport && (
-              <section className="overflow-hidden rounded-[22px] border border-white/85 bg-[linear-gradient(145deg,rgba(240,250,249,.86),rgba(255,255,255,.68))] shadow-[0_18px_46px_-36px_rgba(13,100,117,.52)] backdrop-blur-xl">
-                <div className="border-b border-[#d7ebe8]/80 px-5 py-5 sm:px-6">
+              <section className="overflow-hidden rounded-md border border-white/85 bg-card  backdrop-blur-xl">
+                <div className="border-b border-border px-5 py-5 sm:px-6">
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <div className="text-[10px] font-medium tracking-[0.12em] text-[#4a8171]">
+                      <div className="text-xs font-medium tracking-[0.12em] text-foreground">
                         LATEST INVENTORY SNAPSHOT
                       </div>
                       <h2 className="mt-2 text-base font-semibold">万纬库存导入</h2>
-                      <p className="mt-1 text-[10px] text-muted-foreground">
+                      <p className="mt-1 text-xs text-muted-foreground">
                         {latestImport.source_file_name} ·{" "}
                         {formatDateTime(latestImport.imported_at)}
                       </p>
                     </div>
-                    <div className="grid size-10 place-items-center rounded-[14px] bg-white/82 text-[#0d7580] shadow-sm ring-1 ring-white backdrop-blur-md">
+                    <div className="grid size-10 place-items-center rounded-md bg-white/82 text-foreground  ring-1 ring-white backdrop-blur-md">
                       <FileSpreadsheet className="size-5" />
                     </div>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-px bg-[#d7ebe8]/80">
+                <div className="grid grid-cols-2 gap-px bg-muted">
                   {[
                     ["源表明细", `${latestImport.total_rows} 条`],
                     ["库存总量", number(latestImport.total_quantity)],
@@ -917,20 +908,20 @@ export default async function InventoryPage({
                     ["待完善主档", `${latestImport.unmatched_product_rows} 条`],
                   ].map(([label, value]) => (
                     <div className="bg-white/52 px-5 py-4 backdrop-blur-md" key={label}>
-                      <div className="text-[9px] text-muted-foreground">{label}</div>
+                      <div className="text-xs text-muted-foreground">{label}</div>
                       <div className="mt-1 text-sm font-semibold">{value}</div>
                     </div>
                   ))}
                 </div>
-                <div className="space-y-2 px-5 py-4 text-[10px] leading-5 text-muted-foreground sm:px-6">
+                <div className="space-y-2 px-5 py-4 text-xs leading-5 text-muted-foreground sm:px-6">
                   <div className="flex gap-2">
-                    <CircleAlert className="mt-0.5 size-3.5 shrink-0 text-[#a36a2b]" />
+                    <CircleAlert className="mt-0.5 size-3.5 shrink-0 text-foreground" />
                     缺生产日期 {latestImport.missing_production_date_rows} 条 ·
                     缺保质期 {latestImport.missing_shelf_life_rows} 条 · 缺条码{" "}
                     {latestImport.missing_barcode_rows} 条
                   </div>
                   <div className="flex gap-2">
-                    <Database className="mt-0.5 size-3.5 shrink-0 text-[#4a8171]" />
+                    <Database className="mt-0.5 size-3.5 shrink-0 text-foreground" />
                     已按文件指纹防重复导入，条码冲突不会自动覆盖产品主档。
                   </div>
                 </div>
@@ -938,11 +929,11 @@ export default async function InventoryPage({
             )}
 
             {warehouses.length > 0 && (
-              <section className="rounded-[22px] border border-white/85 bg-white/72 p-5 shadow-[0_18px_46px_-38px_rgba(9,57,91,.4)] backdrop-blur-xl sm:p-6">
+              <section className="rounded-md border border-white/85 bg-white/72 p-5  backdrop-blur-xl sm:p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-sm font-semibold">仓库档案</h2>
-                    <p className="mt-1 text-[10px] text-muted-foreground">
+                    <p className="mt-1 text-xs text-muted-foreground">
                       自有仓与第三方仓统一管理
                     </p>
                   </div>
@@ -951,12 +942,12 @@ export default async function InventoryPage({
                 <div className="mt-4 space-y-3">
                   {warehouses.map((warehouse) => (
                     <div
-                      className="rounded-xl border border-white/90 bg-[#f2f7fa]/72 px-4 py-3 shadow-sm backdrop-blur-md transition hover:border-[#bfe4e3] hover:bg-white/88"
+                      className="rounded-md border border-white/90 bg-muted px-4 py-3  backdrop-blur-md transition hover:border-border hover:bg-white/88"
                       key={warehouse.id}
                     >
                       <div className="flex items-center justify-between gap-3">
                         <div className="text-xs font-medium">{warehouse.name}</div>
-                        <span className="rounded-full bg-[#eaf3f8] px-2 py-1 text-[9px] text-[#0d6c78]">
+                        <span className="rounded-full bg-muted px-2 py-1 text-xs text-foreground">
                           {warehouse.warehouse_type === "third_party"
                             ? "第三方仓"
                             : warehouse.warehouse_type === "virtual"
@@ -964,7 +955,7 @@ export default async function InventoryPage({
                               : "自有仓"}
                         </span>
                       </div>
-                      <div className="mt-1 text-[9px] text-muted-foreground">
+                      <div className="mt-1 text-xs text-muted-foreground">
                         {warehouse.code}
                         {warehouse.partner_name
                           ? ` · 服务方 ${warehouse.partner_name}`
@@ -979,45 +970,45 @@ export default async function InventoryPage({
             {canManage ? (
               <>
                 {!warehouses.length ? (
-                  <section className="rounded-[22px] border border-white/85 bg-white/76 p-5 shadow-[0_18px_46px_-38px_rgba(9,57,91,.4)] backdrop-blur-xl sm:p-6">
+                  <section className="rounded-md border border-white/85 bg-white/76 p-5  backdrop-blur-xl sm:p-6">
                     <div className="flex items-start justify-between">
                       <div>
                         <h2 className="text-base font-semibold">创建第一个仓库</h2>
-                        <p className="mt-1 text-[11px] text-muted-foreground">
+                        <p className="mt-1 text-xs text-muted-foreground">
                           建立仓库档案后才能录入 SKU
                         </p>
                       </div>
                       <Warehouse className="size-5 text-primary/65" />
                     </div>
                     <form action={createWarehouse} className="mt-5 space-y-4">
-                      <label className="block text-[10px] text-muted-foreground">
+                      <label className="block text-xs text-muted-foreground">
                         仓库名称
                         <input
-                          className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs outline-none focus:border-primary/40"
+                          className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs outline-none focus:border-primary/40"
                           name="name"
                           placeholder="例如：德馨淼盛主仓"
                           required
                         />
                       </label>
-                      <label className="block text-[10px] text-muted-foreground">
+                      <label className="block text-xs text-muted-foreground">
                         仓库编码
                         <input
-                          className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs uppercase outline-none focus:border-primary/40"
+                          className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs uppercase outline-none focus:border-primary/40"
                           name="code"
                           placeholder="例如：DX-WH-01"
                           required
                         />
                       </label>
-                      <label className="block text-[10px] text-muted-foreground">
+                      <label className="block text-xs text-muted-foreground">
                         仓库地址
                         <input
-                          className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs outline-none focus:border-primary/40"
+                          className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs outline-none focus:border-primary/40"
                           name="address"
                           placeholder="选填"
                         />
                       </label>
                       <button
-                        className="h-10 w-full rounded-xl bg-primary text-xs font-medium text-primary-foreground"
+                        className="h-10 w-full rounded-md bg-primary text-xs font-medium text-primary-foreground"
                         type="submit"
                       >
                         创建仓库
@@ -1025,21 +1016,21 @@ export default async function InventoryPage({
                     </form>
                   </section>
                 ) : (
-                  <section className="rounded-[22px] border border-white/85 bg-white/76 p-5 shadow-[0_18px_46px_-38px_rgba(9,57,91,.4)] backdrop-blur-xl sm:p-6">
+                  <section className="rounded-md border border-white/85 bg-white/76 p-5  backdrop-blur-xl sm:p-6">
                     <div className="flex items-start justify-between">
                       <div>
                         <h2 className="text-base font-semibold">新增库存商品</h2>
-                        <p className="mt-1 text-[11px] text-muted-foreground">
+                        <p className="mt-1 text-xs text-muted-foreground">
                           建立 SKU、库位和安全库存
                         </p>
                       </div>
                       <PackagePlus className="size-5 text-primary/65" />
                     </div>
                     <form action={createInventoryItem} className="mt-5 space-y-4">
-                      <label className="block text-[10px] text-muted-foreground">
+                      <label className="block text-xs text-muted-foreground">
                         所属仓库
                         <select
-                          className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
+                          className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
                           name="warehouseId"
                           required
                         >
@@ -1053,56 +1044,56 @@ export default async function InventoryPage({
                         </select>
                       </label>
                       <div className="grid grid-cols-2 gap-3">
-                        <label className="text-[10px] text-muted-foreground">
+                        <label className="text-xs text-muted-foreground">
                           SKU 编码
                           <input
-                            className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs uppercase outline-none focus:border-primary/40"
+                            className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs uppercase outline-none focus:border-primary/40"
                             name="sku"
                             placeholder="DX-R001"
                             required
                           />
                         </label>
-                        <label className="text-[10px] text-muted-foreground">
+                        <label className="text-xs text-muted-foreground">
                           计量单位
                           <input
-                            className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs outline-none focus:border-primary/40"
+                            className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs outline-none focus:border-primary/40"
                             defaultValue="件"
                             name="unit"
                             required
                           />
                         </label>
                       </div>
-                      <label className="block text-[10px] text-muted-foreground">
+                      <label className="block text-xs text-muted-foreground">
                         商品名称
                         <input
-                          className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs outline-none focus:border-primary/40"
+                          className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs outline-none focus:border-primary/40"
                           name="productName"
                           placeholder="输入商品完整名称"
                           required
                         />
                       </label>
                       <div className="grid grid-cols-2 gap-3">
-                        <label className="text-[10px] text-muted-foreground">
+                        <label className="text-xs text-muted-foreground">
                           规格
                           <input
-                            className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs outline-none focus:border-primary/40"
+                            className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs outline-none focus:border-primary/40"
                             name="specification"
                             placeholder="5kg × 4袋"
                           />
                         </label>
-                        <label className="text-[10px] text-muted-foreground">
+                        <label className="text-xs text-muted-foreground">
                           库位
                           <input
-                            className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs uppercase outline-none focus:border-primary/40"
+                            className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs uppercase outline-none focus:border-primary/40"
                             name="locationCode"
                             placeholder="A-01-01"
                           />
                         </label>
                       </div>
-                      <label className="block text-[10px] text-muted-foreground">
+                      <label className="block text-xs text-muted-foreground">
                         安全库存
                         <input
-                          className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs outline-none focus:border-primary/40"
+                          className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs outline-none focus:border-primary/40"
                           defaultValue="0"
                           min="0"
                           name="safetyStock"
@@ -1111,7 +1102,7 @@ export default async function InventoryPage({
                         />
                       </label>
                       <button
-                        className="h-10 w-full rounded-xl bg-primary text-xs font-medium text-primary-foreground"
+                        className="h-10 w-full rounded-md bg-primary text-xs font-medium text-primary-foreground"
                         type="submit"
                       >
                         保存库存商品
@@ -1121,11 +1112,11 @@ export default async function InventoryPage({
                 )}
 
                 {inventory.length > 0 && (
-                  <section className="rounded-[22px] border border-white/85 bg-white/76 p-5 shadow-[0_18px_46px_-38px_rgba(9,57,91,.4)] backdrop-blur-xl sm:p-6">
+                  <section className="rounded-md border border-white/85 bg-white/76 p-5  backdrop-blur-xl sm:p-6">
                     <div className="flex items-start justify-between">
                       <div>
                         <h2 className="text-base font-semibold">办理出入库</h2>
-                        <p className="mt-1 text-[11px] text-muted-foreground">
+                        <p className="mt-1 text-xs text-muted-foreground">
                           库存数量将在数据库内原子更新
                         </p>
                       </div>
@@ -1135,10 +1126,10 @@ export default async function InventoryPage({
                       action={recordInventoryMovement}
                       className="mt-5 space-y-4"
                     >
-                      <label className="block text-[10px] text-muted-foreground">
+                      <label className="block text-xs text-muted-foreground">
                         库存商品
                         <select
-                          className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
+                          className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
                           name="inventoryItemId"
                           required
                         >
@@ -1151,10 +1142,10 @@ export default async function InventoryPage({
                         </select>
                       </label>
                       <div className="grid grid-cols-2 gap-3">
-                        <label className="text-[10px] text-muted-foreground">
+                        <label className="text-xs text-muted-foreground">
                           业务类型
                           <select
-                            className="mt-1.5 h-10 w-full rounded-xl border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
+                            className="mt-1.5 h-10 w-full rounded-md border border-border bg-white px-3 text-xs outline-none focus:border-primary/40"
                             defaultValue="inbound"
                             name="movementType"
                           >
@@ -1162,10 +1153,10 @@ export default async function InventoryPage({
                             <option value="outbound">出库</option>
                           </select>
                         </label>
-                        <label className="text-[10px] text-muted-foreground">
+                        <label className="text-xs text-muted-foreground">
                           数量
                           <input
-                            className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs outline-none focus:border-primary/40"
+                            className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs outline-none focus:border-primary/40"
                             min="0.001"
                             name="quantity"
                             required
@@ -1175,18 +1166,18 @@ export default async function InventoryPage({
                         </label>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
-                        <label className="text-[10px] text-muted-foreground">
+                        <label className="text-xs text-muted-foreground">
                           生产日期
                           <input
-                            className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs outline-none focus:border-primary/40"
+                            className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs outline-none focus:border-primary/40"
                             name="productionDate"
                             type="date"
                           />
                         </label>
-                        <label className="text-[10px] text-muted-foreground">
+                        <label className="text-xs text-muted-foreground">
                           保质期（月）
                           <input
-                            className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs outline-none focus:border-primary/40"
+                            className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs outline-none focus:border-primary/40"
                             max="120"
                             min="1"
                             name="shelfLifeMonths"
@@ -1195,25 +1186,25 @@ export default async function InventoryPage({
                           />
                         </label>
                       </div>
-                      <label className="block text-[10px] text-muted-foreground">
+                      <label className="block text-xs text-muted-foreground">
                         来源单号
                         <input
-                          className="mt-1.5 h-10 w-full rounded-xl border border-border px-3 text-xs outline-none focus:border-primary/40"
+                          className="mt-1.5 h-10 w-full rounded-md border border-border px-3 text-xs outline-none focus:border-primary/40"
                           name="referenceNo"
                           placeholder="采购单、销售单或配送单号"
                         />
                       </label>
-                      <label className="block text-[10px] text-muted-foreground">
+                      <label className="block text-xs text-muted-foreground">
                         备注
                         <textarea
-                          className="mt-1.5 min-h-20 w-full resize-y rounded-xl border border-border px-3 py-2.5 text-xs outline-none focus:border-primary/40"
+                          className="mt-1.5 min-h-20 w-full resize-y rounded-md border border-border px-3 py-2.5 text-xs outline-none focus:border-primary/40"
                           maxLength={300}
                           name="note"
                           placeholder="填写经办说明或异常情况"
                         />
                       </label>
                       <button
-                        className="h-10 w-full rounded-xl bg-primary text-xs font-medium text-primary-foreground"
+                        className="h-10 w-full rounded-md bg-primary text-xs font-medium text-primary-foreground"
                         type="submit"
                       >
                         确认并更新库存
@@ -1223,10 +1214,10 @@ export default async function InventoryPage({
                 )}
               </>
             ) : (
-              <section className="rounded-[22px] border border-white/85 bg-white/72 p-6 text-center shadow-[0_18px_46px_-38px_rgba(9,57,91,.4)] backdrop-blur-xl">
+              <section className="rounded-md border border-white/85 bg-white/72 p-6 text-center  backdrop-blur-xl">
                 <ShieldCheck className="mx-auto size-8 text-muted-foreground/50" />
                 <h2 className="mt-3 text-sm font-medium">当前为库存查询视图</h2>
-                <p className="mt-2 text-[10px] leading-5 text-muted-foreground">
+                <p className="mt-2 text-xs leading-5 text-muted-foreground">
                   仓储部门人员和系统管理员可以维护 SKU 并办理出入库。
                 </p>
               </section>

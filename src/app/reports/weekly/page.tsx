@@ -55,13 +55,13 @@ const reportSections = [
 
 function ReportDetails({ report }: { report: WeeklyReportRow }) {
   return (
-    <details className="group rounded-[18px] border border-border/80 bg-white open:shadow-[0_14px_38px_-30px_rgba(23,57,50,.35)]">
+    <details className="group rounded-md border border-border/80 bg-white open:">
       <summary className="flex cursor-pointer list-none items-center gap-4 p-4 sm:p-5">
         <span
-          className={`grid size-10 shrink-0 place-items-center rounded-xl ${
+          className={`grid size-10 shrink-0 place-items-center rounded-md ${
             report.status === "submitted"
-              ? "bg-[#eaf3f8] text-primary"
-              : "bg-[#fff4e7] text-[#9a6321]"
+              ? "bg-muted text-primary"
+              : "bg-muted text-foreground"
           }`}
         >
           {report.status === "submitted" ? (
@@ -72,23 +72,23 @@ function ReportDetails({ report }: { report: WeeklyReportRow }) {
         </span>
         <span className="min-w-0 flex-1">
           <span className="flex flex-wrap items-center gap-2">
-            <span className="text-sm font-semibold text-[#294b65]">
+            <span className="text-sm font-semibold text-foreground">
               {report.employee_name}
             </span>
-            <span className="rounded-full bg-[#f1f5f3] px-2 py-1 text-[9px] text-muted-foreground">
+            <span className="rounded-full bg-muted px-2 py-1 text-xs text-muted-foreground">
               {report.department_name ?? "部门待设置"}
             </span>
             <span
-              className={`rounded-full px-2 py-1 text-[9px] font-medium ${
+              className={`rounded-full px-2 py-1 text-xs font-medium ${
                 report.status === "submitted"
-                  ? "bg-[#eaf3f8] text-[#0d6c78]"
-                  : "bg-[#fff4e7] text-[#9a6321]"
+                  ? "bg-muted text-foreground"
+                  : "bg-muted text-foreground"
               }`}
             >
               {report.status === "submitted" ? "已提交" : "草稿"}
             </span>
           </span>
-          <span className="mt-1.5 block text-[10px] text-muted-foreground">
+          <span className="mt-1.5 block text-xs text-muted-foreground">
             {formatWeekRange(report.week_start)} ·{" "}
             {report.status === "submitted"
               ? `提交于 ${formatDateTime(report.submitted_at)}`
@@ -97,11 +97,11 @@ function ReportDetails({ report }: { report: WeeklyReportRow }) {
         </span>
         <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" />
       </summary>
-      <div className="grid gap-3 border-t border-border/75 bg-[#fbfcfc] p-4 sm:grid-cols-2 sm:p-5">
+      <div className="grid gap-3 border-t border-border/75 bg-muted p-4 sm:grid-cols-2 sm:p-5">
         {reportSections.map(([key, label]) => (
-          <section className="rounded-xl border border-border/70 bg-white p-4" key={key}>
-            <h3 className="text-[10px] font-semibold text-primary">{label}</h3>
-            <p className="mt-2 whitespace-pre-wrap text-[11px] leading-6 text-[#52655f]">
+          <section className="rounded-md border border-border/70 bg-white p-4" key={key}>
+            <h3 className="text-xs font-semibold text-primary">{label}</h3>
+            <p className="mt-2 whitespace-pre-wrap text-xs leading-6 text-foreground">
               {report[key]}
             </p>
           </section>
@@ -163,13 +163,13 @@ export default async function WeeklyReportsPage({
         roleLabel: employee.title ?? "内部员工",
       }}
     >
-      <main className="mx-auto max-w-[1600px] p-4 sm:p-6 xl:p-8">
-        <section className="relative overflow-hidden rounded-[24px] bg-[#0a385d] px-6 py-7 text-white shadow-[0_18px_50px_-32px_rgba(12,47,41,.75)] sm:px-8 lg:px-10">
+      <main className="mx-auto max-w-[1440px] p-4 sm:p-6 xl:p-8">
+        <section className="ui-page-header">
           <div className="absolute -right-20 -top-36 size-80 rounded-full border border-white/8" />
           <NotebookPen className="pointer-events-none absolute right-12 top-1/2 hidden size-40 -translate-y-1/2 text-white/[0.055] sm:block" />
           <div className="relative flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
             <div>
-              <div className="text-xs font-medium tracking-[0.12em] text-[#79d8d5]">
+              <div className="text-xs font-medium tracking-[0.12em] text-muted-foreground">
                 WEEKLY REPORT
               </div>
               <h1 className="mt-3 text-2xl font-semibold tracking-[-0.035em] sm:text-[30px]">
@@ -180,19 +180,19 @@ export default async function WeeklyReportsPage({
               </p>
             </div>
             <Link
-              className="inline-flex h-10 w-fit items-center gap-2 rounded-xl border border-white/14 bg-white/8 px-4 text-xs text-white/70 transition-colors hover:bg-white/12"
+              className="inline-flex h-10 w-fit items-center gap-2 rounded-md border border-white/14 bg-white/8 px-4 text-xs text-white/70 transition-colors hover:bg-white/12"
               href="/knowledge/weekly-report-and-quarterly-review"
             >
-              <BookOpenText className="size-4 text-[#6bd7d4]" />
+              <BookOpenText className="size-4 text-muted-foreground" />
               查看周报制度
             </Link>
           </div>
         </section>
 
-        <section className="mt-5 flex flex-col gap-3 rounded-[22px] border border-border/80 bg-white p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+        <section className="mt-5 flex flex-col gap-3 rounded-md border border-border/80 bg-white p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
           <div className="flex gap-2">
             <Link
-              className={`inline-flex h-9 items-center gap-2 rounded-xl px-3 text-[10px] font-medium ${
+              className={`inline-flex h-9 items-center gap-2 rounded-md px-3 text-xs font-medium ${
                 view === "mine"
                   ? "bg-primary text-white"
                   : "border border-border text-muted-foreground"
@@ -204,7 +204,7 @@ export default async function WeeklyReportsPage({
             </Link>
             {canReviewTeam && (
               <Link
-                className={`inline-flex h-9 items-center gap-2 rounded-xl px-3 text-[10px] font-medium ${
+                className={`inline-flex h-9 items-center gap-2 rounded-md px-3 text-xs font-medium ${
                   view === "team"
                     ? "bg-primary text-white"
                     : "border border-border text-muted-foreground"
@@ -221,7 +221,7 @@ export default async function WeeklyReportsPage({
             <CalendarRange className="size-4 text-muted-foreground" />
             <select
               aria-label="选择周报周期"
-              className="h-9 rounded-xl border border-border bg-[#f3f7fa] px-3 text-[10px] outline-none focus:border-primary/35"
+              className="h-9 rounded-md border border-border bg-muted px-3 text-xs outline-none focus:border-primary/35"
               defaultValue={selectedWeek}
               name="week"
             >
@@ -233,7 +233,7 @@ export default async function WeeklyReportsPage({
               ))}
             </select>
             <button
-              className="h-9 rounded-xl border border-border bg-white px-3 text-[10px] font-medium text-muted-foreground hover:bg-muted"
+              className="h-9 rounded-md border border-border bg-white px-3 text-xs font-medium text-muted-foreground hover:bg-muted"
               type="submit"
             >
               切换
@@ -242,43 +242,43 @@ export default async function WeeklyReportsPage({
         </section>
 
         {params.saved === "draft" && (
-          <div className="mt-5 rounded-xl border border-[#d8e3ea] bg-[#edf2f7] px-4 py-3 text-xs text-[#42647a]">
+          <div className="mt-5 rounded-md border border-border bg-muted px-4 py-3 text-xs text-foreground">
             周报草稿已保存，仅你本人可以查看。
           </div>
         )}
         {params.saved === "submit" && (
-          <div className="mt-5 rounded-xl border border-[#d8e8ee] bg-[#eef4f8] px-4 py-3 text-xs text-primary">
+          <div className="mt-5 rounded-md border border-border bg-muted px-4 py-3 text-xs text-primary">
             周报已提交，直属负责人已经收到站内通知。
           </div>
         )}
 
         {error ? (
-          <section className="mt-5 rounded-[22px] border border-[#ead8d8] bg-[#f8eeee] px-6 py-12 text-center text-[#965151]">
+          <section className="mt-5 rounded-md border border-border bg-muted px-6 py-12 text-center text-foreground">
             <NotebookPen className="mx-auto size-7" />
             <h2 className="mt-4 text-sm font-semibold">暂时无法读取周报数据</h2>
-            <p className="mt-2 text-xs text-[#965151]/75">
+            <p className="mt-2 text-xs text-foreground">
               请确认第十二个数据库迁移已经执行。
             </p>
           </section>
         ) : view === "mine" ? (
           <>
-            <section className="mt-5 rounded-[22px] border border-border/80 bg-white p-5 shadow-[0_10px_35px_-28px_rgba(23,57,50,.32)] sm:p-6">
+            <section className="mt-5 rounded-md border border-border/80 bg-white p-5  sm:p-6">
               <div className="mb-5 flex flex-col gap-2 border-b border-border/75 pb-5 sm:flex-row sm:items-end sm:justify-between">
                 <div>
-                  <div className="text-[10px] font-medium tracking-[0.12em] text-primary">
+                  <div className="text-xs font-medium tracking-[0.12em] text-primary">
                     REPORTING PERIOD
                   </div>
-                  <h2 className="mt-2 text-lg font-semibold tracking-[-0.02em] text-[#294b65]">
+                  <h2 className="mt-2 text-lg font-semibold tracking-[-0.02em] text-foreground">
                     {formatWeekRange(selectedWeek)} 周报
                   </h2>
                 </div>
                 <span
-                  className={`w-fit rounded-full px-3 py-1.5 text-[9px] font-medium ${
+                  className={`w-fit rounded-full px-3 py-1.5 text-xs font-medium ${
                     selectedReport?.status === "submitted"
-                      ? "bg-[#eaf3f8] text-[#0d6c78]"
+                      ? "bg-muted text-foreground"
                       : selectedReport?.status === "draft"
-                        ? "bg-[#fff4e7] text-[#9a6321]"
-                        : "bg-[#edf2f7] text-[#42647a]"
+                        ? "bg-muted text-foreground"
+                        : "bg-muted text-foreground"
                   }`}
                 >
                   {selectedReport?.status === "submitted"
@@ -291,17 +291,17 @@ export default async function WeeklyReportsPage({
               <WeeklyReportForm report={selectedReport} weekStart={selectedWeek} />
             </section>
 
-            <section className="mt-5 rounded-[22px] border border-border/80 bg-white p-5 sm:p-6">
+            <section className="mt-5 rounded-md border border-border/80 bg-white p-5 sm:p-6">
               <div className="flex items-end justify-between">
                 <div>
-                  <div className="text-[10px] font-medium tracking-[0.12em] text-primary">
+                  <div className="text-xs font-medium tracking-[0.12em] text-primary">
                     MY HISTORY
                   </div>
-                  <h2 className="mt-2 text-base font-semibold text-[#294b65]">
+                  <h2 className="mt-2 text-base font-semibold text-foreground">
                     我的周报记录
                   </h2>
                 </div>
-                <span className="text-[10px] text-muted-foreground">
+                <span className="text-xs text-muted-foreground">
                   共 {myReports.length} 份
                 </span>
               </div>
@@ -311,7 +311,7 @@ export default async function WeeklyReportsPage({
                     <ReportDetails key={report.id} report={report} />
                   ))
                 ) : (
-                  <div className="rounded-[18px] bg-[#f3f7fa] px-6 py-10 text-center text-xs text-muted-foreground">
+                  <div className="rounded-md bg-muted px-6 py-10 text-center text-xs text-muted-foreground">
                     还没有周报记录，从上方完成第一份周报。
                   </div>
                 )}
@@ -319,20 +319,20 @@ export default async function WeeklyReportsPage({
             </section>
           </>
         ) : (
-          <section className="mt-5 rounded-[22px] border border-border/80 bg-white p-5 sm:p-6">
+          <section className="mt-5 rounded-md border border-border/80 bg-white p-5 sm:p-6">
             <div className="flex flex-col gap-3 border-b border-border/75 pb-5 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <div className="text-[10px] font-medium tracking-[0.12em] text-primary">
+                <div className="text-xs font-medium tracking-[0.12em] text-primary">
                   TEAM REPORTS
                 </div>
-                <h2 className="mt-2 text-lg font-semibold tracking-[-0.02em] text-[#294b65]">
+                <h2 className="mt-2 text-lg font-semibold tracking-[-0.02em] text-foreground">
                   {formatWeekRange(selectedWeek)} 团队周报
                 </h2>
-                <p className="mt-1.5 text-[10px] text-muted-foreground">
+                <p className="mt-1.5 text-xs text-muted-foreground">
                   仅展示你有权查看且已经提交的周报，员工草稿不会出现在此处。
                 </p>
               </div>
-              <span className="w-fit rounded-full bg-[#eaf3f8] px-3 py-1.5 text-[9px] font-medium text-[#0d6c78]">
+              <span className="w-fit rounded-full bg-muted px-3 py-1.5 text-xs font-medium text-foreground">
                 已提交 {submittedCount} 份
               </span>
             </div>
@@ -342,10 +342,10 @@ export default async function WeeklyReportsPage({
                   <ReportDetails key={report.id} report={report} />
                 ))
               ) : (
-                <div className="rounded-[18px] bg-[#f3f7fa] px-6 py-12 text-center">
+                <div className="rounded-md bg-muted px-6 py-12 text-center">
                   <UsersRound className="mx-auto size-6 text-muted-foreground/45" />
                   <h3 className="mt-3 text-sm font-semibold">本周期暂无团队周报</h3>
-                  <p className="mt-2 text-[10px] text-muted-foreground">
+                  <p className="mt-2 text-xs text-muted-foreground">
                     员工提交后会自动显示在这里。
                   </p>
                 </div>

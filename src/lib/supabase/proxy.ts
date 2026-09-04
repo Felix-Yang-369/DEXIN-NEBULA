@@ -81,6 +81,16 @@ export async function updateSession(request: NextRequest) {
   const { data: verifiedToken } = await supabase.auth.getClaims();
   const isAuthenticated = Boolean(verifiedToken?.claims.sub);
   const { pathname } = request.nextUrl;
+  const needsBootstrap =
+    isAuthenticated &&
+    (pathname === "/login" || !isFinanceScopeAllowedPath(pathname));
+  const { data: bootstrapData } = needsBootstrap
+    ? await supabase.rpc("current_app_bootstrap")
+    : { data: null };
+  const bootstrap = (bootstrapData ?? {}) as {
+    employee?: { roleCodes?: string[] };
+    workspace?: { defaultWorkspace?: string };
+  };
 
   if (!isAuthenticated && isProtectedPath(pathname)) {
     const loginUrl = request.nextUrl.clone();
@@ -96,12 +106,10 @@ export async function updateSession(request: NextRequest) {
       ? requestedPath
       : null;
     if (!destination) {
-      const authUserId = verifiedToken?.claims.sub;
-      const { data: employee } = await supabase.from("employees").select("id").eq("auth_user_id", authUserId).eq("status", "active").maybeSingle();
-      const { data: preference } = employee
-        ? await supabase.from("workspace_preferences").select("default_workspace").eq("employee_id", employee.id).maybeSingle()
-        : { data: null };
-      destination = defaultWorkspacePaths[preference?.default_workspace ?? "dashboard"] ?? "/dashboard";
+      destination =
+        defaultWorkspacePaths[
+          bootstrap.workspace?.defaultWorkspace ?? "dashboard"
+        ] ?? "/dashboard";
     }
     const destinationUrl = new URL(destination, request.url);
     dashboardUrl.pathname = destinationUrl.pathname;
@@ -111,33 +119,12 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (isAuthenticated && !isFinanceScopeAllowedPath(pathname)) {
-    const authUserId = verifiedToken?.claims.sub;
-    const { data: employee } = await supabase
-      .from("employees")
-      .select("id")
-      .eq("auth_user_id", authUserId)
-      .eq("status", "active")
-      .maybeSingle();
-
-    if (employee) {
-      const { data: roleRows } = await supabase
-        .from("employee_roles")
-        .select("roles(code)")
-        .eq("employee_id", employee.id);
-      const roleCodes = (roleRows ?? [])
-        .map((row) => {
-          const role = Array.isArray(row.roles) ? row.roles[0] : row.roles;
-          return role?.code;
-        })
-        .filter((code): code is string => Boolean(code));
-
-      if (isScopedFinanceUser(roleCodes)) {
-        const financeUrl = request.nextUrl.clone();
-        financeUrl.pathname = "/finance";
-        financeUrl.search = "";
-        financeUrl.searchParams.set("error", "restricted_access");
-        return NextResponse.redirect(financeUrl);
-      }
+    if (isScopedFinanceUser(bootstrap.employee?.roleCodes ?? [])) {
+      const financeUrl = request.nextUrl.clone();
+      financeUrl.pathname = "/finance";
+      financeUrl.search = "";
+      financeUrl.searchParams.set("error", "restricted_access");
+      return NextResponse.redirect(financeUrl);
     }
   }
 

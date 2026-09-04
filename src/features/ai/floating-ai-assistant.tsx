@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import {
   ArrowUp,
@@ -10,7 +9,6 @@ import {
   ExternalLink,
   LoaderCircle,
   Maximize2,
-  MessageCircleMore,
   Minus,
   PackageSearch,
   Sparkles,
@@ -41,10 +39,10 @@ function MessageSources({ message }: { message: AiChatMessage }) {
   if (message.sources.length === 0) return null;
 
   return (
-    <div className="mt-3 flex flex-wrap gap-1.5 border-t border-[#dce7ee] pt-2.5">
+    <div className="mt-3 flex flex-wrap gap-1.5 border-t border-border pt-2.5">
       {message.sources.slice(0, 3).map((source, index) => (
         <Link
-          className="inline-flex max-w-full items-center gap-1 rounded-full bg-[#eef5f8] px-2 py-1 text-[9px] font-medium text-[#0d6475] transition hover:bg-[#dff5f4]"
+          className="inline-flex max-w-full items-center gap-1 rounded-md bg-muted px-2 py-1 text-xs font-medium text-foreground transition hover:bg-muted"
           href={source.href}
           key={`${source.type}-${source.id}`}
           title={source.title}
@@ -59,10 +57,13 @@ function MessageSources({ message }: { message: AiChatMessage }) {
   );
 }
 
-export function FloatingAiAssistant({ configured }: { configured: boolean }) {
-  const pathname = usePathname();
-  const [open, setOpen] = useState(false);
-  const [minimized, setMinimized] = useState(false);
+export function FloatingAiAssistantPanel({
+  configured,
+  onMinimize,
+}: {
+  configured: boolean;
+  onMinimize: () => void;
+}) {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<AiChatMessage[]>([]);
   const [input, setInput] = useState("");
@@ -74,12 +75,17 @@ export function FloatingAiAssistant({ configured }: { configured: boolean }) {
   const canSubmit = configured && input.trim().length > 0 && !loading;
 
   useEffect(() => {
-    if (!open || minimized) return;
     inputRef.current?.focus();
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [open, minimized, messages, loading]);
+  }, [messages, loading]);
 
-  if (pathname === "/login" || pathname.startsWith("/ai") || pathname.startsWith("/customer-service/widget")) return null;
+  useEffect(() => {
+    const handleEscape = (event: globalThis.KeyboardEvent) => {
+      if (event.key === "Escape") onMinimize();
+    };
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [onMinimize]);
 
   const ask = async (question: string) => {
     const value = question.trim();
@@ -137,79 +143,25 @@ export function FloatingAiAssistant({ configured }: { configured: boolean }) {
     void ask(input);
   };
 
-  if (!open) {
-    return (
-      <div className="fixed bottom-4 right-3 z-[90] flex items-end gap-2 sm:bottom-6 sm:right-6">
-        <button
-          aria-label="打开德小馨 AI 助手"
-          className="group flex items-center gap-3 rounded-[24px] border border-white/80 bg-white/92 py-2 pl-4 pr-2 text-left shadow-[0_18px_50px_-18px_rgba(6,24,44,.38)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_58px_-18px_rgba(6,24,44,.5)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#18afb3] focus-visible:ring-offset-2"
-          onClick={() => {
-            setOpen(true);
-            setMinimized(false);
-          }}
-          type="button"
-        >
-          <span className="hidden sm:block">
-            <span className="flex items-center gap-1.5 text-[11px] font-semibold text-[#0a2340]">
-              随时问德小馨
-              <Sparkles className="size-3 text-[#e1a72d]" />
-            </span>
-            <span className="mt-0.5 flex items-center gap-1.5 text-[9px] text-[#6d8192]">
-              <span
-                className={`size-1.5 rounded-full ${
-                  configured ? "bg-[#18afb3]" : "bg-amber-400"
-                }`}
-              />
-              {configured ? "企业知识与业务助手" : "AI 服务等待配置"}
-            </span>
-          </span>
-          <span className="relative">
-            <span className="absolute -inset-1 rounded-[25px] bg-[#18afb3]/20 opacity-0 blur-md transition group-hover:opacity-100" />
-            <DexiaoxinAvatar className="relative size-16 rounded-[22px] shadow-[0_12px_28px_-15px_rgba(6,24,44,.8)] sm:size-[72px]" priority />
-            <span className="absolute -bottom-1 -left-1 grid size-7 place-items-center rounded-full border-2 border-white bg-[#0a2340] text-white shadow-lg">
-              <MessageCircleMore className="size-3.5" />
-            </span>
-          </span>
-        </button>
-      </div>
-    );
-  }
-
-  if (minimized) {
-    return (
-      <button
-        aria-label="已最小化的德小馨 AI 助手"
-        className="group fixed bottom-4 right-3 z-[90] rounded-[22px] border border-white/80 bg-white/90 p-1.5 shadow-[0_18px_50px_-18px_rgba(6,24,44,.5)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_58px_-18px_rgba(6,24,44,.6)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#18afb3] focus-visible:ring-offset-2 sm:bottom-6 sm:right-6"
-        onClick={() => setMinimized(false)}
-        title="恢复德小馨助手窗口"
-        type="button"
-      >
-        <DexiaoxinAvatar className="size-14 rounded-[18px] shadow-[0_12px_28px_-15px_rgba(6,24,44,.8)] transition-transform duration-300 group-hover:scale-[1.03]" priority />
-      </button>
-    );
-  }
-
   return (
     <section
       aria-label="德小馨 AI 助手"
-      className="fixed bottom-3 right-3 z-[90] flex h-[min(620px,calc(100dvh-24px))] w-[min(390px,calc(100vw-24px))] flex-col overflow-hidden rounded-[28px] border border-white/70 bg-[#f7fafc]/95 shadow-[0_30px_80px_-24px_rgba(6,24,44,.55)] backdrop-blur-xl sm:bottom-6 sm:right-6"
+      className="fixed bottom-20 right-3 z-[90] flex h-[min(620px,calc(100dvh-96px))] w-[min(390px,calc(100vw-24px))] flex-col overflow-hidden rounded-md border border-white/70 bg-muted backdrop-blur-xl sm:right-6 lg:bottom-6 lg:h-[min(620px,calc(100dvh-48px))]"
       role="dialog"
     >
-      <header className="relative overflow-hidden bg-[linear-gradient(135deg,#06182c_0%,#0a385d_62%,#0d7580_100%)] px-4 pb-4 pt-4 text-white">
-        <div className="absolute -right-10 -top-16 size-40 rounded-full border border-[#6bd7d4]/20" />
-        <div className="absolute -right-3 top-8 size-20 rounded-full bg-[#18afb3]/10 blur-xl" />
+      <header className="bg-sidebar px-4 pb-4 pt-4 text-white">
         <div className="relative flex items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
-            <DexiaoxinAvatar className="size-11 rounded-[15px] ring-white/20" priority />
+            <DexiaoxinAvatar className="size-11 rounded-md ring-white/20" />
             <div className="min-w-0">
               <h2 className="flex items-center gap-1.5 text-[13px] font-semibold">
                 德小馨 AI
-                <Sparkles className="size-3 text-[#f0bf54]" />
+                <Sparkles className="size-3 text-muted-foreground" />
               </h2>
-              <p className="mt-0.5 flex items-center gap-1.5 text-[9px] text-white/65">
+              <p className="mt-0.5 flex items-center gap-1.5 text-xs text-white/65">
                 <span
                   className={`size-1.5 rounded-full ${
-                    configured ? "bg-[#6bd7d4]" : "bg-amber-300"
+                    configured ? "bg-muted" : "bg-amber-300"
                   }`}
                 />
                 {configured ? "在线 · 已连接企业知识库" : "服务等待管理员配置"}
@@ -219,26 +171,23 @@ export function FloatingAiAssistant({ configured }: { configured: boolean }) {
           <div className="flex items-center gap-1">
             <button
               aria-label="最小化德小馨助手"
-              className="grid size-8 place-items-center rounded-xl text-white/70 transition hover:bg-white/10 hover:text-white"
-              onClick={() => setMinimized(true)}
+              className="grid size-8 place-items-center rounded-md text-white/70 transition hover:bg-white/10 hover:text-white"
+              onClick={onMinimize}
               type="button"
             >
               <Minus className="size-4" />
             </button>
             <Link
               aria-label="进入德小馨完整工作区"
-              className="grid size-8 place-items-center rounded-xl text-white/70 transition hover:bg-white/10 hover:text-white"
+              className="grid size-8 place-items-center rounded-md text-white/70 transition hover:bg-white/10 hover:text-white"
               href="/ai"
             >
               <Maximize2 className="size-3.5" />
             </Link>
             <button
               aria-label="收起德小馨助手"
-              className="grid size-8 place-items-center rounded-xl text-white/70 transition hover:bg-white/10 hover:text-white"
-              onClick={() => {
-                setOpen(false);
-                setMinimized(false);
-              }}
+              className="grid size-8 place-items-center rounded-md text-white/70 transition hover:bg-white/10 hover:text-white"
+              onClick={onMinimize}
               type="button"
             >
               <X className="size-4" />
@@ -250,41 +199,41 @@ export function FloatingAiAssistant({ configured }: { configured: boolean }) {
       <div className="flex-1 overflow-y-auto px-4 py-4">
         {messages.length === 0 ? (
           <div className="flex h-full flex-col">
-            <div className="rounded-[20px] border border-[#dce7ee] bg-white p-4 shadow-[0_14px_38px_-30px_rgba(6,24,44,.35)]">
-              <p className="text-[12px] font-semibold text-[#0a2340]">
+            <div className="rounded-md border border-border bg-white p-4 ">
+              <p className="text-[12px] font-semibold text-foreground">
                 你好，我是德小馨 👋
               </p>
-              <p className="mt-2 text-[10px] leading-5 text-[#6d8192]">
+              <p className="mt-2 text-xs leading-5 text-foreground">
                 我可以在你的账号权限内查询公司制度、客户、产品、供应链、文件、审批和财务数据，并标注来源。
               </p>
             </div>
-            <div className="mt-4 text-[9px] font-medium uppercase tracking-[0.14em] text-[#8093a3]">
+            <div className="mt-4 text-xs font-medium uppercase tracking-[0.14em] text-foreground">
               你可以这样问
             </div>
             <div className="mt-2 grid gap-2">
               {quickQuestions.map(({ icon: Icon, label, prompt }) => (
                 <button
-                  className="group flex items-center gap-3 rounded-2xl border border-[#dce7ee] bg-white px-3 py-3 text-left transition hover:border-[#91d3d1] hover:bg-[#f5fbfb] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="group flex items-center gap-3 rounded-lg border border-border bg-white px-3 py-3 text-left transition hover:border-border hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
                   disabled={!configured}
                   key={label}
                   onClick={() => void ask(prompt)}
                   type="button"
                 >
-                  <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-[#dff5f4] text-[#0d7580] transition group-hover:bg-[#18afb3] group-hover:text-white">
+                  <span className="grid size-8 shrink-0 place-items-center rounded-md bg-muted text-foreground transition group-hover:bg-muted group-hover:text-white">
                     <Icon className="size-4" />
                   </span>
                   <span className="min-w-0">
-                    <span className="block text-[10px] font-semibold text-[#172b3f]">
+                    <span className="block text-xs font-semibold text-foreground">
                       {label}
                     </span>
-                    <span className="mt-0.5 block truncate text-[9px] text-[#7d8f9d]">
+                    <span className="mt-0.5 block truncate text-xs text-foreground">
                       {prompt}
                     </span>
                   </span>
                 </button>
               ))}
             </div>
-            <div className="mt-auto rounded-2xl bg-[#eef5f8] px-3 py-2.5 text-[9px] leading-4 text-[#6d8192]">
+            <div className="mt-auto rounded-lg bg-muted px-3 py-2.5 text-xs leading-4 text-foreground">
               德小馨不会直接执行审批、付款、删除或修改操作。
             </div>
           </div>
@@ -298,13 +247,13 @@ export function FloatingAiAssistant({ configured }: { configured: boolean }) {
                 key={message.id}
               >
                 {message.role === "assistant" ? (
-                  <DexiaoxinAvatar className="mt-0.5 size-8 rounded-[11px]" decorative />
+                  <DexiaoxinAvatar className="mt-0.5 size-8 rounded-full" decorative />
                 ) : null}
                 <div
-                  className={`max-w-[82%] rounded-[18px] px-3.5 py-3 text-[10px] leading-5 ${
+                  className={`max-w-[82%] rounded-md px-3.5 py-3 text-xs leading-5 ${
                     message.role === "user"
-                      ? "rounded-br-md bg-[#0a385d] text-white"
-                      : "rounded-bl-md border border-[#dce7ee] bg-white text-[#2e465b] shadow-[0_12px_30px_-28px_rgba(6,24,44,.45)]"
+                      ? "rounded-br-md bg-primary text-white"
+                      : "rounded-bl-md border border-border bg-white text-foreground "
                   }`}
                 >
                   <p className="whitespace-pre-wrap">{message.content}</p>
@@ -316,9 +265,9 @@ export function FloatingAiAssistant({ configured }: { configured: boolean }) {
             ))}
             {loading ? (
               <div className="flex items-center gap-2.5">
-                <DexiaoxinAvatar className="size-8 rounded-[11px]" decorative />
-                <div className="flex items-center gap-2 rounded-[16px] rounded-bl-md border border-[#dce7ee] bg-white px-3 py-2.5 text-[9px] text-[#708595]">
-                  <LoaderCircle className="size-3.5 animate-spin text-[#0d7580]" />
+                <DexiaoxinAvatar className="size-8 rounded-full" decorative />
+                <div className="flex items-center gap-2 rounded-md rounded-bl-md border border-border bg-white px-3 py-2.5 text-xs text-foreground">
+                  <LoaderCircle className="size-3.5 animate-spin text-foreground" />
                   正在检索授权资料…
                 </div>
               </div>
@@ -328,24 +277,24 @@ export function FloatingAiAssistant({ configured }: { configured: boolean }) {
         )}
       </div>
 
-      <footer className="border-t border-[#dce7ee] bg-white/90 p-3 backdrop-blur">
+      <footer className="border-t border-border bg-white/90 p-3 backdrop-blur">
         {!configured ? (
-          <p className="mb-2 rounded-xl bg-amber-50 px-3 py-2 text-[9px] leading-4 text-amber-800">
+          <p className="mb-2 rounded-md bg-amber-50 px-3 py-2 text-xs leading-4 text-amber-800">
             DeepSeek API 尚未配置，请联系管理员。
           </p>
         ) : null}
         {error ? (
-          <p aria-live="polite" className="mb-2 rounded-xl bg-red-50 px-3 py-2 text-[9px] leading-4 text-red-700">
+          <p aria-live="polite" className="mb-2 rounded-md bg-red-50 px-3 py-2 text-xs leading-4 text-red-700">
             {error}
           </p>
         ) : null}
         <form
-          className="relative rounded-[18px] border border-[#cddce6] bg-white p-1.5 shadow-[0_12px_28px_-24px_rgba(6,24,44,.5)] focus-within:border-[#18afb3] focus-within:ring-2 focus-within:ring-[#18afb3]/10"
+          className="relative rounded-md border border-border bg-white p-1.5  focus-within:border-border focus-within:ring-2 focus-within:ring-ring/20"
           onSubmit={submit}
         >
           <textarea
             aria-label="向德小馨提问"
-            className="max-h-24 min-h-11 w-full resize-none bg-transparent px-2.5 py-2 pr-12 text-[10px] leading-5 text-[#172b3f] outline-none placeholder:text-[#8b9ba8]"
+            className="max-h-24 min-h-11 w-full resize-none bg-transparent px-2.5 py-2 pr-12 text-xs leading-5 text-foreground outline-none placeholder:text-muted-foreground"
             disabled={!configured || loading}
             maxLength={1000}
             onChange={(event) => setInput(event.target.value)}
@@ -365,7 +314,7 @@ export function FloatingAiAssistant({ configured }: { configured: boolean }) {
           />
           <button
             aria-label="发送问题"
-            className="absolute bottom-2 right-2 grid size-8 place-items-center rounded-xl bg-[#0d6475] text-white transition hover:bg-[#0a385d] disabled:cursor-not-allowed disabled:bg-[#cbd8e0]"
+            className="absolute bottom-2 right-2 grid size-8 place-items-center rounded-md bg-primary text-white transition hover:bg-muted disabled:cursor-not-allowed disabled:bg-muted"
             disabled={!canSubmit}
             type="submit"
           >
@@ -376,9 +325,9 @@ export function FloatingAiAssistant({ configured }: { configured: boolean }) {
             )}
           </button>
         </form>
-        <div className="mt-2 flex items-center justify-between px-1 text-[8px] text-[#8a9aa7]">
+        <div className="mt-2 flex items-center justify-between px-1 text-xs text-muted-foreground">
           <span>Enter 发送 · Shift + Enter 换行</span>
-          <Link className="font-medium text-[#0d7580] hover:underline" href="/ai">
+          <Link className="font-medium text-foreground hover:underline" href="/ai">
             完整工作区
           </Link>
         </div>
